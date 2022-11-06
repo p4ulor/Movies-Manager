@@ -1,0 +1,95 @@
+openapi: 3.0.1
+info:
+  title: Chelas Movies DataBase
+  description: "An API that obtains movies from the IMDB API and manages user's and the groups of movies made by the users (their movie lists)"
+  termsOfService: http://swagger.io/terms/
+  version: 1.0.0
+tags:
+  - name: Users
+    description: Describes sign up and log in operations
+  - name: Search movies
+    description: Fetches the IMDB API to get the top movies and to search movies by name
+  - name: Manage groups
+    description: Allows a user to create a group and edit it in many aspects
+
+paths:
+  /users/signup:
+    post:
+      tags:
+        - Users
+      summary: Creates a new user
+      requestBody:
+        description: Required information for sign up
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignUpRequest'
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+
+
+components:
+  securitySchemes:
+    userAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    AppError:
+      type: object
+      description: Application error
+      required:
+        - code
+        - name
+        - message
+      properties:
+        code:
+          type: number
+          format: integer
+          description: HTTP Error code
+          example: 404
+        name:
+          type: string
+          description: HTTP Error name
+          example: Client Error name
+        message:
+          type: string
+          description: Error description message
+          example: An error occurred
+
+    UserSignUpRequest:
+      description: Required info for a user sign up
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: the user's name
+          example: Filipe
+        
+        email:
+          type: string
+          description: the user's email
+          example: filipe@gmail.com
+        
+        password:
+          type: string
+          description: the user's password (which will be hashed)
+          example: strongpass
+
+    UserTokenResponse:
+      type: object
+      description: Response with the user's token
+      properties:
+        token:
+          type: string
+          description: the activity's id
+          example: "061bebd1-0d4b-43e4-b2d2-34f1be9e0cab"
