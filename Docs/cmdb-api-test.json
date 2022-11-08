@@ -1,0 +1,142 @@
+{
+	"info": {
+		"_postman_id": "9de2d987-b181-496e-9a2e-1edaca24a81c",
+		"name": "IPW",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24004812"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Error Tests",
+					"item": [
+						{
+							"name": "Create user w/ empty name",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"\",\r\n    \"password\": \"ay\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:1904/signup",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "1904",
+									"path": [
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create user w/ missing field",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"ay\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:1904/signup",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "1904",
+									"path": [
+										"signup"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"paulo\",\r\n    \"password\": \"ay\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:1904/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1904",
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1904/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1904",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Main page",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1904/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1904",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
