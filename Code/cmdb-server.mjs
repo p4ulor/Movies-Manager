@@ -11,14 +11,22 @@ let app = express()
 
 app.use(express.json())
 
-app.get('/movie', api.getMoviesList)
+app.get('/',(req, res) => {
+    res.send('Benfica in da building')
+})
+
+app.post('/signup', api.signUpUser)
+app.post('/login', api.loginUser)
+app.post('/creategroup', api.createGroup)
+
+/* app.get('/movie', api.getMoviesList)
 app.get('/movie/:name', api.getMovieByName)
 app.post('/group/:name:description', api.createGroup)
 app.put('/group/:id:name:description', api.updateGroup)
 app.get('/group', api.getGroupList)
 app.delete('/group/:id', api.deleteGroup)
 app.post('/group/:idGroup:idMovie', api.addMovieToGroup)
-app.delete('/group/:idGroup:idMovie', api.deleteMovieFromGroup)
+app.delete('/group/:idGroup:idMovie', api.deleteMovieFromGroup) */
 
 app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))
 
