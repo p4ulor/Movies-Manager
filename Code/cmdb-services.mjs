@@ -19,9 +19,18 @@ export async function userSignInOrLogin(body, isSignIn) {
 
 export async function createGroup(body, token){
     if(!isAStringAndNotEmpty(body.name)) throw new utils.BadRequest("Group name must be a non-empty string")
-    
+    const userFound = await data.getUserByToken(token)
+    if(!userFound) throw new utils.BadRequest("User not found. Invalid token")
+    try { data.createGroupForUser(userFound.id, body.name, body.description, body.isPrivate) } 
+    catch(e){ throw new utils.BadRequest(e) }
 }
 
+export async function addMovieToGroup(body, token){
+    //check movie props?
+    const userFound = await data.getUserByToken(token)
+    if(!userFound) throw new utils.BadRequest("User not found. Invalid token")
+    data.addMovieToGroupOfAUser(userFound.id, body.movie, body.group)
+}
 
 // Auxiliary functions:
 function isAStringAndNotEmpty(value) {

@@ -18,6 +18,7 @@ app.get('/',(req, res) => {
 app.post('/signup', api.signUpUser)
 app.post('/login', api.loginUser)
 app.post('/creategroup', api.createGroup)
+app.post('/addmovie', api.addMovieToGroup)
 
 /* app.get('/movie', api.getMoviesList)
 app.get('/movie/:name', api.getMovieByName)

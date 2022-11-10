@@ -33,6 +33,12 @@ export class Unathorized extends Error {
     }
 }
 
+export class Conflict extends Error {
+    constructor(message) { super(message)
+        this.code = statusCodes.CONFLICT
+    }
+}
+
 export const newUserRequest = {
     name: "",
     password: ""
@@ -42,4 +48,9 @@ export const newGroupRequest = {
     name: "",
     description: "",
     isPrivate: true
+}
+
+export const addMovieToGroupRequest = {
+    movie: "",
+    group: ""
 }

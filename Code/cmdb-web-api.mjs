@@ -29,7 +29,20 @@ export async function createGroup(req, rsp){
         const token = getHeaderToken(req)
         doesBodyContainProps(req.body, utils.newGroupRequest)
         await services.createGroup(req.body, token) //must have await!!! Or it crashes and says: UnhandledPromiseRejectionWarning: Error: Group name must be a non-empty string in case of error, instead of going to the catch
-        rsp.status(utils.statusCodes.OK)
+        rsp.status(utils.statusCodes.OK).json() //I must have the .json() to respond or the client will wait forever? Hmmm
+    } catch(e) {
+        if(e.code) rsp.status(e.code).json({error: e.message})
+        else rsp.status(utils.statusCodes.INTERNAL_SERVER_ERROR).json({error: e})
+    }
+}
+
+export async function addMovieToGroup(req, rsp){
+    try {
+        const token = getHeaderToken(req)
+        doesBodyContainProps(req.body, utils.addMovieToGroupRequest)
+        doesBodyContainProps(req.body.movie, {name: "", id: 0})
+        await services.addMovieToGroup(req.body, token)
+        rsp.status(utils.statusCodes.OK).json() 
     } catch(e) {
         if(e.code) rsp.status(e.code).json({error: e.message})
         else rsp.status(utils.statusCodes.INTERNAL_SERVER_ERROR).json({error: e})
@@ -38,7 +51,7 @@ export async function createGroup(req, rsp){
 
 
 //aux functions:
-function doesBodyContainProps(body, props){
+function doesBodyContainProps(body, props){ //note: it doesnt check the type!
     var propsKeys = Object.keys(props)
     let missingProp = undefined
     propsKeys.every(key => {

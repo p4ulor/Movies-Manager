@@ -218,6 +218,15 @@
 						},
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"myfavmovies\",\r\n    \"description\": \"of all time\",\r\n    \"isPrivate\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:1904/creategroup",
 							"protocol": "http",
@@ -227,6 +236,44 @@
 							"port": "1904",
 							"path": [
 								"creategroup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add movie to a group",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"movie\": {\r\n        \"name\": \"Borat\",\r\n        \"id\": 98378192\r\n    },\r\n    \"group\": \"fav\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:1904/addmovie",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1904",
+							"path": [
+								"addmovie"
 							]
 						}
 					},
