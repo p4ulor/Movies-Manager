@@ -2,7 +2,7 @@ export const statusCodes = {
     OK: 200,
     CREATED: 201,
     BAD_REQUEST: 400,
-    UNATHORIZED: 401,
+    UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     CONFLICT: 409,
@@ -27,9 +27,9 @@ export class Forbidden extends Error {
     }
 }
 
-export class Unathorized extends Error {
+export class Unauthorized extends Error {
     constructor(message) { super(message)
-        this.code = statusCodes.UNATHORIZED
+        this.code = statusCodes.UNAUTHORIZED
     }
 }
 

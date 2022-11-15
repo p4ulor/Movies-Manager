@@ -10,7 +10,7 @@ export async function userSignInOrLogin(body, isSignIn) {
         
         console.log("token ->"+token)
         if(token==undefined) throw new utils.NotFound("User not found")
-        if(token==false) throw new utils.Unathorized("Wrong password")
+        if(token==false) throw new utils.Unauthorized("Wrong password")
         
         else return token
 

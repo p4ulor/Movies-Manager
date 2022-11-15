@@ -4,7 +4,7 @@
 ## Then run like:
 - node cmdb-server.mjs
 or
-- npm run
+- npm start
 
 ## NPM Packages/dependencies included:
 - [express](https://www.npmjs.com/package/express) - For Handling HTTP requests
