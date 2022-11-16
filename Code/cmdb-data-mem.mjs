@@ -1,11 +1,12 @@
-import { constants } from 'node:buffer';
+import * as imdbapi from './cmdb-movies-data.mjs'
+import { BadRequest, Forbidden } from './utils.mjs';
 
 // Our data source / data storage
 const crypto = await import('node:crypto');
 
 class Group {
     constructor(name, description, isPrivate){
-        this.name = name,
+        this.name = name, //uses as unique key / id
         this.description = description,
         this.isPrivate = isPrivate,
         this.movies = []
@@ -18,9 +19,22 @@ class Group {
 }
 
 class Movie {
-    constructor(name, id){
+    constructor(name, id, duration){
         this.name = name,
         this.id = id
+        this.duration = duration //in minutes
+    }
+}
+
+class User {
+    constructor(id, name, groups, token, hash, salt, api_key){
+        this.id = id
+        this.name = name
+        this.groups = groups
+        this.token = token
+        this.hash = hash
+        this.salt = salt
+        this.api_key = api_key
     }
 }
 
@@ -31,7 +45,8 @@ const users = [
         groups: [new Group("fav", "fav of all time", true)],
         token: 'f7c59d82-8a6a-436d-96e0-dd2758a37ab1',
         hash: '7fcd2055b9bb7f567714d426e3e948c0f6bbd906f895d8c72863f7be571ec07d',
-        salt: 'b3a8bd6c42ff7c1670fda5f625878f85'
+        salt: 'b3a8bd6c42ff7c1670fda5f625878f85',
+        api_key: "k_25f649os"
     }
 ]
 
@@ -70,14 +85,25 @@ export async function createGroupForUser(id, name, description, isPrivate){
     console.log("User's new data -> "+JSON.stringify(users[userIndex]))
 }
 
-export async function addMovieToGroupOfAUser(id, movie, group){
+export async function addMovieToGroupOfAUser(id, movieID, group){
     const userIndex = await getIndexOfUserByID(id)
     if(userIndex==-1) throw new Error("User not found in data-mem")
     const groupFound = users[userIndex].groups.find(g => {
         return g.name==group
     })
+    //check if movie is already in the group
+    if(groupFound.movies.length!=0){
+        const isDuplicate = groupFound.movies.any(movie => {
+            return movie.id==movieID
+        })
+        if(isDuplicate) throw new Conflict("You already have that movie in the list")
+    }
+    
 
-    groupFound.movies.push(new Movie(movie.name, movie.id))
+    //get movie in IMDB by id, and get name and duration, using the user's api key
+    const movie = await imdbapi.imdb_API_getMovie(users[userIndex].api_key, movieID)
+    if(movie==null) throw new BadRequest("Movie ID doesn't exist")
+    groupFound.movies.push(new Movie(movie.name, movieID, movie.duration))
     console.log("addMovieToGroupOfAUser -> "+JSON.stringify(users[userIndex]))
 }
 

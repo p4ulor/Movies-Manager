@@ -15,10 +15,10 @@ app.get('/',(req, res) => {
     res.send('Benfica in da building')
 })
 
-app.post('/signup', api.signUpUser)
-app.post('/login', api.loginUser)
-app.post('/creategroup', api.createGroup)
-app.post('/addmovie', api.addMovieToGroup)
+app.post('/users', api.signUpUser)
+app.post('/login', api.loginUser) //delete?
+app.post('/groups', api.createGroup)
+app.put('/groups/:groupID', api.addMovieToGroup)
 
 /* app.get('/movie', api.getMoviesList)
 app.get('/movie/:name', api.getMovieByName)

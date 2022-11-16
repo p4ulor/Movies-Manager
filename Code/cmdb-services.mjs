@@ -25,11 +25,10 @@ export async function createGroup(body, token){
     catch(e){ throw new utils.BadRequest(e) }
 }
 
-export async function addMovieToGroup(body, token){
-    //check movie props?
+export async function addMovieToGroup(movieID, groupName, token){
     const userFound = await data.getUserByToken(token)
     if(!userFound) throw new utils.BadRequest("User not found. Invalid token")
-    data.addMovieToGroupOfAUser(userFound.id, body.movie, body.group)
+    data.addMovieToGroupOfAUser(userFound.id, movieID, groupName)
 }
 
 // Auxiliary functions:

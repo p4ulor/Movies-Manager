@@ -40,8 +40,8 @@ export async function addMovieToGroup(req, rsp){
     try {
         const token = getHeaderToken(req)
         doesBodyContainProps(req.body, utils.addMovieToGroupRequest)
-        doesBodyContainProps(req.body.movie, {name: "", id: 0})
-        await services.addMovieToGroup(req.body, token)
+        const paramGroupID = req.params.groupID //gets :groupID
+        await services.addMovieToGroup(req.body.id, paramGroupID, token)
         rsp.status(utils.statusCodes.OK).json() 
     } catch(e) {
         if(e.code) rsp.status(e.code).json({error: e.message})
@@ -51,7 +51,7 @@ export async function addMovieToGroup(req, rsp){
 
 
 //aux functions:
-function doesBodyContainProps(body, props){ //note: it doesnt check the type!
+function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!
     var propsKeys = Object.keys(props)
     let missingProp = undefined
     propsKeys.every(key => {

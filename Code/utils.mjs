@@ -51,6 +51,5 @@ export const newGroupRequest = {
 }
 
 export const addMovieToGroupRequest = {
-    movie: "",
-    group: ""
+    id: "", //movieID
 }

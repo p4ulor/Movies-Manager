@@ -254,11 +254,11 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"movie\": {\r\n        \"name\": \"Borat\",\r\n        \"id\": 98378192\r\n    },\r\n    \"group\": \"fav\"\r\n}",
+							"raw": "{\r\n    \"id\": \"tt0443453\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -266,14 +266,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/addmovie",
+							"raw": "http://localhost:1904/groups/fav",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
-								"addmovie"
+								"groups",
+								"fav"
 							]
 						}
 					},
