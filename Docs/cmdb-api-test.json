@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "9de2d987-b181-496e-9a2e-1edaca24a81c",
+		"_postman_id": "f8668b6b-a5f3-44fa-b31d-7ade5e71ac23",
 		"name": "IPW",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24004812"
+		"_exporter_id": "24168930"
 	},
 	"item": [
 		{
@@ -85,14 +85,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/signup",
+							"raw": "http://localhost:1904/users",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
-								"signup"
+								"users"
 							]
 						}
 					},
@@ -164,7 +164,7 @@
 							"response": []
 						},
 						{
-							"name": "Create group w/ out bearer token Copy",
+							"name": "Create group w/ out bearer token where name is empty",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -228,14 +228,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/creategroup",
+							"raw": "http://localhost:1904/groups",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
-								"creategroup"
+								"groups"
 							]
 						}
 					},
@@ -275,6 +275,81 @@
 							"path": [
 								"groups",
 								"fav"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"description": "Group Id to be inserted ",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Groups of a User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1904/groups/paulo?limit=1&skip=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1904",
+							"path": [
+								"groups",
+								"paulo"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								},
+								{
+									"key": "skip",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Group of a User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1904/groups/fav",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1904",
+							"path": [
+								"groups",
+								"fav"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
 					},
