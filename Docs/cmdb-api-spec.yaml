@@ -6,14 +6,16 @@ info:
   version: 1.0.0
 tags:
   - name: Users
-    description: Describes sign up and log in operations
-  - name: Search movies
-    description: Fetches the IMDB API to get the top movies and to search movies by name
-  - name: Manage groups
-    description: Allows a user to create a group and edit it in many aspects
+    description: Describes sign up operation
+  - name: Login
+    description:  Describes login operation
+  - name: Movies
+    description:  Describes the listing of top 250 movies (max) and the information data about a specific movie operations
+  - name: Groups
+    description: Describes the operations needed to support the Groups section. Listing, Creation, Update and Delete operations on groups and Adding and Deletion of a movie from a group's list. 
 
 paths:
-  /users/signup:
+  /users:
     post:
       tags:
         - Users
@@ -32,14 +34,143 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
-
-
+  /login:
+    post:
+      tags:
+        - Login
+      summary: Performs Login operation
+      requestBody:
+        description: Required information for login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogIn'
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+  /movies:
+    get:
+      tags:
+        - Movies
+      summary: Returns a list of the Top 250 popular movies
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Top250Data'
+  /movies/name:
+    get:
+      tags:
+        - Movies
+      summary: Returns the search by movie's name 
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+  /groups:
+    get:
+      tags:
+        - Groups
+      summary: Returns a List of Groups
+      responses:
+        200:
+          description: Returns a user's group list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+    post:
+      tags:
+        - Groups
+      summary: Creates a new Group
+      requestBody:
+        description: Required information for creating a new group
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignUpRequest'
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+    put:
+      tags:
+        - Groups
+      summary: Updates a Group
+      requestBody:
+        description: Required information for updating a group
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignUpRequest'
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'            
+    delete:
+      tags:
+        - Groups
+      summary: Deletes a Group
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+  /groups/groupID/movieID:
+    put:
+      tags:
+        - Groups
+      summary: Adds a Movie to a Group
+      requestBody:
+        description: Required information for adding a movie to a group
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignUpRequest'
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'
+    delete:
+      tags:
+        - Groups
+      summary: Removes a Movie from a Group
+      responses:
+        200:
+          description: Returns token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenResponse'                
 components:
   securitySchemes:
     userAuth:
       type: http
       scheme: bearer
-
   schemas:
     AppError:
       type: object
@@ -74,12 +205,25 @@ components:
           type: string
           description: the user's name
           example: Filipe
-        
         email:
           type: string
           description: the user's email
           example: filipe@gmail.com
-        
+        password:
+          type: string
+          description: the user's password (which will be hashed)
+          example: strongpass
+
+    UserLogIn:
+      description: Required info for a user LogIn action
+      required:
+        - name
+        - password
+      properties:
+        name:
+          type: string
+          description: the user's name
+          example: Filipe
         password:
           type: string
           description: the user's password (which will be hashed)
@@ -93,3 +237,12 @@ components:
           type: string
           description: the activity's id
           example: "061bebd1-0d4b-43e4-b2d2-34f1be9e0cab"
+
+    Top250Data:
+      type: object
+      description: Response with the list of most popular Movies
+      properties:
+        items:
+          type: array
+          items:
+            type: object
