@@ -107,6 +107,13 @@ export async function addMovieToGroupOfAUser(id, movieID, group){
     console.log("addMovieToGroupOfAUser -> "+JSON.stringify(users[userIndex]))
 }
 
+export async function getGroupListOfAUser(id){
+    const userIndex = await getIndexOfUserByID(id)
+    if(userIndex==-1) throw new Error("User not found in data-mem")
+    const groupFound = users[userIndex].groups.map(g => g.name)
+    return groupFound
+}
+
 
 
 //Auxiliary functions:

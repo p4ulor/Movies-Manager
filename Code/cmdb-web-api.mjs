@@ -49,6 +49,18 @@ export async function addMovieToGroup(req, rsp){
     }
 }
 
+export async function getGroupList(req, rsp){
+    try{
+        const token = getHeaderToken(req)
+        const paramUserID = req.params.userID //gets :userID
+        const ret = await services.getGroupList(paramUserID)
+        rsp.status(utils.statusCodes.OK).json(ret) 
+    } catch(e) {
+        if(e.code) rsp.status(e.code).json({error: e.message})
+        else rsp.status(utils.statusCodes.INTERNAL_SERVER_ERROR).json({error: e})
+    }
+}
+
 
 //aux functions:
 function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!

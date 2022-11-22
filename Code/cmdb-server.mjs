@@ -19,6 +19,7 @@ app.post('/users', api.signUpUser)
 app.post('/login', api.loginUser) //delete?
 app.post('/groups', api.createGroup)
 app.put('/groups/:groupID', api.addMovieToGroup)
+app.get('/groups/:userID', api.getGroupList)
 
 /* app.get('/movie', api.getMoviesList)
 app.get('/movie/:name', api.getMovieByName)

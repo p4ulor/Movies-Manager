@@ -31,6 +31,10 @@ export async function addMovieToGroup(movieID, groupName, token){
     data.addMovieToGroupOfAUser(userFound.id, movieID, groupName)
 }
 
+export async function getGroupList(userID){
+    data.getGroupListOfAUser(userID)
+}
+
 // Auxiliary functions:
 function isAStringAndNotEmpty(value) {
     return typeof value == 'string' && value != ""
