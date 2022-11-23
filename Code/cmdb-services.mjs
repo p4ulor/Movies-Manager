@@ -35,6 +35,15 @@ export async function getGroupList(userID){
     data.getGroupListOfAUser(userID)
 }
 
+export async function updateGroup(groupName, groupDescription, token){
+    if(!isAStringAndNotEmpty(groupName)) throw new utils.BadRequest("Group name must be a non-empty string")
+    if(!isAStringAndNotEmpty(groupDescription)) throw new utils.BadRequest("Group description must be a non-empty string")
+    const userFound = await data.getUserByToken(token)
+    if(!userFound) throw new utils.BadRequest("User not found. Invalid token")
+    try { data.updateGroup(userFound.id, groupName, groupDescription) } 
+    catch(e){ throw new utils.BadRequest(e) }
+}
+
 // Auxiliary functions:
 function isAStringAndNotEmpty(value) {
     return typeof value == 'string' && value != ""

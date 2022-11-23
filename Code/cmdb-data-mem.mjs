@@ -114,6 +114,18 @@ export async function getGroupListOfAUser(id){
     return groupFound
 }
 
+export async function updateGroup(id, name, description){
+    const userIndex = await getIndexOfUserByID(id)
+    if(userIndex==-1) throw new Error("User not found in data-mem")
+    users[userIndex].groups.forEach(group=> {
+        if(group.name==name) {
+            group.name = name
+            group.description = description
+        }
+    })
+    console.log("User's new data -> "+JSON.stringify(users[userIndex]))
+}
+
 
 
 //Auxiliary functions:

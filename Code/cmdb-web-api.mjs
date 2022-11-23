@@ -61,6 +61,19 @@ export async function getGroupList(req, rsp){
     }
 }
 
+export async function updateGroup(req, rsp){
+    try {
+        const token = getHeaderToken(req)
+        const paramgroupName = req.params.groupName
+        const paramgroupDescription = req.params.groupDescription
+        await services.updateGroup(paramgroupName, paramgroupDescription, token) //must have await!!! Or it crashes and says: UnhandledPromiseRejectionWarning: Error: Group name must be a non-empty string in case of error, instead of going to the catch
+        rsp.status(utils.statusCodes.OK).json() //I must have the .json() to respond or the client will wait forever? Hmmm
+    } catch(e) {
+        if(e.code) rsp.status(e.code).json({error: e.message})
+        else rsp.status(utils.statusCodes.INTERNAL_SERVER_ERROR).json({error: e})
+    }
+}
+
 
 //aux functions:
 function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!
