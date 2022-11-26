@@ -266,7 +266,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups/:fav",
+							"raw": "http://localhost:1904/groups/:groupID/:movieID",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -274,7 +274,8 @@
 							"port": "1904",
 							"path": [
 								"groups",
-								":fav"
+								":groupID",
+								":movieID"
 							],
 							"query": [
 								{
@@ -286,8 +287,12 @@
 							],
 							"variable": [
 								{
-									"key": "fav",
-									"value": null
+									"key": "groupID",
+									"value": "1"
+								},
+								{
+									"key": "movieID",
+									"value": "tt0443453"
 								}
 							]
 						}
@@ -310,23 +315,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/0?limit=1&skip=1",
+							"raw": "http://localhost:1904/groups?limit=1",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "1904",
 							"path": [
-								"groups",
-								"0"
+								"groups"
 							],
 							"query": [
 								{
 									"key": "limit",
-									"value": "1"
-								},
-								{
-									"key": "skip",
 									"value": "1"
 								}
 							]
@@ -350,7 +350,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/:fav",
+							"raw": "http://localhost:1904/groups/:groupID",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -358,7 +358,7 @@
 							"port": "1904",
 							"path": [
 								"groups",
-								":fav"
+								":groupID"
 							],
 							"query": [
 								{
@@ -369,8 +369,8 @@
 							],
 							"variable": [
 								{
-									"key": "fav",
-									"value": null
+									"key": "groupID",
+									"value": "0"
 								}
 							]
 						}
@@ -402,7 +402,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups/:1",
+							"raw": "http://localhost:1904/groups/:groupID",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -410,38 +410,12 @@
 							"port": "1904",
 							"path": [
 								"groups",
-								":1"
+								":groupID"
 							],
 							"variable": [
 								{
-									"key": "1",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete group",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:1904/groups/:1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "1904",
-							"path": [
-								"groups",
-								":1"
-							],
-							"variable": [
-								{
-									"key": "1",
-									"value": null
+									"key": "groupID",
+									"value": "1"
 								}
 							]
 						}
@@ -451,10 +425,20 @@
 				{
 					"name": "Get group by ID",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/:1",
+							"raw": "http://localhost:1904/groups/:groupID",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -462,12 +446,12 @@
 							"port": "1904",
 							"path": [
 								"groups",
-								":1"
+								":groupID"
 							],
 							"variable": [
 								{
-									"key": "1",
-									"value": null
+									"key": "groupID",
+									"value": "1"
 								}
 							]
 						}
@@ -477,10 +461,20 @@
 				{
 					"name": "Remove movie from group",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/:1/tt0120663",
+							"raw": "http://localhost:1904/groups/:groupID/:movieID",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -488,13 +482,17 @@
 							"port": "1904",
 							"path": [
 								"groups",
-								":1",
-								"tt0120663"
+								":groupID",
+								":movieID"
 							],
 							"variable": [
 								{
-									"key": "1",
-									"value": null
+									"key": "groupID",
+									"value": "1"
+								},
+								{
+									"key": "movieID",
+									"value": "tt0110912"
 								}
 							]
 						}
@@ -509,10 +507,20 @@
 				{
 					"name": "Search movies by name",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/movies/:the ?limit=5",
+							"raw": "http://localhost:1904/movies/:searchTerms?limit=10",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -520,18 +528,18 @@
 							"port": "1904",
 							"path": [
 								"movies",
-								":the "
+								":searchTerms"
 							],
 							"query": [
 								{
 									"key": "limit",
-									"value": "5"
+									"value": "10"
 								}
 							],
 							"variable": [
 								{
-									"key": "the ",
-									"value": null
+									"key": "searchTerms",
+									"value": "the "
 								}
 							]
 						}
@@ -541,6 +549,16 @@
 				{
 					"name": "Get top movies",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {

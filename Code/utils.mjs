@@ -41,7 +41,8 @@ export class Conflict extends Error {
 
 export const newUserRequest = {
     name: "",
-    password: ""
+    password: "",
+    api_key: ""
 }
 
 export const newGroupRequest = {
@@ -52,4 +53,9 @@ export const newGroupRequest = {
 
 export const addMovieToGroupRequest = {
     id: "", //movieID
+}
+
+export const updateGroupRequest = {
+    groupName: "",
+    groupDescription: ""
 }

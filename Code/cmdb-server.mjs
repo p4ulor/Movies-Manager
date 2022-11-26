@@ -18,18 +18,16 @@ app.get('/',(req, res) => {
 app.post('/users', api.signUpUser)
 app.post('/login', api.loginUser) //delete?
 app.post('/groups', api.createGroup)
-app.put('/groups/:groupID', api.addMovieToGroup)
-app.get('/groups/:userID', api.getGroupList)
-app.put('/groups/:groupName/:groupDescription', api.updateGroup)
+app.put('/groups/:groupID/:movieID', api.addMovieToGroup)
+app.get('/groups', api.getGroupList) //query params -> skip and limit
+app.post('/groups/:groupID', api.updateGroup)
+app.delete('/groups/:groupID', api.deleteGroup)
+app.get('/groups/:groupID', api.getGroup)
+app.delete('/groups/:groupID/:movieID', api.removeMovieFromGroup)
 
-/* app.get('/movie', api.getMoviesList)
-app.get('/movie/:name', api.getMovieByName)
----app.post('/group/:name:description', api.createGroup)
-app.put('/group/:id/:name/:description', api.updateGroup)
----app.get('/group', api.getGroupList)
-app.delete('/group/:id', api.deleteGroup)
----app.post('/group/:idGroup:idMovie', api.addMovieToGroup)
-app.delete('/group/:idGroup:idMovie', api.deleteMovieFromGroup) */
+//IMDB calls
+app.get('/movies', api.getTopMovies), //query params -> top
+app.get('/movies/:searchTerms', api.searchMovie) //query params -> limit
 
 app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))
 
