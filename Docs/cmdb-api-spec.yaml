@@ -29,18 +29,55 @@ paths:
               $ref: '#/components/schemas/UserSignUpRequest'
       responses:
         200:
-          description: Returns token.
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMissingField'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Application error
+                properties:
+                  error:
+                    type: string
+                    description: The returned error
+                    example: "Wrong password"                               
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Application error
+                properties:
+                  error:
+                    type: string
+                    description: The returned error
+                    example: "There's already a user with that name={Name}"
+                    
   /login:
     post:
       tags:
         - Login
-      summary: Performs Login operation
+      summary: Uses authentication credentials to get the user's token
       requestBody:
-        description: Required information for login
+        description: User credentials
         required: true
         content:
           application/json:
@@ -53,6 +90,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        401:
+          description: Password error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'                
+  
   /movies/{top}:
     get:
       tags:
@@ -73,6 +129,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Top250Data'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMissingParam'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF' 
+                
   /movies/:name/{limit}:
     get:
       tags:
@@ -88,11 +163,30 @@ paths:
           example: 5
       responses:
         200:
-          description: Returns token.
+          description: Returns the search by movie's name
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'
+                $ref: '#/components/schemas/SearchMovies'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMissingParam'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF' 
+                
   /groups:
     post:
       tags:
@@ -104,20 +198,65 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSignUpRequest'
+              $ref: '#/components/schemas/CreateGroupRequest'
       responses:
         200:
           description: Returns token.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'
-                
-  /groups/:groupID:
+                type: object
+                description: Response with the group's id
+                properties:
+                  id:
+                    type: number
+                    format: integer
+                    description: the group's id
+                    example: 3
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorGroupNameEmpty'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF'                  
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Application error
+                properties:
+                  error:
+                    type: string
+                    description: The returned error
+                    example: "There's already a group with that name={Name}"
+
+  /groups/{groupID}:
     get:
       tags:
         - Groups
       summary: Returns detail of a Group
+      parameters:
+        - name: groupID
+          in: path
+          description: the Group's ID to return the details of
+          required: true
+          schema:
+            type: integer
+            example: 5
       responses:
         200:
           description: Returns a user's group detail
@@ -125,18 +264,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
-
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMissingParam'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'   
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF' 
+                
     post:
       tags:
         - Groups
       summary: Updates a Group
+      parameters:
+        - name: groupID
+          in: path
+          description: the Group's ID to update
+          required: true
+          schema:
+            type: integer
+            example: 5
       requestBody:
         description: Required information for updating a group
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSignUpRequest'
+              $ref: '#/components/schemas/UpdateGroup'
       responses:
         200:
           description: Returns token.
@@ -144,11 +309,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'  
-                                
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMissingParam'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF' 
+                
     delete:
       tags:
         - Groups
       summary: Deletes a Group
+      parameters:
+        - name: groupID
+          in: path
+          description: the Group's ID to delete
+          required: true
+          schema:
+            type: integer
+            example: 5
       responses:
         200:
           description: Returns token.
@@ -156,11 +347,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
-  /groups/:userID:
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'                
+                
+  /groups/{limit}:
     get:
       tags:
         - Groups
-      summary: Returns a List of Groups
+      summary: Returns a list of Groups
+      parameters:
+        - name: limit
+          in: path
+          description: the list limit (max. 50)
+          required: true
+          schema:
+            type: integer
+          example: 5
       responses:
         200:
           description: Returns a user's group list
@@ -168,6 +380,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMissingParam'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'
+
   /groups/:groupID/:movieID:
     put:
       tags:
@@ -186,8 +411,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'
-                
+                type: object
+                description: Response with the group's id
+                properties:
+                  msg:
+                    type: string
+                    description: the name of the added movie
+                    example: "Added movie -> {Name}"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'                                
     delete:
       tags:
         - Groups
@@ -199,12 +441,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokenResponse'              
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'                
+                
 components:
   securitySchemes:
     userAuth:
       type: http
       scheme: bearer
+
   schemas:
+    ErrorUserNF:
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "User not found"
+
+    ErrorNotLogIn:
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "You are not logged in / You have no authorization to perform this action"
+          
+    ErrorMissingField:
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "Missing field -> {Field}"   
+          
+    ErrorGroupNameEmpty:
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "Group name must be a non-empty string"
+          
+    ErrorMissingParam:    
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "Path param {Name} is missing"
+    
     AppError:
       type: object
       description: Application error
@@ -217,7 +518,7 @@ components:
           type: number
           format: integer
           description: HTTP Error code
-          example: 404
+          example: 4**
         name:
           type: string
           description: HTTP Error name
@@ -231,24 +532,24 @@ components:
       description: Required info for a user sign up
       required:
         - name
-        - email
         - password
+        - api_key
       properties:
         name:
           type: string
           description: the user's name
           example: Filipe
-        email:
-          type: string
-          description: the user's email
-          example: filipe@gmail.com
         password:
           type: string
           description: the user's password (which will be hashed)
           example: strongpass
+        api_key:
+          type: string
+          description: the client API key
+          example: e8d234ssr
 
     UserLogIn:
-      description: Required info for a user LogIn action
+      description: Information for user authentication
       required:
         - name
         - password
@@ -261,6 +562,21 @@ components:
           type: string
           description: the user's password (which will be hashed)
           example: strongpass
+
+    UpdateGroup:
+      description: Information for user authentication
+      required:
+         - groupName
+         - groupDescription
+      properties:
+        groupName:
+          type: string
+          description: the group's name to update
+          example: "Last seen"
+        groupDescription:
+          type: string
+          description: the group's description
+          example: "Of action films"
 
     UserTokenResponse:
       type: object
@@ -275,6 +591,76 @@ components:
       type: object
       description: Response with the list of most popular Movies
       properties:
-        films:
-          type: object
-          enum: ["Movie1","Movie2","Movie3"]
+        top:
+          type: array
+          items:
+            type: object
+            description: Movies information
+            required:
+              - id
+              - rank
+              - name
+            properties:
+              id:
+                type: string
+                description: The movie's ID
+                example: tt0111161              
+              rank:
+                type: number
+                format: integer
+                description: The rank of the movie
+                example: 1
+              name:
+                type: string
+                description: The movie's name
+                example: The Shawshank Redemption
+                
+    SearchMovies:
+      type: object
+      description: Response with the list resulting from a search of a string
+      properties:
+        top:
+          type: array
+          items:
+            type: object
+            description: Movies information
+            required:
+              - id
+              - title
+              - description
+            properties:
+              id:
+                type: string
+                description: The movie's ID
+                example: tt6289132              
+              title:
+                type: string
+                description: The movie's name
+                example: The Boulet Brothers' Dragula
+              description:
+                type: string
+                description: The movie's small description
+                example: 2016– TV Series Dracmorda Boulet, Swanthula Boulet
+                
+    CreateGroupRequest:
+      description: Required info for creating a Group
+      required:
+        - name
+        - descriptioon
+        - isPrivate
+      properties:
+        name:
+          type: string
+          description: the group's name
+          example: Already seen
+        descriptioon:
+          type: string
+          description: the group's description
+          example: In all my life
+        isPrivate:
+          type: boolean
+          description: privacy of the group 
+          example: true   
+    
+
+
