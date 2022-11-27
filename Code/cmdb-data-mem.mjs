@@ -66,7 +66,7 @@ let nextGroupID = () => {
 
 export async function createUser(name, password, api_key){
     try {
-        if(await tryFindUserBy_(false, false, name)) throw new Conflict(`There's already a user with name=${name}`)
+        if(await tryFindUserBy_(false, false, name, true)) throw new Conflict(`There's already a user with name=${name}`)
         const saltAndHashedPW = hashPassword(password)
         const token = crypto.randomUUID()
         const newUser = new User(nextUserID(), name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
@@ -91,9 +91,10 @@ export async function createGroupForUser(userID, name, description, isPrivate){
         userGroups.forEach(group=> { //check if name of group is not repetitive
             if(group.name==name) throw new Error(`There's already a group with name = ${name}`)
         })
-        userGroups.push(new Group(nextGroupID(), name, description, isPrivate))
-
+        const id = nextGroupID()
+        userGroups.push(new Group(id, name, description, isPrivate))
         console.log("User's new data -> "+JSON.stringify(user))
+        return {id: id}
     } catch(e) { throw e }
 }
 
@@ -193,14 +194,17 @@ function verifyPassword(pw, hashedPassword, usersSalt){
     return hashedPassword === hash
 }
 
-//Auxiliary function for querying
-export async function tryFindUserBy_(id, token, name) { 
+//Auxiliary function for querying. When used for createUser, onlyCheckIfItExists=true. Just to say if a user w/ same name exists
+//For all the other uses, a call to this function is intended to return the user
+export async function tryFindUserBy_(id, token, name, onlyCheckIfItExists) { 
     const userFound = users.find(user=> { 
-        if(id || id==0 /*-_-*/) return user.id==id
+        if(id || id===0 /*-_-*/) return user.id==id
         if(name) return user.name==name
         if(token) return user.token==token
-        else false
+        /* else return false */
     })
+
+    if(onlyCheckIfItExists) return userFound!=undefined
     if(!userFound) throw new NotFound("User not found")
     return userFound
 }

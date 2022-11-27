@@ -39,10 +39,17 @@ export class Conflict extends Error {
     }
 }
 
+//Expected Request bodies
+
 export const newUserRequest = {
     name: "",
     password: "",
     api_key: ""
+}
+
+export const UserLoginRequest = {
+    name: "",
+    password: "",
 }
 
 export const newGroupRequest = {
@@ -51,11 +58,16 @@ export const newGroupRequest = {
     isPrivate: true
 }
 
-export const addMovieToGroupRequest = {
-    id: "", //movieID
-}
-
 export const updateGroupRequest = {
     groupName: "",
     groupDescription: ""
+}
+
+// Server response bodies
+export const imdb_API_KeyInvalid = {
+    errorMessage: "Invalid API Key"
+}
+
+export const generalServerResponse = {
+    msg: ""
 }

@@ -19,7 +19,7 @@ export async function createGroup(body, token){
     try {
         if(!isAStringAndNotEmpty(body.name)) throw new utils.BadRequest("Group name must be a non-empty string")
         const userID = await getUserIDByToken(token)
-        await dataMem.createGroupForUser(userID, body.name, body.description, body.isPrivate)  
+        return await dataMem.createGroupForUser(userID, body.name, body.description, body.isPrivate)  
     } catch(e) { throw e }
 }
 

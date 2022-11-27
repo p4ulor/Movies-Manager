@@ -7,7 +7,7 @@ import * as api from './cmdb-web-api.mjs'
 const PORT = 1904
 
 console.log("Start setting up server")
-let app = express()
+export let app = express()
 
 app.use(express.json())
 

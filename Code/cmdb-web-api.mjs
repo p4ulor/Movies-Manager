@@ -11,7 +11,7 @@ export async function signUpUser(req, rsp) {
 
 export async function loginUser(req, rsp) {
     tryCatch(async () => {
-        doesBodyContainProps(req.body, utils.newUserRequest)
+        doesBodyContainProps(req.body, utils.UserLoginRequest)
         const tokenOfTheUser = await services.userSignInOrLogin(req.body, false).catch((e) => { throw e})
         rsp.status(utils.statusCodes.OK).json({token: tokenOfTheUser})
     }, rsp)
@@ -21,8 +21,8 @@ export async function createGroup(req, rsp){
     tryCatch(async () => {
         const token = getHeaderToken(req)
         doesBodyContainProps(req.body, utils.newGroupRequest)
-        await services.createGroup(req.body, token).catch((e) => { throw e})
-        rsp.status(utils.statusCodes.OK).json() //I must have the .json() to respond or the client will wait forever? Hmmm
+        const res = await services.createGroup(req.body, token).catch((e) => { throw e})
+        rsp.status(utils.statusCodes.OK).json(res) //I must have the .json() to respond or the client will wait forever? Hmmm
     }, rsp)
 }
 
@@ -111,7 +111,7 @@ function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the typ
         }
         else return true
     })
-    if(missingProp) throw new utils.BadRequest(`Missing field -> ${missingField}`)
+    if(missingProp) throw new utils.BadRequest(`Missing field -> ${missingProp}`)
 }
 
 class Param {

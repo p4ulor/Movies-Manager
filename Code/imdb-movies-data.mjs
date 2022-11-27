@@ -11,7 +11,7 @@ export async function imdb_getMovie(userAPIKey, movieID){
     return fetch(URI).then(response => {
         return response.json().then(obj => {
             const movieWithOurProps = getMovieProperties(obj)
-            console.log("Movie obtained w/ id ="+JSON.stringify(movieWithOurProps))
+            console.log("Movie obtained from imdb API -> "+JSON.stringify(movieWithOurProps))
             return movieWithOurProps
         })
     }).catch(e => {
