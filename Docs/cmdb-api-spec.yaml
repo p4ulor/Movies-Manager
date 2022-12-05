@@ -201,7 +201,7 @@ paths:
               $ref: '#/components/schemas/CreateGroupRequest'
       responses:
         200:
-          description: Returns token.
+          description: Returns the id of the new created group.
           content:
             application/json:
               schema:
@@ -263,7 +263,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'
+                $ref: '#/components/schemas/GroupDetailResponse'
         400:
           description: Bad Request
           content:
@@ -301,20 +301,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateGroup'
+              $ref: '#/components/schemas/UpdateGroupRequest'
       responses:
         200:
-          description: Returns token.
+          description: Returns details of updated group
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'  
+                $ref: '#/components/schemas/UpdateGroupResponse'  
         400:
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorMissingParam'
+                $ref: '#/components/schemas/ErrorGroupNameEmpty'
         403:
           description: Forbidden
           content:
@@ -342,29 +342,35 @@ paths:
             example: 5
       responses:
         200:
-          description: Returns token.
+          description: Response with the information of group's deletion
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'
+                $ref: '#/components/schemas/DeleteGroupResponse'
         400:
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorMissingGroupID'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'
         404:
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'                
+                $ref: '#/components/schemas/ErrorUserNF'               
                 
   /groups/{limit}:
     get:
       tags:
         - Groups
-      summary: Returns a list of Groups
+      summary: Returns a list of Groups of a User
       parameters:
         - name: limit
           in: path
@@ -379,7 +385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'
+                $ref: '#/components/schemas/ListOfGroupResponse'
         400:
           description: Bad Request
           content:
@@ -392,6 +398,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorNotLogIn'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNF' 
 
   /groups/:groupID/:movieID:
     put:
@@ -399,20 +411,20 @@ paths:
         - Groups
       summary: Adds a Movie to a Group
       requestBody:
-        description: Required information for adding a movie to a group
+        description: Required information for adding a movie to a group.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSignUpRequest'
+              $ref: '#/components/schemas/AddMovieRequest'
       responses:
         200:
-          description: Returns token.
+          description: Returns the information of the added movie.
           content:
             application/json:
               schema:
                 type: object
-                description: Response with the group's id
+                description: Response with message
                 properties:
                   msg:
                     type: string
@@ -423,13 +435,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorMissingParam'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'       
         404:
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'                                
+                $ref: '#/components/schemas/ErrorUserNF'  
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMovieAlreadyExist'
     delete:
       tags:
         - Groups
@@ -440,19 +464,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTokenResponse'              
+                $ref: '#/components/schemas/RemoveMovieGroupResponse'              
         400:
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'
+                $ref: '#/components/schemas/ErrorMissingGroupID'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorNotLogIn'                 
         404:
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AppError'                
+                $ref: '#/components/schemas/ErrorUserNF' 
                 
 components:
   securitySchemes:
@@ -505,6 +535,24 @@ components:
           type: string
           description: The returned error
           example: "Path param {Name} is missing"
+          
+    ErrorMissingGroupID:    
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "Group with id {groupID} not found"
+          
+    ErrorMovieAlreadyExist:    
+      type: object
+      description: Application error
+      properties:
+        error:
+          type: string
+          description: The returned error
+          example: "You already have that movie in the list"
     
     AppError:
       type: object
@@ -563,8 +611,8 @@ components:
           description: the user's password (which will be hashed)
           example: strongpass
 
-    UpdateGroup:
-      description: Information for user authentication
+    UpdateGroupRequest:
+      description: Update Details of a Group
       required:
          - groupName
          - groupDescription
@@ -575,8 +623,29 @@ components:
           example: "Last seen"
         groupDescription:
           type: string
-          description: the group's description
+          description: the group's description to update
           example: "Of action films"
+          
+    UpdateGroupResponse:
+      description: The message that it was a successful deletion
+      required:
+         - groupID
+         - groupName
+         - groupDescription
+      properties:
+        groupID:
+          type: number
+          format: integer
+          description: Group's ID
+          example: 1        
+        groupName:
+          type: string
+          description: the group's new name
+          example: "watch in 1 year"
+        groupDescription:
+          type: string
+          description: the group's new description
+          example: "zzzzzz"
 
     UserTokenResponse:
       type: object
@@ -584,8 +653,103 @@ components:
       properties:
         token:
           type: string
-          description: the activity's id
+          description: the user token
           example: "061bebd1-0d4b-43e4-b2d2-34f1be9e0cab"
+        
+    DeleteGroupResponse:
+      type: object
+      description: Group deletion message
+      properties:
+        msg:
+          type: string
+          description: Message 
+          example: "Deleted group -> {groupName}"
+          
+    RemoveMovieGroupResponse:
+      type: object
+      description: Remove Movie from Group
+      properties:
+        msg:
+          type: string
+          description: Message 
+          example: "Deleted movie -> {movieName}} from group -> {groupName}"
+
+    GroupDetailResponse:
+      type: object
+      description: Group detail
+      required:
+        - id
+        - name
+        - description
+        - isPrivate
+        - movies
+        - totalDuration
+      properties:
+        id:
+          type: number
+          format: integer
+          description: Group's ID
+          example: 1
+        name:
+          type: string
+          description: Group's name
+          example: watch later
+        description:
+          type: string
+          description: Group's description
+          example: No time
+        isPrivate:
+          type: boolean
+          description: Group's privacy
+          example: true
+        movies:
+          type: array
+          items:
+            type: object
+            description: Movies information
+            required:
+              - name
+              - id
+              - duration
+            properties:
+              name:
+                type: string
+                description: The movie's name
+                example: Eyes Wide Shut        
+              id:
+                type: string
+                description: The movie's ID
+                example: tt0120663              
+              duration:
+                type: number
+                format: integer
+                description: Duration (min) of the movie
+                example: 159
+        totalDuration:
+          type: number
+          format: integer
+          description: Total duration (min) of movies in group
+          example: 159        
+          
+    ListOfGroupResponse:
+      description: The message that it was a successful deletion
+      type: array
+      items:
+        type: object
+        description: Group information
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: string
+            description: The group's ID
+            example: 1              
+          name:
+            type: string
+            description: The group's name
+            example: "watch in 1 year"
+
 
     Top250Data:
       type: object
@@ -662,5 +826,12 @@ components:
           description: privacy of the group 
           example: true   
     
-
-
+    AddMovieRequest:
+      description: Required info for adding a movie to a group.
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: the movie's id
+          example: "tt0443453"
