@@ -1,0 +1,42 @@
+{{!-- Every render uses this base/master page for having the name 'layout.hbs' https://stackoverflow.com/q/26871522/9375488 --}}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+
+    {{!-- Get css from web https://getbootstrap.com/docs/4.3/getting-started/download/#jsdelivr--}}
+    {{!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script> --}}
+    {{!-- Get css from public/ --}}
+    <link href="bootstrap.min.css" rel="stylesheet"> {{!-- This href works out because of the setting of the static files folder location w/ 'express.static()' https://stackoverflow.com/a/62150381/9375488 --}}
+
+    <title>{{title}}</title>
+    </head>
+
+    <body>
+        {{!-- https://getbootstrap.com/docs/4.0/components/navbar/ --}}
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <div class="container-fluid">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/movies">Users</a>
+                    </li>   
+                </ul>
+
+                <ul class="navbar-nav ml-auto"> {{!-- https://stackoverflow.com/a/20362024/9375488 --}}
+                    <li class="nav-item ml-auto">
+                        <a class="nav-link  float-right" href="/login">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        {{{body}}} {{!-- https://handlebarsjs.com/guide/expressions.html#html-escaping https://stackoverflow.com/a/30012816/9375488 --}}
+        
+    </body>
+</html>

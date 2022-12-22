@@ -1,6 +1,6 @@
-import * as dataMem from './cmdb-data-mem.mjs'
-import * as imdbAPI from './imdb-movies-data.mjs'
-import * as utils from './utils.mjs'
+import * as dataMem from '../data/cmdb-data-mem.mjs'
+import * as imdbAPI from '../data/imdb-movies-data.mjs'
+import * as utils from '../utils/utils.mjs'
 
 export async function userSignInOrLogin(body, isSignIn) {
     try { 

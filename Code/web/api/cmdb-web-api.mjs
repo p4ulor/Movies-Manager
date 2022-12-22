@@ -1,5 +1,5 @@
-import * as services from './cmdb-services.mjs'
-import * as utils from './utils.mjs'
+import * as services from '../../services/cmdb-services.mjs'
+import * as utils from '../../utils/utils.mjs'
 
 export async function signUpUser(req, rsp) {
     tryCatch(async () => {

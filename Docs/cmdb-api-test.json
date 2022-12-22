@@ -27,12 +27,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:1904/signup",
-									"protocol": "http",
+									"raw": "{{host}}{{api}}/signup",
 									"host": [
-										"localhost"
+										"{{host}}{{api}}"
 									],
-									"port": "1904",
 									"path": [
 										"signup"
 									]
@@ -55,12 +53,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:1904/signup",
-									"protocol": "http",
+									"raw": "{{host}}{{api}}/signup",
 									"host": [
-										"localhost"
+										"{{host}}{{api}}"
 									],
-									"port": "1904",
 									"path": [
 										"signup"
 									]
@@ -77,7 +73,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo23\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_000000\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo23aaab\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_000000\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -85,12 +81,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/users",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/users",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"users"
 							]
@@ -113,12 +107,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/login",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/login",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"login"
 							]
@@ -150,12 +142,10 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:1904/creategroup",
-									"protocol": "http",
+									"raw": "{{host}}{{api}}/creategroup",
 									"host": [
-										"localhost"
+										"{{host}}{{api}}"
 									],
-									"port": "1904",
 									"path": [
 										"creategroup"
 									]
@@ -188,12 +178,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:1904/creategroup",
-									"protocol": "http",
+									"raw": "{{host}}{{api}}/creategroup",
 									"host": [
-										"localhost"
+										"{{host}}{{api}}"
 									],
-									"port": "1904",
 									"path": [
 										"creategroup"
 									]
@@ -228,12 +216,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups"
 							]
@@ -266,12 +252,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups/:groupID/:movieID",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups/:groupID/:movieID",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups",
 								":groupID",
@@ -315,12 +299,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups?limit=1",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups?limit=1",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups"
 							],
@@ -350,12 +332,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/:groupID",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups/:groupID",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups",
 								":groupID"
@@ -402,12 +382,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:1904/groups/:groupID",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups/:groupID",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups",
 								":groupID"
@@ -438,12 +416,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/:groupID",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups/:groupID",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups",
 								":groupID"
@@ -474,12 +450,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/groups/:groupID/:movieID",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/groups/:groupID/:movieID",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"groups",
 								":groupID",
@@ -520,12 +494,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/movies/:searchTerms?limit=10",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/movies/:searchTerms?limit=10",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"movies",
 								":searchTerms"
@@ -562,12 +534,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:1904/movies?top=5",
-							"protocol": "http",
+							"raw": "{{host}}{{api}}/movies?top=5",
 							"host": [
-								"localhost"
+								"{{host}}{{api}}"
 							],
-							"port": "1904",
 							"path": [
 								"movies"
 							],
@@ -589,12 +559,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:1904/",
-					"protocol": "http",
+					"raw": "{{host}}/",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "1904",
 					"path": [
 						""
 					]
@@ -627,6 +595,16 @@
 		{
 			"key": "pauloToken",
 			"value": "f7c59d82-8a6a-436d-96e0-dd2758a37ab1",
+			"type": "string"
+		},
+		{
+			"key": "host",
+			"value": "http://localhost:1904",
+			"type": "string"
+		},
+		{
+			"key": "api",
+			"value": "/api",
 			"type": "string"
 		}
 	]

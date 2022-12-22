@@ -1,10 +1,17 @@
+'use strict'
+
 import * as imdbAPI from './imdb-movies-data.mjs'
-import { BadRequest, Conflict, Forbidden, NotFound } from './utils.mjs';
+import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/utils.mjs';
 
 const crypto = await import('node:crypto')
 
 class Group {
     /* #movies */ //We thinked about using private members https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields https://stackoverflow.com/a/52237988/9375488
+
+    /** https://stackoverflow.com/a/31420719/9375488 https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
+     * @param {Number} id
+     * @param {String} name
+     */
     constructor(id, name, description, isPrivate, movies, totalDuration){
         this.id = id,
         this.name = name,
@@ -88,9 +95,12 @@ export async function createGroupForUser(userID, name, description, isPrivate){
     try {
         const user = await tryFindUserBy_(userID)
         const userGroups = user.groups
-        userGroups.forEach(group=> { //check if name of group is not repetitive
+
+        // Removed this because of the new functional requirement -> i) Support more than one group with the same name, irrespective of its owner user.
+        /* userGroups.forEach(group=> { //check if name of group is not repetitive
             if(group.name==name) throw new Error(`There's already a group with name = ${name}`)
-        })
+        }) */
+
         const id = nextGroupID()
         userGroups.push(new Group(id, name, description, isPrivate))
         console.log("User's new data -> "+JSON.stringify(user))
