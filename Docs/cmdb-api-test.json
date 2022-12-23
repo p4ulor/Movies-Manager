@@ -550,6 +550,30 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get movie TODO",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}{{api}}/movies/:movieName",
+							"host": [
+								"{{host}}{{api}}"
+							],
+							"path": [
+								"movies",
+								":movieName"
+							],
+							"variable": [
+								{
+									"key": "movieName",
+									"value": "Batman"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

@@ -19,18 +19,15 @@
         {{!-- https://getbootstrap.com/docs/4.0/components/navbar/ --}}
         <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
             <div class="container-fluid">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav" id="navBarUnorderedList">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/movies">Users</a>
-                    </li>   
+                    </li>  
                 </ul>
 
                 <ul class="navbar-nav ml-auto"> {{!-- https://stackoverflow.com/a/20362024/9375488 --}}
                     <li class="nav-item ml-auto">
-                        <a class="nav-link  float-right" href="/login">Login</a>
+                        <a class="nav-link float-right" id="loginLink" href="/login">Login</a>
                     </li>
                 </ul>
             </div>
@@ -39,4 +36,56 @@
         {{{body}}} {{!-- https://handlebarsjs.com/guide/expressions.html#html-escaping https://stackoverflow.com/a/30012816/9375488 --}}
         
     </body>
+    <script>
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        window.addEventListener("load", ()=>{
+            const isUserLoggedIn = getCookie("userID")
+            console.log(isUserLoggedIn)
+            if(isUserLoggedIn!=""){
+                const newNavBarItem = document.createElement("li")
+                newNavBarItem.className = "nav-item"
+
+                const anchor = document.createElement("a")
+                anchor.className = "nav-link"
+                anchor.href = "/mygroups"
+                anchor.innerHTML = "My groups"
+                
+                newNavBarItem.append(anchor)
+                
+                document.getElementById("navBarUnorderedList").appendChild(newNavBarItem)
+
+                const logOut = document.getElementById("loginLink")
+                logOut.innerHTML="Logout"
+                logOut.href="/"
+                logOut.onclick = () => {
+                    setTimeout(() => {
+                        logOut.innerHTML="Login"
+                        logOut.href="/login"
+                        logOut.onclick = null
+                    }, 500)
+
+                    while(document.cookie!=''){  //clear all cookies
+                        document.cookie = document.cookie + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+                    }
+                    //clear cookies manually...
+                    //document.cookie = "userID" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;' //https://stackoverflow.com/a/10593045/9375488
+                    //document.cookie = "token" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+                }
+            }
+        })
+
+    </script>
 </html>

@@ -1,0 +1,7 @@
+<div class="text-center">
+    <h1>Groups of user {{userName}}</h1>
+    {{#each groups}}
+        {{> group}} {{!-- The ''> group' says that this variable is to be interpreted as a .hbs view --}}
+        <hr>
+    {{/each}}
+</div>

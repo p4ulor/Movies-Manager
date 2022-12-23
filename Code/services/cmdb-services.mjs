@@ -1,16 +1,16 @@
 import * as dataMem from '../data/cmdb-data-mem.mjs'
 import * as imdbAPI from '../data/imdb-movies-data.mjs'
-import * as utils from '../utils/utils.mjs'
+import * as utils from '../utils/errors-and-bodies.mjs'
 
 export async function userSignInOrLogin(body, isSignIn) {
     try { 
         if(!isAStringAndNotEmpty(body.name)) throw new utils.BadRequest("User name must be a non-empty string")
         if(isSignIn) return await dataMem.createUser(body.name, body.password, body.api_key)
         else {
-            const token = await dataMem.loginUser(body.name, body.password)
-            console.log("token ->"+token)
-            if(token==false) throw new utils.Unauthorized("Wrong password")
-            else return token
+            const tokenAnduserID = await dataMem.loginUser(body.name, body.password)
+            console.log("token ->"+JSON.stringify(tokenAnduserID))
+            if(tokenAnduserID==false) throw new utils.Unauthorized("Wrong password")
+            else return tokenAnduserID
         }
     } catch(e) { throw e }
 }

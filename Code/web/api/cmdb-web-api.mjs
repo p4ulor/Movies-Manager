@@ -1,5 +1,6 @@
 import * as services from '../../services/cmdb-services.mjs'
-import * as utils from '../../utils/utils.mjs'
+import * as utils from '../../utils/errors-and-bodies.mjs'
+import { doesBodyContainProps } from '../../utils/utils.mjs'
 
 export async function signUpUser(req, rsp) {
     tryCatch(async () => {
@@ -101,18 +102,6 @@ export async function searchMovie(req, rsp){
 }
 
 //aux functions:
-function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!
-    var propsKeys = Object.keys(props)
-    let missingProp = undefined
-    propsKeys.every(key => {
-        if(!body.hasOwnProperty(key)){
-            missingProp = key
-            return false
-        }
-        else return true
-    })
-    if(missingProp) throw new utils.BadRequest(`Missing field -> ${missingProp}`)
-}
 
 class Param {
     constructor(name, isNumber){

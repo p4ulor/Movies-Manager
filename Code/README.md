@@ -1,13 +1,10 @@
-## In order too use, first install the package.json dependencies 
+## In order too use, first install the dependencies in package.json 
 - npm install
 
 ## Plain run:
 - node cmdb-server.mjs
 or
 - npm run start
-
-## Dev run to auto restart on code changes
-- npm run dev
 
 ## Run mocha tests
 - npm run test
@@ -17,6 +14,8 @@ or
 - [express](https://www.npmjs.com/package/express) - For Handling HTTP requests
 - [node-fetch](https://www.npmjs.com/package/node-fetch) - For Making server side HTTP requests
 - [cookie-parser](https://www.npmjs.com/package/cookie-parser)
+- [express-session](https://www.npmjs.com/package/express-session)
+- [cors](https://www.npmjs.com/package/cors)
 ### For creating the front-end UI (the view engine)
 - [hbs](https://www.npmjs.com/package/hbs)
 - [serve-favicon](https://www.npmjs.com/package/serve-favicon)
@@ -30,7 +29,20 @@ or
 
 ## Recommended package and run command during development:
 - [nodemon](https://www.npmjs.com/package/nodemon/v/1.18.10)
-You can optionally install it globally since it's not a component that is not part of our code, using the npm flag: -g. Run like: nodemon <file.mjs>. This will make so we don't have to restart the server everytime we make changes, which can make developing faster and easier.
+You can optionally install it globally since it's not a component that is part of our code, using the npm flag: -g. Run like: nodemon <file.mjs>. This will make so we don't have to restart the server everytime we make changes to our code, which can make developing faster and easier.
 - npm run dev
 
-Should we add `jest-openapi` used in the classes?
+Our database is a NoSQL and document structured database called [Elastic Search](https://www.elastic.co/downloads/elasticsearch) which was built using Java and runs w/ the JVM. It stores out data in JSON format, which is an advantage because we're using JS, so the there's a high interoperability between the database and our server. It can be accessed by an HTTP API and follows the REST principles. Elastic Search 8.5.3 is 600mb, once it is ran. An Elastic Search cluster is created once you run it, it's a group of one or more Elasticsearch nodes instances that are connected together, which store our data. Elastic Search is by default running in port 9200
+### Changes done to Elastic Search files in order to work easily
+#### In `elasticsearch-8.5.3/config/elasticsearch.yml`, add:
+1. ingest.geoip.downloader.enabled: false ([source](https://stackoverflow.com/a/72626114/9375488))
+2. [source](https://stackoverflow.com/a/44358409/9375488)
+- - transport.host: localhost
+- - network.host: 192.168.1.126
+3. Disable logins and SSL by putting them all false
+- xpack.security.enabled: false
+- xpack.security.enrollment.enabled: false
+- xpack.security.http.ssl: 
+- - **enabled: false**
+- xpack.security.transport.ssl:
+- - **enabled: false**

@@ -1,12 +1,14 @@
 <div class="row justify-content-md-center">
-    <form method="POST" action="{{host}}{{api}}/login">
+    <form method="POST" action="{{host}}{{path}}/login">
         <label>Username</label>
-        <input type="text"></input>
+        <input type="text" name="name" required></input>
         </br>
         <label>Password</label>
-        <input type="password"></input>
+        <input type="password" name="password" required</input>
         </br>
         <button type="submit">Register</button>
         <button type="submit">Login</button>
     </form>
 </div>
+
+{{!-- The 'name' property is used for the form to parse the inputs and place them in the json body as fields--}}

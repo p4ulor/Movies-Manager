@@ -1,7 +1,7 @@
 'use strict'
 
 import * as imdbAPI from './imdb-movies-data.mjs'
-import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/utils.mjs';
+import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-bodies.mjs';
 
 const crypto = await import('node:crypto')
 
@@ -86,7 +86,7 @@ export async function createUser(name, password, api_key){
 export async function loginUser(name, password){
     try {
         const userFound = await tryFindUserBy_(false, false, name)
-        if(verifyPassword(password, userFound.hash, userFound.salt)) return userFound.token
+        if(verifyPassword(password, userFound.hash, userFound.salt)) return {token: userFound.token, userID: userFound.id}
         return false
     } catch(e) { throw e }
 }
