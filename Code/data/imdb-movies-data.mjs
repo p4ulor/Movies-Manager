@@ -23,7 +23,8 @@ export async function imdb_getMovie(userAPIKey, movieID){
 const getMovieProperties = (obj) => { return { 
     id: obj.id, 
     name: obj.title, 
-    duration: obj.runtimeMins
+    duration: obj.runtimeMins,
+    imageURL: obj.image
 }}
 
 export async function imdb_getTopMovies(numOfTop, userAPIKey){

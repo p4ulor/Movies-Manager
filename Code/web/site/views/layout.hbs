@@ -5,12 +5,12 @@
     <head>
     <meta charset="utf-8">
 
-    {{!-- Get css from web https://getbootstrap.com/docs/4.3/getting-started/download/#jsdelivr--}}
+    {{!-- OPTION1: Get css from web https://getbootstrap.com/docs/4.3/getting-started/download/#jsdelivr--}}
     {{!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script> --}}
-    {{!-- Get css from public/ --}}
-    <link href="bootstrap.min.css" rel="stylesheet"> {{!-- This href works out because of the setting of the static files folder location w/ 'express.static()' https://stackoverflow.com/a/62150381/9375488 --}}
+    {{!-- OPTION2: Get css from public/ --}}
+    <link href="/bootstrap.min.css" rel="stylesheet"> {{!-- Must have '/' or it wont work in sub routes like '/groups/aaaaa' This href works out because of the setting of the static files folder location w/ 'express.static()' https://stackoverflow.com/a/62150381/9375488 --}}
 
     <title>{{title}}</title>
     </head>
@@ -51,31 +51,38 @@
             }
             return "";
         }
+
+        function addNewNavItem(name, link){
+            const newNavBarItem = document.createElement("li")
+            newNavBarItem.className = "nav-item"
+
+            const anchor = document.createElement("a")
+            anchor.className = "nav-link"
+            anchor.href = link
+            anchor.innerHTML = name
+            
+            newNavBarItem.append(anchor)
+            
+            document.getElementById("navBarUnorderedList").appendChild(newNavBarItem)
+        }
+
         window.addEventListener("load", ()=>{
             const isUserLoggedIn = getCookie("userID")
             console.log(isUserLoggedIn)
             if(isUserLoggedIn!=""){
-                const newNavBarItem = document.createElement("li")
-                newNavBarItem.className = "nav-item"
-
-                const anchor = document.createElement("a")
-                anchor.className = "nav-link"
-                anchor.href = "/mygroups"
-                anchor.innerHTML = "My groups"
-                
-                newNavBarItem.append(anchor)
-                
-                document.getElementById("navBarUnorderedList").appendChild(newNavBarItem)
+                addNewNavItem("My Groups", "/mygroups")
+                addNewNavItem("Search for movies", "/search")
+                addNewNavItem("Top movies", "/top")
 
                 const logOut = document.getElementById("loginLink")
                 logOut.innerHTML="Logout"
                 logOut.href="/"
                 logOut.onclick = () => {
-                    setTimeout(() => {
+                    setTimeout(() => { 
                         logOut.innerHTML="Login"
                         logOut.href="/login"
                         logOut.onclick = null
-                    }, 500)
+                    }, 500) //becuse otherwise it will instantly go to /login...
 
                     while(document.cookie!=''){  //clear all cookies
                         document.cookie = document.cookie + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'

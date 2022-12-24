@@ -76,8 +76,15 @@ export async function getTopMovies(numOfTopMovies, token){
 
 export async function searchMovie(searchTerms, limit, token){
     try {
-        const userAPIKey = await (await dataMem.tryFindUserBy_(false, token)).api_key
+        const userAPIKey = (await dataMem.tryFindUserBy_(false, token)).api_key
         return await imdbAPI.imdb_searchMovie(searchTerms, limit, userAPIKey)
+    } catch(e) { throw e }    
+}
+
+export async function getMovie(movieID, token){
+    try {
+        const userAPIKey = (await dataMem.tryFindUserBy_(false, token)).api_key
+        return await imdbAPI.imdb_getMovie(userAPIKey, movieID)
     } catch(e) { throw e }    
 }
 

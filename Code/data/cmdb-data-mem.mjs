@@ -23,16 +23,17 @@ class Group {
         this.addMovie = function addMovie(newMovie){
             if(!newMovie instanceof Movie) throw new Error("Can only add movies of type Movie")
             this.movies.push(newMovie)
-            this.totalDuration +=newMovie.duration
+            this.totalDuration = new Number(newMovie.duration) + new Number(this.totalDuration) //must be like this or it concatenates as strings...
         }
     }
 }
 
 class Movie {
-    constructor(name, id, duration){
+    constructor(name, id, duration, imageURL){
         this.name = name,
         this.id = id
         this.duration = duration //in minutes
+        this.imageURL = imageURL
     }
 }
 
@@ -52,7 +53,11 @@ const users = [
     new User(0,'paulo',
         [
         new Group(0, "fav", "fav of all time", true), 
-        new Group(1, "watch later", "No time", true, [new Movie("Eyes Wide Shut", "tt0120663", 159), new Movie("Pulp Fiction","tt0110912", 154)], 313)
+        new Group(1, "watch later", "No time", true, [
+            new Movie("Eyes Wide Shut", "tt0120663", 159, "https://m.media-amazon.com/images/M/MV5BYzMzZjcyNzEtZjE2OC00Yjk3LWExOGItODdhNzhkZTdmM2M0XkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_Ratio0.6762_AL_.jpg"), 
+            new Movie("Pulp Fiction","tt0110912", 154, "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_Ratio0.6904_AL_.jpg")
+            ], 
+            313)
         ],
         'f7c59d82-8a6a-436d-96e0-dd2758a37ab1',
         '7fcd2055b9bb7f567714d426e3e948c0f6bbd906f895d8c72863f7be571ec07d',
@@ -79,7 +84,7 @@ export async function createUser(name, password, api_key){
         const newUser = new User(nextUserID(), name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
         console.log("New user -> ", newUser)
         users.push(newUser)
-        return token
+        return {token: token, userID: newUser.id}
     } catch(e) { throw e }
 }
 
@@ -123,7 +128,7 @@ export async function addMovieToGroupOfAUser(userID, movieID, groupID){
         //get movie in IMDB by id, and get name and duration, using the user's api key
         const movie = await imdbAPI.imdb_getMovie(user.api_key, movieID)
         if(movie==null) throw new BadRequest("Movie ID doesn't exist")
-        groupFound.addMovie(new Movie(movie.name, movieID, movie.duration))
+        groupFound.addMovie(new Movie(movie.name, movieID, movie.duration, movie.imageURL))
         console.log("addMovieToGroupOfAUser -> "+JSON.stringify(user))
         return {msg: `Added movie -> ${movie.name}`}
     } catch(e) { throw e }

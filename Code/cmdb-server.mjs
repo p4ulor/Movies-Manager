@@ -18,7 +18,7 @@ app.use(express.urlencoded({extended: true})) // for parsing application/x-www-f
 app.use(cookieParser())
 
 app.set('view engine', 'hbs') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=production%2C%20otherwise%20undefined.-,view%20engine,-String
-hbs.registerPartials('./web/site/views/') //https://stackoverflow.com/a/40583205/9375488
+hbs.registerPartials('./web/site/views/partials') // In order for things like '{{> group}}' to work inside .hbs files https://stackoverflow.com/a/40583205/9375488
 app.set('views', './web/site/views/') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=false%20(disabled)-,views,-String%20or%20Array
 
 app.use(favicon('./web/site/public/favicon.ico')) //https://expressjs.com/en/resources/middleware/serve-favicon.html
@@ -38,8 +38,10 @@ app.get(apiPath+'/groups/:groupID', api.getGroup)
 app.delete(apiPath+'/groups/:groupID/:movieID', api.removeMovieFromGroup)
 
 //IMDB calls
-app.get('/movies', api.getTopMovies), //query params -> top
-app.get('/movies/:searchTerms', api.searchMovie) //query params -> limit
+app.get(apiPath+'/movies/top', api.getTopMovies), //query params -> top
+app.get(apiPath+'/movies/search/:searchTerms', api.searchMovie) //query params -> limit //todo: change from path param to mandatory query param
+app.get(apiPath+'/movies/:movieID', api.getMovie)
+
 
 // WEB
 import site from './web/site/cmdb-web-site.mjs'

@@ -5,16 +5,16 @@ import { doesBodyContainProps } from '../../utils/utils.mjs'
 export async function signUpUser(req, rsp) {
     tryCatch(async () => {
         doesBodyContainProps(req.body, utils.newUserRequest)
-        const newUserToken = await services.userSignInOrLogin(req.body, true).catch((e) => { throw e})
-        rsp.status(utils.statusCodes.OK).json({token: newUserToken})
+        const tokenAnduserID = await services.userSignInOrLogin(req.body, true).catch((e) => { throw e})
+        rsp.status(utils.statusCodes.OK).json(tokenAnduserID)
     }, rsp)
 }
 
 export async function loginUser(req, rsp) {
     tryCatch(async () => {
         doesBodyContainProps(req.body, utils.UserLoginRequest)
-        const tokenOfTheUser = await services.userSignInOrLogin(req.body, false).catch((e) => { throw e})
-        rsp.status(utils.statusCodes.OK).json({token: tokenOfTheUser})
+        const tokenAnduserID = await services.userSignInOrLogin(req.body, false).catch((e) => { throw e})
+        rsp.status(utils.statusCodes.OK).json(tokenAnduserID)
     }, rsp)
 }
 
@@ -82,6 +82,8 @@ export async function removeMovieFromGroup(req, rsp){
     }, rsp)
 }
 
+//IMDB calls:
+
 export async function getTopMovies(req, rsp){
     tryCatch(async () => {
         const token = getHeaderToken(req)
@@ -99,6 +101,15 @@ export async function searchMovie(req, rsp){
         const ret = await services.searchMovie(searchTermsPathParam, limitQueryParam, token).catch((e) => { throw e})
         rsp.status(utils.statusCodes.OK).json(ret) 
     }, rsp)
+}
+
+export async function getMovie(req, resp){
+    tryCatch(async () => {
+        const token = getHeaderToken(req)
+        const [movieID] = doesPathContain_Query_or_Path_Params(req, [new Param("movieID")], true)
+        const ret = await services.getMovie(movieID, token).catch((e) => { throw e})
+        resp.status(utils.statusCodes.OK).json(ret) 
+    }, resp)
 }
 
 //aux functions:
