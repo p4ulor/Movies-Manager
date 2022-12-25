@@ -299,7 +299,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}{{api}}/groups?limit=1",
+							"raw": "{{host}}{{api}}/groups?limit=3",
 							"host": [
 								"{{host}}{{api}}"
 							],
@@ -309,7 +309,7 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "1"
+									"value": "3"
 								}
 							]
 						}
@@ -494,24 +494,22 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}{{api}}/movies/:searchTerms?limit=10",
+							"raw": "{{host}}{{api}}/movies/search?searchTerms=the&limit=10",
 							"host": [
 								"{{host}}{{api}}"
 							],
 							"path": [
 								"movies",
-								":searchTerms"
+								"search"
 							],
 							"query": [
 								{
+									"key": "searchTerms",
+									"value": "the"
+								},
+								{
 									"key": "limit",
 									"value": "10"
-								}
-							],
-							"variable": [
-								{
-									"key": "searchTerms",
-									"value": "the "
 								}
 							]
 						}
@@ -534,12 +532,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}{{api}}/movies?top=5",
+							"raw": "{{host}}{{api}}/movies/top?top=5",
 							"host": [
 								"{{host}}{{api}}"
 							],
 							"path": [
-								"movies"
+								"movies",
+								"top"
 							],
 							"query": [
 								{
@@ -552,23 +551,33 @@
 					"response": []
 				},
 				{
-					"name": "Get movie TODO",
+					"name": "Get movie by ID from IMDB",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}{{api}}/movies/:movieName",
+							"raw": "{{host}}{{api}}/movies/:movieID",
 							"host": [
 								"{{host}}{{api}}"
 							],
 							"path": [
 								"movies",
-								":movieName"
+								":movieID"
 							],
 							"variable": [
 								{
-									"key": "movieName",
-									"value": "Batman"
+									"key": "movieID",
+									"value": "tt0118715"
 								}
 							]
 						}

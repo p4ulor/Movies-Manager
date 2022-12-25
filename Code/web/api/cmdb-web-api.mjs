@@ -22,7 +22,7 @@ export async function createGroup(req, rsp){
     tryCatch(async () => {
         const token = getHeaderToken(req)
         doesBodyContainProps(req.body, utils.newGroupRequest)
-        const res = await services.createGroup(req.body, token).catch((e) => { throw e})
+        const res = await services.createGroup(req.body.name, req.body.description, req.body.isPrivate, token).catch((e) => { throw e})
         rsp.status(utils.statusCodes.OK).json(res) //I must have the .json() to respond or the client will wait forever? Hmmm
     }, rsp)
 }
@@ -96,9 +96,10 @@ export async function getTopMovies(req, rsp){
 export async function searchMovie(req, rsp){
     tryCatch(async () => {
         const token = getHeaderToken(req)
-        const [searchTermsPathParam] = doesPathContain_Query_or_Path_Params(req, [new Param("searchTerms")], true)
+        const [searchTermsPathParam] = doesPathContain_Query_or_Path_Params(req, [new Param("searchTerms")], null, true)
+        const [skiQueryParam] = doesPathContain_Query_or_Path_Params(req, [new Param("skip", true)])
         const [limitQueryParam] = doesPathContain_Query_or_Path_Params(req, [new Param("limit", true)])
-        const ret = await services.searchMovie(searchTermsPathParam, limitQueryParam, token).catch((e) => { throw e})
+        const ret = await services.searchMovie(searchTermsPathParam, skiQueryParam, limitQueryParam, token).catch((e) => { throw e})
         rsp.status(utils.statusCodes.OK).json(ret) 
     }, rsp)
 }
@@ -121,12 +122,13 @@ class Param {
     }
 }
 
-function doesPathContain_Query_or_Path_Params(req, arrayOfParams, isPathParams){
+function doesPathContain_Query_or_Path_Params(req, arrayOfParams, isPathParams, isMandatory){
     const paramValues = []
     arrayOfParams.forEach(param => {
         const paramValue = (isPathParams) ? req.param(param.name) : req.query[param.name]
         if(!isPathParams && paramValue==undefined) {
             //if query param is missing, do nothing. But since we do [varname1, varname2] we need to fill it or it doesnt match
+            if(isMandatory) throw new utils.BadRequest(`Query param :${req.query[param.name]} is missing`)
             paramValues.push(undefined)
         } else {
             if(paramValue==undefined) throw new utils.BadRequest(`Path param :${param.name} is missing`)

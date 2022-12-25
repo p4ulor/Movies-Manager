@@ -51,7 +51,7 @@ router.get('/mygroups',(req, rsp) => {
     view.options.userName = getUserNameFromCookie(req)
     view.options.groups = []
 
-    services.getGroupList(0, 2, getTokenFromCookie(req)).then(arrayOfGroups => {
+    services.getGroupList(0, 3, getTokenFromCookie(req)).then(arrayOfGroups => {
         arrayOfGroups.forEach(group => {
             view.options.groups.push(
                 {
@@ -92,7 +92,7 @@ router.get('/movies/:movieID',(req, rsp) => {
     const view = new HandleBarsView('movie.hbs')
     services.getMovie(req.params.movieID, getTokenFromCookie(req)).then(movie => {
         view.options.movieName = movie.name
-        view.options.movieDuration = totalMinutesToHoursAndMinutes(movie.duration)
+        view.options.movieDuration = ` (${totalMinutesToHoursAndMinutes(movie.duration)})`
         view.options.imageURL = movie.imageURL
         rsp.render(view.file, view.options)
     }).catch(e => {
@@ -101,20 +101,50 @@ router.get('/movies/:movieID',(req, rsp) => {
     })
 })
 
+router.get('/creategroup',(req, rsp) => {
+    const view = new HandleBarsView('createGroup.hbs', 'Search for a movie')
+    rsp.render(view.file, view.options)
+})
+
 router.get('/search',(req, rsp) => {
     const view = new HandleBarsView('searchMovies.hbs', 'Search for a movie')
-    rsp.render(view.file, view.options)
+    if(req.query.searchTerms!=undefined){
+        view.options.searchTerms = req.query.searchTerms //causes the value in the input box to not disappear
+        view.options.pageNumber = req.query.page==undefined ? 1 : new Number(req.query.page)+1
+        const skip = new Number(view.options.pageNumber) * 5 - 5
+        services.searchMovie(req.query.searchTerms, skip, 5, getTokenFromCookie(req)).then(result => {
+            view.options.movies = result.found.map(movie => {
+                //console.log(movie)
+                return {
+                    movieName: movie.title,
+                    movieDescription: movie.description,
+                    moviePage: `/movies/${movie.id}`
+                }
+            })
+            rsp.render(view.file, view.options)
+        })
+    } else {
+        view.options.nextLimit = 5
+        rsp.render(view.file, view.options)
+    }
 })
 
 router.get('/top',(req, rsp) => {
     const view = new HandleBarsView('getTopMovies.hbs', 'Top movies')
-    rsp.render(view.file, view.options)
-})
+    const limit = !req.query.top ? 5 : req.query.top
+    services.getTopMovies(limit, getTokenFromCookie(req)).then(topMovies => {
+        view.options.movies = topMovies.top.map(movie => {
+            return {
+                movieName: movie.name,
+                movieDuration: "",
+                moviePage: `/movies/${movie.id}`
+            }
+        })
 
-router.get('*', function(req, res){
-    const view = new HandleBarsView('notFound.hbs', 'Not found')
-    res.status(404).render(view.file, view.options);
-});
+        rsp.render(view.file, view.options)
+    })
+    //rsp.render(view.file, view.options)
+})
 
 export default router
 
@@ -127,7 +157,7 @@ router.post(`${shadowWebRoute}/login`, (req, resp, next) => {
     .then(tokenAnduserID => {
         processLoginOrRegister(req, resp, tokenAnduserID)
     })
-    .catch(next) //https://stackoverflow.com/a/46122356/9375488
+    .catch(next) // what is this next 'next' function? -> https://stackoverflow.com/a/46122356/9375488
 })
 
 router.post(`${shadowWebRoute}/register`, (req, resp, next) => {
@@ -137,8 +167,23 @@ router.post(`${shadowWebRoute}/register`, (req, resp, next) => {
     .then(tokenAnduserID => {
         processLoginOrRegister(req, resp, tokenAnduserID)
     })
-    .catch(next) //https://stackoverflow.com/a/46122356/9375488
+    .catch(next)
 })
+
+router.post(`${shadowWebRoute}/newgroup`, (req, resp, next) => {
+    services.createGroup(req.body.name, req.body.description, false, getTokenFromCookie(req)).then(groupID => {
+        resp.setHeader('Location', `/mygroups`)
+        .status(302)
+        .end()
+    })
+    .catch(next)
+})
+
+router.get('*', function(req, res){
+    const view = new HandleBarsView('notFound.hbs', 'Not found')
+    res.status(404).render(view.file, view.options);
+});
+
 
 function processLoginOrRegister(req, resp, tokenAnduserID){
     let tomorrow = new Date()

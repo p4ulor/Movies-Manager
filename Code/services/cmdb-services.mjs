@@ -15,11 +15,11 @@ export async function userSignInOrLogin(body, isSignIn) {
     } catch(e) { throw e }
 }
 
-export async function createGroup(body, token){
+export async function createGroup(name, description, isPrivate, token){
     try {
-        if(!isAStringAndNotEmpty(body.name)) throw new utils.BadRequest("Group name must be a non-empty string")
+        if(!isAStringAndNotEmpty(name)) throw new utils.BadRequest("Group name must be a non-empty string")
         const userID = await getUserIDByToken(token)
-        return await dataMem.createGroupForUser(userID, body.name, body.description, body.isPrivate)  
+        return await dataMem.createGroupForUser(userID, name, description, isPrivate)  
     } catch(e) { throw e }
 }
 
@@ -74,10 +74,12 @@ export async function getTopMovies(numOfTopMovies, token){
     } catch(e) { throw e }
 }
 
-export async function searchMovie(searchTerms, limit, token){
+export async function searchMovie(searchTerms, skip, limit, token){
     try {
         const userAPIKey = (await dataMem.tryFindUserBy_(false, token)).api_key
-        return await imdbAPI.imdb_searchMovie(searchTerms, limit, userAPIKey)
+        if(skip==undefined) skip = 0
+        if(limit==undefined) limit = 10
+        return await imdbAPI.imdb_searchMovie(searchTerms, skip, limit, userAPIKey)
     } catch(e) { throw e }    
 }
 

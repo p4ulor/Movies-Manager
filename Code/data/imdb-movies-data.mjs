@@ -1,6 +1,7 @@
 // Contains functions responsible for using the IMDB API in order to get movies, using a users key (cmdb-imdb-api-access)
 
 import fetch from "node-fetch"
+import { processPaging } from "../utils/paging.mjs"
 
 const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}`
 const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${key}`
@@ -27,14 +28,31 @@ const getMovieProperties = (obj) => { return {
     imageURL: obj.image
 }}
 
+let cachedTopResults = []
+
 export async function imdb_getTopMovies(numOfTop, userAPIKey){
+    const topNmovies = []
+
+    /* SOLELY TO AVOID REPETITIVE REQUESTS TO THE API */
+    if(cachedTopResults.length!=0){
+        console.log("obtaining cached top movies results")
+        const paging = processPaging(0, numOfTop, cachedTopResults.length)
+        if(paging!=null){
+            for (let i = paging.startIndex; i <= paging.limitIndex; i++){
+                topNmovies.push(getTopMoviesItemArrayObjProperties(cachedTopResults[i]))
+            }
+        }
+        const jsonResponse = {top: topNmovies}
+        return jsonResponse
+    }
+    /* *************************************************** */
+
     let URI = IMDB_top250Movies(userAPIKey)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
-            const itemsArray = obj.items
-            const topNmovies = []
+            cachedTopResults = obj.items
             for (let i = 0; i < numOfTop; i++){
-                topNmovies.push(getTopMoviesItemArrayObjProperties(itemsArray[i]))
+                topNmovies.push(getTopMoviesItemArrayObjProperties(cachedTopResults[i]))
             }
             const jsonResponse = {top: topNmovies}
             console.log("Top movies obtained ="+JSON.stringify(jsonResponse))
@@ -52,14 +70,44 @@ const getTopMoviesItemArrayObjProperties = (obj) => { return {
     name: obj.title
 }}
 
-export async function imdb_searchMovie(searchTerms, limit, userAPIKey){
+let cachedResults = new Array({ //this initialization is solely to give the types to intelissense
+    terms: "",
+    results: {}
+})
+
+export async function imdb_searchMovie(searchTerms, skip, limit, userAPIKey){
+    const moviesFound = []
+
+    /* SOLELY TO AVOID REPETITIVE REQUESTS TO THE API */
+    let indexOfSameTerms = cachedResults.findIndex(value => {
+        return value.terms==searchTerms
+    })
+
+    if(indexOfSameTerms!=-1){
+        console.log("obtaining cached results")
+        const results = cachedResults[indexOfSameTerms].results
+        const paging = processPaging(skip, limit, results.length)
+        if(paging!=null){
+            for (let i = paging.startIndex; i <= paging.limitIndex; i++){
+                moviesFound.push(searchMovieObjProperties(results[i]))
+            }
+        }
+        return {found: moviesFound}
+    }
+    /* *************************************************** */
+
     let URI = IMDB_searchMovie(userAPIKey, searchTerms)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
             const resultsArray = obj.results
-            const moviesFound = []
-            for (let i = 0; i < limit; i++){
-                moviesFound.push(searchMovieObjProperties(resultsArray[i]))
+
+            cachedResults.push({terms: searchTerms, results: resultsArray})
+            
+            const paging = processPaging(skip, limit, resultsArray.length)
+            if(paging!=null){
+                for (let i = paging.startIndex; i <= paging.limitIndex; i++){
+                    moviesFound.push(searchMovieObjProperties(resultsArray[i]))
+                }
             }
             const jsonResponse = {found: moviesFound}
             console.log("Movies obtained ="+JSON.stringify(jsonResponse))

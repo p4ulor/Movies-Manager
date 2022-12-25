@@ -39,7 +39,7 @@ app.delete(apiPath+'/groups/:groupID/:movieID', api.removeMovieFromGroup)
 
 //IMDB calls
 app.get(apiPath+'/movies/top', api.getTopMovies), //query params -> top
-app.get(apiPath+'/movies/search/:searchTerms', api.searchMovie) //query params -> limit //todo: change from path param to mandatory query param
+app.get(apiPath+'/movies/search', api.searchMovie) //query params -> pathParam and limit
 app.get(apiPath+'/movies/:movieID', api.getMovie)
 
 

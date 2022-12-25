@@ -1,4 +1,14 @@
 <div class="text-center">
     <h1>Search movies</h1>
-    <label>Movie name</label><input type="text"></input>
+    <form method="GET" action="{{host}}/search">
+        <label>Movie name</label>
+        <input type="text" name="searchTerms" value={{searchTerms}}></input>
+        <input type="submit" hidden/> {{!-- https://stackoverflow.com/a/477699/9375488 --}}
+        <button type="submit" name="page" value={{pageNumber}}>Next page</button>
+    </form>
+    {{#each movies}}
+        {{> movieItemSearch}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
+        <hr>
+    {{/each}}
+</div>
 </div>

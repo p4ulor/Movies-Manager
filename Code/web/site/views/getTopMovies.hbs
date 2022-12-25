@@ -1,4 +1,19 @@
 <div class="text-center">
     <h1>Top movies</h1>
-    
+    <label>Get top: </label>
+    <input type="range" min="1" max="250" value = "5" id="range" oninput="this.nextElementSibling.value = this.value"
+        onchange="location.href=`{{host}}/top?top=${document.getElementById('range').value}`"
+    >
+    <output id="output"></output>
+    {{#each movies}}
+        {{> movieItem}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
+        <hr>
+    {{/each}}
+    <script> 
+        // this will prevent the slider of always starting with 5 
+        if(location.href.includes("=")){
+            document.getElementById('range').value = location.href.split("=")[1]
+        }
+        document.getElementById('output').innerText = document.getElementById('range').value
+    </script>
 </div>
