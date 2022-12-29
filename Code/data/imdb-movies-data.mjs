@@ -1,6 +1,7 @@
 // Contains functions responsible for using the IMDB API in order to get movies, using a users key (cmdb-imdb-api-access)
 
 import fetch from "node-fetch"
+import { BadRequest } from "../utils/errors-and-bodies.mjs"
 import { processPaging } from "../utils/paging.mjs"
 
 const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}`
@@ -8,6 +9,7 @@ const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${k
 const IMDB_searchMovie = (key, searchTerms) => `https://imdb-api.com/en/API/SearchMovie/${key}/${searchTerms}`
 
 export async function imdb_getMovie(userAPIKey, movieID){
+    if(!movieID || !userAPIKey) throw new BadRequest(`userAPIKey and movieID must be provided. userAPIKey=${userAPIKey}. movieID=${movieID}`)
     let URI = IMDB_getMovieById(userAPIKey, movieID)
     return fetch(URI).then(response => {
         return response.json().then(obj => {

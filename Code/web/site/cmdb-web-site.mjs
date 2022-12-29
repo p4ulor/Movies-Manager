@@ -50,8 +50,8 @@ router.get('/mygroups',(req, rsp) => {
     const view = new HandleBarsView('listOfGroups.hbs', null)
     view.options.userName = getUserNameFromCookie(req)
     view.options.groups = []
-
-    services.getGroupList(0, 3, getTokenFromCookie(req)).then(arrayOfGroups => {
+    const token = getTokenFromCookie(req, rsp)
+    services.getGroupList(0, 3, token).then(arrayOfGroups => {
         arrayOfGroups.forEach(group => {
             view.options.groups.push(
                 {
@@ -70,7 +70,8 @@ router.get('/mygroups',(req, rsp) => {
 router.get('/groups/:groupID',(req, rsp) => {
     const view = new HandleBarsView('group.hbs', null)
     view.options.userName = getUserNameFromCookie(req)
-    services.getGroup(req.params.groupID, getTokenFromCookie(req)).then(group => {
+    const token = getTokenFromCookie(req, rsp)
+    services.getGroup(req.params.groupID, token).then(group => {
         view.options.groupName = group.name
         view.options.groupDescription = group.description
         view.options.totalDuration = group.totalDuration
@@ -90,7 +91,8 @@ router.get('/groups/:groupID',(req, rsp) => {
 
 router.get('/movies/:movieID',(req, rsp) => {
     const view = new HandleBarsView('movie.hbs')
-    services.getMovie(req.params.movieID, getTokenFromCookie(req)).then(movie => {
+    const token = getTokenFromCookie(req, rsp)
+    services.getMovie(req.params.movieID, token).then(movie => {
         view.options.movieName = movie.name
         view.options.movieDuration = ` (${totalMinutesToHoursAndMinutes(movie.duration)})`
         view.options.imageURL = movie.imageURL
@@ -112,7 +114,8 @@ router.get('/search',(req, rsp) => {
         view.options.searchTerms = req.query.searchTerms //causes the value in the input box to not disappear
         view.options.pageNumber = req.query.page==undefined ? 1 : new Number(req.query.page)+1
         const skip = new Number(view.options.pageNumber) * 5 - 5
-        services.searchMovie(req.query.searchTerms, skip, 5, getTokenFromCookie(req)).then(result => {
+        const token = getTokenFromCookie(req, rsp)
+        services.searchMovie(req.query.searchTerms, skip, 5, token).then(result => {
             view.options.movies = result.found.map(movie => {
                 //console.log(movie)
                 return {
@@ -132,7 +135,8 @@ router.get('/search',(req, rsp) => {
 router.get('/top',(req, rsp) => {
     const view = new HandleBarsView('getTopMovies.hbs', 'Top movies')
     const limit = !req.query.top ? 5 : req.query.top
-    services.getTopMovies(limit, getTokenFromCookie(req)).then(topMovies => {
+    const token = getTokenFromCookie(req, rsp)
+    services.getTopMovies(limit, token).then(topMovies => {
         view.options.movies = topMovies.top.map(movie => {
             return {
                 movieName: movie.name,
@@ -171,7 +175,8 @@ router.post(`${shadowWebRoute}/register`, (req, resp, next) => {
 })
 
 router.post(`${shadowWebRoute}/newgroup`, (req, resp, next) => {
-    services.createGroup(req.body.name, req.body.description, false, getTokenFromCookie(req)).then(groupID => {
+    const token = getTokenFromCookie(req, resp)
+    services.createGroup(req.body.name, req.body.description, false, token).then(groupID => {
         resp.setHeader('Location', `/mygroups`)
         .status(302)
         .end()
@@ -200,6 +205,8 @@ function getUserNameFromCookie(req){
     return req.cookies.userName  //this is possible due to 'app.use(cookieParser())', otherwise it accessing .userName would cause undefined reference error
 }
 
-function getTokenFromCookie(req){
-    return req.cookies.token
+function getTokenFromCookie(req, resp){
+    const token = req.cookies.token
+    if(token==undefined) resp.setHeader('Location', `/login`).status(302).end()
+    else return token
 }

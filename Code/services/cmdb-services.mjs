@@ -86,7 +86,7 @@ export async function searchMovie(searchTerms, skip, limit, token){
 export async function getMovie(movieID, token){
     try {
         const userAPIKey = (await dataMem.tryFindUserBy_(false, token)).api_key
-        return await imdbAPI.imdb_getMovie(userAPIKey, movieID)
+        return await dataMem.getMovieFromDBorIMDB(movieID, userAPIKey)
     } catch(e) { throw e }    
 }
 
