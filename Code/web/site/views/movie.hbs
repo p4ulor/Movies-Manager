@@ -1,6 +1,75 @@
-<div class="text-center">
+<div class="text-center" id="movieDiv">
     <h2>{{movieName}}</h2>
     <h3>{{movieDuration}}</h3>
-    <img src={{imageURL}}></img>
-    <button>Add to a group TODO</button>
+    <div>
+        <img src={{imageURL}} style="max-width: 20%; height: auto;"></img>
+    </div>
+    
+    <button onclick="openSelector()" class="btn-space btn btn-primary btn-space">Add to a group</button>
+
+    {{!-- <button onclick="ay()" class="btn-space btn btn-primary btn-space" >Remove movie from group</button> --}} {{!-- Maybe todo --}}
+        
 </div>
+
+<script>
+    let isOpen = false
+    function openSelector(){
+        if(isOpen) return
+        isOpen = true
+
+        let uri = getHandlBarsOptionString(`${{{getListOfGroupsURI}}}`)
+        //gets names and id's of user's groups. We thought about storing the groups in sessionStorage for optimization, but since listing the groups of a user can receives skip and limit params, and groups can be added or deleted, this would mean that we would need to keep up sessionStorage with all of these operations, which we could implement, but we guessed that it wouldn't be "The be-all and end-all" nor the focus of this project
+        function getGroups(){ //https://stackoverflow.com/questions/34558264/fetch-api-with-cookie
+            fetch(uri, { method: "GET", credentials: 'same-origin', body: null}).then(async response => { 
+                if(!response.ok){
+                    return response.json().then(message => {
+                        let alertMsg = `Error ${response.status}`
+                        alertMsg = alertMsg.concat(`, ${message.error}`)
+                        alert(alertMsg)
+                        return null
+                    })
+                }
+                try { 
+                    let groupsArray = await response.json()
+                    showGroupsList(groupsArray)
+                }
+                catch(e) { console.log("Error converting to json->"+e) }
+            }).catch(e => {
+                alert("Fetch error ->"+e)
+            })
+        }
+
+        function createForm(){
+            const selector = document.getElementById("selector");
+            let groupID = selector.value
+            console.log(groupID)
+            const func = {{{function_addMovieToGroupSetURL}}} //(see handlebars registered helpers in server.mjs)  https://handlebarsjs.com/guide/#html-escaping
+            const host = getHandlBarsOptionString(`${{{host}}}`)
+
+            document.createElement("form")
+            form.method = "POST"
+            form.action = `${host}${func(groupID)}`
+        }
+
+        function showGroupsList(groupsArray){
+            const form = createForm()
+
+            const selector = document.createElement("select")
+            selector.id="selector"
+
+            for (const group of groupsArray) {
+                let option = document.createElement("option")
+                option.text = group.name
+                option.value = group.id
+                selector.appendChild(option)
+            }
+
+            document.getElementById("movieDiv").append(selector)
+        }
+        getGroups()
+    }
+
+    function getHandlBarsOptionString(str){
+        return str.substring(1, str.length) //because the '$' is included in the string...
+    }
+</script>

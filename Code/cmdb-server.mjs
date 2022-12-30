@@ -19,6 +19,9 @@ app.use(cookieParser())
 
 app.set('view engine', 'hbs') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=production%2C%20otherwise%20undefined.-,view%20engine,-String
 hbs.registerPartials('./web/site/views/partials') // In order for things like '{{> group}}' to work inside .hbs files https://stackoverflow.com/a/40583205/9375488
+hbs.registerHelper('function_addMovieToGroupSetURL', function() { //https://handlebarsjs.com/guide/#custom-helpers Im oblitated to setup these helpers here or it doesnt work apparently...
+    return shadowWebRoutes.addMovieToGroup.setUrl //we could avoid using this helper, we're just trying it out
+})
 app.set('views', './web/site/views/') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=false%20(disabled)-,views,-String%20or%20Array
 
 app.use(favicon('./web/site/public/favicon.ico')) //https://expressjs.com/en/resources/middleware/serve-favicon.html
@@ -27,11 +30,16 @@ app.use(express.static('./web/site/public')) //https://expressjs.com/en/starter/
 //API
 import * as api from './web/api/cmdb-web-api.mjs'
 export const apiPath = "/api"
+
+export const apiRoutes = {
+    getGroups: apiPath+'/groups'
+}
+
 app.post(apiPath+'/users', api.signUpUser)
 app.post(apiPath+'/login', api.loginUser) //delete?
 app.post(apiPath+'/groups', api.createGroup)
 app.put(apiPath+'/groups/:groupID/:movieID', api.addMovieToGroup)
-app.get(apiPath+'/groups', api.getGroupList) //query params -> skip and limit
+app.get(apiRoutes.getGroups, api.getGroupList) //query params -> skip and limit
 app.post(apiPath+'/groups/:groupID', api.updateGroup)
 app.delete(apiPath+'/groups/:groupID', api.deleteGroup)
 app.get(apiPath+'/groups/:groupID', api.getGroup)
@@ -44,7 +52,7 @@ app.get(apiPath+'/movies/:movieID', api.getMovie)
 
 
 // WEB
-import site from './web/site/cmdb-web-site.mjs'
+import site, { shadowWebRoutes, webPages } from './web/site/cmdb-web-site.mjs'
 app.use('/', site)
 
 //DOCS

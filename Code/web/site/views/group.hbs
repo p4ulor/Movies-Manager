@@ -1,10 +1,58 @@
 <div class="text-center">
-    <h2>Name: {{groupName}}</h2>
-    <h3>Description: {{groupDescription}}</h3>
+    <form method="POST" action={{updateGroupRoute}}>
+        <h2>Name: 
+            <span id="hide"></span>
+            <input id="txt" name="groupName" value="{{groupName}}" style="border: none;"></input> {{!-- The " " is neccessary or it only shows the first chars before the first space (no further chars after the first space)  --}}
+        </h2>
+
+        <h3>Description:</h3>
+        <textarea name="groupDescription" style="border: none;">{{groupDescription}}</textarea>
+        </br>
+        
+        <button type="submit">Update group details</button>
+    </form>
+
     <h3>Total duration: {{totalDuration}}</h3>
+
     <h4>Movies:</h4>
     {{#each movies}}
         {{> movieItem}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
         <hr>
     {{/each}}
+
+    <form method="POST" action="{{host}}{{deleteGroupRoute}}"></formmethod>
+        <button type="submit" >Delete this group</button>
+    </form>
 </div>
+
+{{!-- 🙏 https://stackoverflow.com/a/38867270/9375488 🙏 --}}
+<style>
+ #txt, #hide {
+    font: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+#txt:focus-visible {
+  /*outline: none; */
+}
+
+#hide {
+  position: absolute;
+  height: 0;
+  overflow: hidden;
+  white-space: pre;
+}
+</style>
+
+<script>
+    const hide = document.getElementById('hide');
+    const txt = document.getElementById('txt');
+    resize();
+    txt.addEventListener("input", resize);
+
+    function resize() {
+        hide.textContent = txt.value;
+        txt.style.width = hide.offsetWidth + "px";
+    }
+</script>

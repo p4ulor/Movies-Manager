@@ -1,3 +1,5 @@
+import { Group } from "../data/cmdb-data-mem.mjs"
+
 export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!
     var propsKeys = Object.keys(props)
     let missingProp = undefined
@@ -11,8 +13,12 @@ export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check 
     if(missingProp) throw new utils.BadRequest(`Missing field -> ${missingProp}`)
 }
 
+/**
+ * @param {number} totalMinutes 
+ * @returns {string} returns something like: 2h 45m
+ */
 export function totalMinutesToHoursAndMinutes(totalMinutes) {
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
     return `${hours}h ${minutes}m`
-  }
+}

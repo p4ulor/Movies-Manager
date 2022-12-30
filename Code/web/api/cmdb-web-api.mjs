@@ -38,6 +38,7 @@ export async function addMovieToGroup(req, rsp){
 
 export async function getGroupList(req, rsp){
     tryCatch(async () => {
+        console.log("acessed getGroupList")
         const token = getHeaderToken(req)
         const [skipQueryParam, limitQueryParam] = doesPathContain_Query_or_Path_Params(req, [new Param("skip", true), new Param("limit", true)])
         const ret = await services.getGroupList(skipQueryParam, limitQueryParam, token).catch((e) => { throw e})
@@ -139,8 +140,18 @@ function doesPathContain_Query_or_Path_Params(req, arrayOfParams, isPathParams, 
     return paramValues
 }
 
+/**
+ * Gets bearer token, if there's no bearer token header. it try to gets the cookie. On fail, throws forbidden exception
+ * @param {Request} req 
+ * @returns {string} token
+ */
 function getHeaderToken(req){
-    try { return req.headers['authorization'].split(" ")[1] } 
+    try {  
+        let token
+        try { token = req.headers['authorization'].split(" ")[1]} catch(e){}
+        if(token==undefined) return req.cookies.token
+        else return token
+    } 
     catch(e) { throw new utils.Forbidden("You are not logged in / You have no authorization to perform this action")}
 }
 

@@ -1,5 +1,5 @@
 <div class="row justify-content-md-center">
-    <form method="POST" action="{{host}}{{path}}/login">
+    <form method="POST" action="{{host}}{{loginRoute}}">
         <label>Username</label>
         <input type="text" name="name" required></input>
         </br>
@@ -8,7 +8,7 @@
         </br>
         <button type="submit">Login</button>
     </form>
-    <button onclick="location.href='{{host}}/register'">Register</button> {{!-- Interesting solution https://stackoverflow.com/a/2906611/9375488 --}}
+    <button onclick="location.href='{{host}}{{registerPage}}'">Register</button> {{!-- Interesting solution https://stackoverflow.com/a/2906611/9375488 --}}
 </div>
 
 {{!-- The 'name' property is used for the form to parse the inputs and place them in the json body as fields--}}

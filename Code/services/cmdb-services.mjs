@@ -53,6 +53,11 @@ export async function deleteGroup(groupID, token){
     } catch(e) { throw e }
 }
 
+/**
+ * @param {number} groupID 
+ * @param {string} token 
+ * @returns {dataMem.Group} A group
+ */
 export async function getGroup(groupID, token){
     try {
         const userID = await getUserIDByToken(token)
@@ -62,8 +67,8 @@ export async function getGroup(groupID, token){
 
 export async function removeMovieFromGroup(groupID, movieID, token){
     try {
-        const userID = await getUserIDByToken(token)
-        return await dataMem.removeMovieFromGroup(groupID, movieID, userID)
+        //const userID = await getUserIDByToken(token)
+        return await dataMem.removeMovieFromGroup(groupID, movieID, token)
     } catch(e) { throw e }
 }
 

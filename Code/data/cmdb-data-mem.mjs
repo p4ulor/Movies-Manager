@@ -5,7 +5,7 @@ import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-b
 
 const crypto = await import('node:crypto')
 
-class Group {
+export class Group {
     /* #movies */ //We thinked about using private members https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields https://stackoverflow.com/a/52237988/9375488
 
     /** https://stackoverflow.com/a/31420719/9375488 https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
@@ -27,7 +27,8 @@ class Group {
          */
         this.addMovie = function addMovie(newMovieID, duration){
             if(!newMovieID instanceof String) throw new Error("Can only add movies of type string")
-            if(isNaN(new Number(duration))) throw new Error("Can only add movies with valid duration of type number")
+            duration = new Number(duration)
+            if(isNaN(duration)) throw new Error("Can only add movies with valid duration of type number")
             this.movies.push(newMovieID)
             this.totalDuration = duration + totalDuration
         }
@@ -138,7 +139,7 @@ export async function addMovieToGroupOfAUser(userID, movieID, groupID){
             if(isDuplicate) throw new Conflict("You already have that movie in the list")
         }
 
-        let movie = getMovieFromDBorIMDB(movieID, user.api_key)
+        let movie = await getMovieFromDBorIMDB(movieID, user.api_key)
         
         groupFound.addMovie(movieID, movie.duration)
         console.log("addMovieToGroupOfAUser -> "+JSON.stringify(user))
@@ -175,6 +176,12 @@ export async function updateGroup(userID, groupID, name, description){
     } catch(e) { throw e }
 }
 
+/**
+ * @type {msg: string}
+ * @param {number} groupID
+ * @param {number} userID
+ * @returns {Promise<Message>}
+ */
 export async function deleteGroup(groupID, userID){
     try {
         const user = await tryFindUserBy_(userID)
@@ -186,10 +193,9 @@ export async function deleteGroup(groupID, userID){
 }
 
 /**
- * @type {}
- * @param {number} groupID 
- * @param {number} userID 
- * @returns 
+ * @param {number} groupID
+ * @param {number} userID
+ * @returns {Promise<Group>}
  */
 export async function getGroup(groupID, userID){
     try {
@@ -206,13 +212,20 @@ export async function getGroup(groupID, userID){
     } catch(e) { throw e }
 }
 
-export async function removeMovieFromGroup(groupID, movieID, userID){
+/**
+ * @type {msg: string} Message
+ * @param {number} groupID 
+ * @param {string} movieID 
+ * @param {string} token 
+ * @returns {Promise<Message>}
+ */
+export async function removeMovieFromGroup(groupID, movieID, token){
     try {
-        const user = await tryFindUserBy_(userID)
+        const user = await tryFindUserBy_(null, token)
         const groupIndex = getIndexOfAGroupOfAUserById(user.groups, groupID)
         const group = user.groups[groupIndex]
         const movieIndex = getIndexOfAMovieOfAGroup(group, movieID)
-        const movieToRemove =  group.movies[movieIndex]
+        const movieToRemove = await getMovieFromDBorIMDB(movieID, user.token)
 
         group.movies.splice(movieIndex, 1)
         group.totalDuration -= movieToRemove.duration
@@ -264,9 +277,9 @@ function getIndexOfAGroupOfAUserById(groupsOfTheUser, groupID){
 
 function getIndexOfAMovieOfAGroup(group, movieID) { 
     let index = -1
-    const movieFound = group.movies.find(movie => {
+    const movieFound = group.movies.find(movieID => {
         index++
-        return movie.id==movieID
+        return movieID==movieID
     })
     if(!movieFound) throw new BadRequest(`Movie with id ${movieID} not found`)
     return index
@@ -289,8 +302,8 @@ function findMovieInServerDB(movieID){
  * @returns {Promise<Movie>} either gets the movie from our DB if exists or imdb if not
  */
 export async function getMovieFromDBorIMDB(movieID, api_key){
+    console.log("Called getMovieFromDB_or_IMDB")
     if(!movieID || !api_key) throw new BadRequest(`userAPIKey and movieID must be provided. api_key=${api_key}. movieID=${movieID}`)
-    console.log("getMovieFromDBorIMDB")
     let movie = findMovieInServerDB(movieID)
     if(movie==undefined){
         movie = await imdbAPI.imdb_getMovie(api_key, movieID)
