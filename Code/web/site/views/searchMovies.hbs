@@ -2,7 +2,7 @@
     <h1>Search movies</h1>
     <form method="GET" action="{{host}}/search">
         <label>Movie name</label>
-        <input type="text" name="searchTerms" value={{searchTerms}}></input>
+        <input type="text" name="searchTerms" value='{{searchTerms}}'></input> {{!-- I put the ' ' and triple { because of inputs with spaces (otherwise, the space, and all chars after the space would be cut) https://stackoverflow.com/a/50378873/9375488 --}}
         <input type="submit" hidden/> {{!-- https://stackoverflow.com/a/477699/9375488 --}}
         <button type="submit" name="page" value={{pageNumber}}>Next page</button>
     </form>
@@ -10,5 +10,4 @@
         {{> movieItemSearch}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
         <hr>
     {{/each}}
-</div>
 </div>

@@ -20,7 +20,7 @@ app.use(cookieParser())
 app.set('view engine', 'hbs') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=production%2C%20otherwise%20undefined.-,view%20engine,-String
 hbs.registerPartials('./web/site/views/partials') // In order for things like '{{> group}}' to work inside .hbs files https://stackoverflow.com/a/40583205/9375488
 hbs.registerHelper('function_addMovieToGroupSetURL', function() { //https://handlebarsjs.com/guide/#custom-helpers Im oblitated to setup these helpers here or it doesnt work apparently...
-    return shadowWebRoutes.addMovieToGroup.setUrl //we could avoid using this helper, we're just trying it out
+    return shadowWebRoutes.addMovieToGroup.setUrl //we could avoid using this helper, we're just trying it out. And we actually learned new things by using this
 })
 app.set('views', './web/site/views/') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=false%20(disabled)-,views,-String%20or%20Array
 
@@ -49,10 +49,11 @@ app.delete(apiPath+'/groups/:groupID/:movieID', api.removeMovieFromGroup)
 app.get(apiPath+'/movies/top', api.getTopMovies), //query params -> top
 app.get(apiPath+'/movies/search', api.searchMovie) //query params -> pathParam and limit
 app.get(apiPath+'/movies/:movieID', api.getMovie)
+app.get(apiPath+'/actor/:actorID', api.getActor)
 
 
 // WEB
-import site, { shadowWebRoutes, webPages } from './web/site/cmdb-web-site.mjs'
+import site, { shadowWebRoutes } from './web/site/cmdb-web-site.mjs'
 app.use('/', site)
 
 //DOCS

@@ -30,20 +30,59 @@ export class Group {
             duration = new Number(duration)
             if(isNaN(duration)) throw new Error("Can only add movies with valid duration of type number")
             this.movies.push(newMovieID)
-            this.totalDuration = duration + totalDuration
+            this.totalDuration = duration + this.totalDuration
         }
     }
 }
 
-class Movie {
+export class Actor {
     /**
-     * @param {string} name 
      * @param {string} id 
-     * @param {number} duration in minutes
-     * @param {string} imageURL 
+     * @param {string} image link
+     * @param {string} name 
+     * @param {string} birthDate In international format 1995-12-31
      */
-    constructor(name, id, duration, imageURL){
-        this.name = name, this.id = id; this.duration = duration; this.imageURL = imageURL
+    constructor(id, image, name, birthDate){
+        this.id = id; this.image = image; this.name = name; this.birthDate = birthDate
+    }
+}
+
+export class MovieActor {
+    /**
+     * @param {string} id 
+     * @param {string} name 1
+     */
+    constructor(id, name){ this.id = id; this.name = name;}
+}
+
+export class Movie {
+    /**
+     * @param {string} id 
+     * @param {string} name 
+     * @param {string} description 
+     * @param {string} imageURL A link
+     * @param {number} duration in minutes
+     * @param {string} director or directors
+     * @param {Array<MovieActor>} actorsList
+     */
+     constructor(id, name, description, imageURL, duration, director, actorsList){
+        this.id = id; this.name = name; this.description = description; this.imageURL = imageURL; 
+        this.duration = duration; this.director = director; this.actorsList = actorsList
+        
+        this.getPreview = function getPreview(){
+            return new MoviePreview(this.id, this.name, this.description, this.duration)
+        }
+    }
+}
+
+class MoviePreview {
+    /**
+     * @param {string} id 
+     * @param {string} name 
+     * @param {string} description 
+     */
+    constructor(id, name, description, duration){
+        this.id = id; this.name = name; this.description = description; this.duration = duration
     }
 }
 
@@ -63,21 +102,56 @@ class User {
 }
 
 const users = [
-    new User(0,'paulo',
+    new User(0, 'paulo',
+        [
+        new Group(0, "fav", "fav of all time", true), 
+        new Group(1, "watch later", "No time", true, ["tt0120663", "tt0110912"], 313) //actually I have watched these movies, dont roast me please, I am big movies watcher myself ;D
+        ],
+        'f7c59d82-8a6a-436d-96e0-dd2758a37ab1',
+        '7fcd2055b9bb7f567714d426e3e948c0f6bbd906f895d8c72863f7be571ec07d', //password=ay
+        'b3a8bd6c42ff7c1670fda5f625878f85',
+        "k_25f649os"
+    ),
+    new User(1, 'carlos',
         [
         new Group(0, "fav", "fav of all time", true), 
         new Group(1, "watch later", "No time", true, ["tt0120663", "tt0110912"], 313)
         ],
-        'f7c59d82-8a6a-436d-96e0-dd2758a37ab1',
-        '7fcd2055b9bb7f567714d426e3e948c0f6bbd906f895d8c72863f7be571ec07d',
+        'f7c59d82-8a6a-436d-96e0-dd2758a37ab2', //2, XD
+        '7fcd2055b9bb7f567714d426e3e948c0f6bbd906f895d8c72863f7be571ec07d', //password=ay
         'b3a8bd6c42ff7c1670fda5f625878f85',
-        "k_25f649os"
+        "k_8puzazju"
     )
 ]
 
+const actorsLibrary = [
+    new Actor("nm0000129",
+    "https://m.media-amazon.com/images/M/MV5BYTFlOTdjMjgtNmY0ZC00MDgxLThjNmEtZGIxZTQyZDdkMTRjXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_Ratio1.0000_AL_.jpg",
+    "Tom Cruise", "1962-7-3"),
+
+    new Actor("nm0000173", 
+    "https://m.media-amazon.com/images/M/MV5BMTk1MjM5NDg4MF5BMl5BanBnXkFtZTcwNDg1OTQ4Nw@@._V1_Ratio1.0000_AL_.jpg",
+    "Nicole Kidman", "1967-6-20"),
+
+    new Actor("nm0000237", 
+    "https://m.media-amazon.com/images/M/MV5BMTMyMjZlYzgtZWRjMC00OTRmLTllZTktMmM1ODVmNjljMTQyXkEyXkFqcGdeQXVyMTExNzQ3MzAw._V1_Ratio1.0000_AL_.jpg",
+    "John Travolta", "1954-2-18"),
+
+    new Actor("nm0000235", 
+    "https://m.media-amazon.com/images/M/MV5BMjMxNzk1MTQyMl5BMl5BanBnXkFtZTgwMDIzMDEyMTE@._V1_Ratio1.0000_AL_.jpg",
+    "Uma Thurman", "1970-5-29")
+]
+
 const moviesLibrary = [
-    new Movie("Eyes Wide Shut", "tt0120663", 159, "https://m.media-amazon.com/images/M/MV5BYzMzZjcyNzEtZjE2OC00Yjk3LWExOGItODdhNzhkZTdmM2M0XkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_Ratio0.6762_AL_.jpg"),
-    new Movie("Pulp Fiction","tt0110912", 154, "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_Ratio0.6904_AL_.jpg")
+    new Movie("tt0120663", "Eyes Wide Shut", 
+            "A Manhattan doctor embarks on a bizarre, night-long odyssey after his wife's admission of unfulfilled longing.",
+            "https://m.media-amazon.com/images/M/MV5BYzMzZjcyNzEtZjE2OC00Yjk3LWExOGItODdhNzhkZTdmM2M0XkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_Ratio0.6762_AL_.jpg",
+            159, "Stanley Kubrick", [ new MovieActor("nm0000129", "Tom Cruise"), new MovieActor("nm0000173", "Nicole Kidman") /* ... */]),
+
+    new Movie("tt0110912", "Pulp Fiction",
+            "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
+            "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_Ratio0.6904_AL_.jpg",
+            154, "Quentin Tarantino", [new MovieActor("nm0000237", "John Travolta"), new MovieActor("nm0000235", "Uma Thurman") /* ... */])
 ]
 
 //the following 2 counters and 2 functions are required since users (not for this assignment though) or groups can be deleted. And it would cause inconsistencies or other problems if using the lenght as a counter
@@ -132,12 +206,12 @@ export async function addMovieToGroupOfAUser(userID, movieID, groupID){
         let user = await tryFindUserBy_(userID)
         const groupFound = user.groups[getIndexOfAGroupOfAUserById(user.groups, groupID)]
         
-        if(groupFound.movies.length!=0){ //check if movie is already in the group
+        /* if(groupFound.movies.length!=0){ //check if movie is already in the group
             const isDuplicate = groupFound.movies.some(movie => {
-                return movie.id==movieID
+                return movie==movieID
             })
             if(isDuplicate) throw new Conflict("You already have that movie in the list")
-        }
+        } */
 
         let movie = await getMovieFromDBorIMDB(movieID, user.api_key)
         
@@ -206,7 +280,7 @@ export async function getGroup(groupID, userID){
         if(group==undefined) throw new NotFound(`Group with id=${groupID} not found`)
         const clonedGroup = JSON.parse(JSON.stringify(group)) //this is so we dont affect the OG object. We are doing it like to avoid defining an
         clonedGroup.movies = await Promise.all(clonedGroup.movies.map(movieID => { //https://stackoverflow.com/a/48273841/9375488 -_-
-            return getMovieFromDBorIMDB(movieID, user.api_key)
+            return getMovieFromDBorIMDB(movieID, user.api_key, true)
         }))
         return clonedGroup //returns group details normally, except that insteaf of returning array of strings (id's) of the movies, it returns the movies in objects of type Movie
     } catch(e) { throw e }
@@ -296,19 +370,42 @@ function findMovieInServerDB(movieID){
 }
 
 /**
- * 
  * @param {string} movieID
  * @param {string} api_key
+ * @param {boolean} justShowPreview If true shows id, name and description of movie, otherwise returns all info of Movie
  * @returns {Promise<Movie>} either gets the movie from our DB if exists or imdb if not
  */
-export async function getMovieFromDBorIMDB(movieID, api_key){
-    console.log("Called getMovieFromDB_or_IMDB")
-    if(!movieID || !api_key) throw new BadRequest(`userAPIKey and movieID must be provided. api_key=${api_key}. movieID=${movieID}`)
+export async function getMovieFromDBorIMDB(movieID, api_key, justShowPreview){
+    console.log("Called getMovieFromDB_or_IMDB", `Preview: ${justShowPreview}`)
+    if(typeof movieID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`userAPIKey and movieID must be provided. userAPIKey=${api_key}. movieID=${movieID}`)
     let movie = findMovieInServerDB(movieID)
     if(movie==undefined){
         movie = await imdbAPI.imdb_getMovie(api_key, movieID)
         if(movie==null) throw new BadRequest(`Movie w ID doesn't exist`)
-        moviesLibrary.push(new Movie(movie.name, movieID, movie.duration, movie.imageURL))
+        moviesLibrary.push(movie)
     } else console.log("Obtained movie from our DB")
-    return movie
+    if(justShowPreview) return movie.getPreview()
+    else return movie
+}
+
+/**
+ * @param {string} actorID 
+ * @returns {Actor | undefined} A actor if found or undefined otherwise
+ */
+function findActorInServerDB(actorID){
+    return actorsLibrary.find(actor => {
+        return actor.id==actorID
+    })
+}
+
+export async function getActorFromDBorIMDB(actorID, api_key){
+    console.log(`Called getActorFromDBorIMDB, actorID=${actorID}`)
+    if(typeof actorID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`userAPIKey and actorID must be provided. userAPIKey=${api_key}. actorID=${actorID}`)
+    let actor = findActorInServerDB(actorID)
+    if(actor==undefined){
+        actor = await imdbAPI.imdb_getActor(api_key, actorID)
+        if(actor==null) throw new BadRequest(`Actor w ID=${actorID} doesn't exist`)
+        actorsLibrary.push(actor)
+    } else console.log("Obtained actor from our DB")
+    return actor
 }

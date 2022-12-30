@@ -3,17 +3,23 @@
 import fetch from "node-fetch"
 import { BadRequest } from "../utils/errors-and-bodies.mjs"
 import { processPaging } from "../utils/paging.mjs"
+import { Actor, Movie, MovieActor } from "./cmdb-data-mem.mjs"
 
 const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}`
 const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${key}`
 const IMDB_searchMovie = (key, searchTerms) => `https://imdb-api.com/en/API/SearchMovie/${key}/${searchTerms}`
+const IMDB_getActorById = (key, actorID) => `https://imdb-api.com/en/API/Name/${key}/${actorID}`
 
-export async function imdb_getMovie(userAPIKey, movieID){
-    if(!movieID || !userAPIKey) throw new BadRequest(`userAPIKey and movieID must be provided. userAPIKey=${userAPIKey}. movieID=${movieID}`)
-    let URI = IMDB_getMovieById(userAPIKey, movieID)
+/**
+ * @param {string} api_key 
+ * @param {string} movieID 
+ */
+export async function imdb_getMovie(api_key, movieID){
+    if(typeof movieID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`api_key and movieID must be provided. api_key=${api_key}. movieID=${movieID}`)
+    let URI = IMDB_getMovieById(api_key, movieID)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
-            const movieWithOurProps = getMovieProperties(obj)
+            const movieWithOurProps = extractMovieProperties(obj)
             console.log("Movie obtained from imdb API -> "+JSON.stringify(movieWithOurProps))
             return movieWithOurProps
         })
@@ -23,16 +29,23 @@ export async function imdb_getMovie(userAPIKey, movieID){
     })
 }
 
-const getMovieProperties = (obj) => { return { 
-    id: obj.id, 
-    name: obj.title, 
-    duration: obj.runtimeMins,
-    imageURL: obj.image
-}}
+const extractMovieProperties = (obj) => { 
+    return new Movie(
+        obj.id, 
+        obj.title,
+        obj.plot,
+        obj.image,
+        obj.runtimeMins,
+        obj.directors,
+        obj.actorList.map(actor => {
+            return new MovieActor(actor.id, actor.name)
+        })
+    )
+}
 
 let cachedTopResults = []
 
-export async function imdb_getTopMovies(numOfTop, userAPIKey){
+export async function imdb_getTopMovies(numOfTop, api_key){
     const topNmovies = []
 
     /* SOLELY TO AVOID REPETITIVE REQUESTS TO THE API */
@@ -49,7 +62,7 @@ export async function imdb_getTopMovies(numOfTop, userAPIKey){
     }
     /* *************************************************** */
 
-    let URI = IMDB_top250Movies(userAPIKey)
+    let URI = IMDB_top250Movies(api_key)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
             cachedTopResults = obj.items
@@ -77,7 +90,7 @@ let cachedResults = new Array({ //this initialization is solely to give the type
     results: {}
 })
 
-export async function imdb_searchMovie(searchTerms, skip, limit, userAPIKey){
+export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
     const moviesFound = []
 
     /* SOLELY TO AVOID REPETITIVE REQUESTS TO THE API */
@@ -98,7 +111,7 @@ export async function imdb_searchMovie(searchTerms, skip, limit, userAPIKey){
     }
     /* *************************************************** */
 
-    let URI = IMDB_searchMovie(userAPIKey, searchTerms)
+    let URI = IMDB_searchMovie(api_key, searchTerms)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
             const resultsArray = obj.results
@@ -126,3 +139,20 @@ const searchMovieObjProperties = (obj) => { return {
     title: obj.title,
     description: obj.description
 }}
+
+export async function imdb_getActor(api_key, actorID){
+    if(typeof actorID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`api_key and actorID must be provided. api_key=${api_key}. actorID=${actorID}`)
+    let URI = IMDB_getActorById(api_key, actorID)
+    return fetch(URI).then(response => {
+        return response.json().then(obj => {
+            const actor = new Actor(actorID, obj.image, obj.name, obj.birthDate)
+            console.log("Actor obtained from imdb API -> "+JSON.stringify(actor))
+            return actor
+        })
+    }).catch(e => {
+        console.log("Actor not found?"+e)
+        return null
+    })
+}
+
+

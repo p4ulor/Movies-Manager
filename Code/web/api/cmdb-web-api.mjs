@@ -114,6 +114,15 @@ export async function getMovie(req, resp){
     }, resp)
 }
 
+export async function getActor(req, resp){
+    tryCatch(async () => {
+        const token = getHeaderToken(req)
+        const [actorID] = doesPathContain_Query_or_Path_Params(req, [new Param("actorID")], true)
+        const ret = await services.getActor(actorID, token).catch((e) => { throw e})
+        resp.status(utils.statusCodes.OK).json(ret) 
+    }, resp)
+}
+
 //aux functions:
 
 class Param {

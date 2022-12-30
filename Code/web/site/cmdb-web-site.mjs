@@ -5,8 +5,6 @@ import * as server from '../../cmdb-server.mjs'
 import * as services from '../../services/cmdb-services.mjs'
 import { doesBodyContainProps, totalMinutesToHoursAndMinutes } from '../../utils/utils.mjs'
 import * as body from '../../utils/errors-and-bodies.mjs'
-import fetch, { Response } from "node-fetch"
-import * as hbs from 'hbs'
 
 const router = express.Router() //Let's us define a fragment of our express app that can be joined with other parts of our app https://expressjs.com/en/5x/api.html#router
 
@@ -53,7 +51,8 @@ const webPages = {
     },
     pageOfAGroup: {
         url: "/groups/:groupID",
-        view: "group.hbs"
+        view: "group.hbs",
+        setUrl: (groupID) => { return `/groups/${groupID}` }
     },
     pageOfAMovie: {
         url: "/movies/:movieID",
@@ -66,6 +65,11 @@ const webPages = {
     topMovies: {
         url: "/top",
         view: "getTopMovies.hbs"
+    },
+    pageOfAnActor: {
+        url: "/actor/:actorID",
+        view: "actorBio.hbs",
+        setUrl: (actorID) => { return `/actor/${actorID}` }
     }
 }
 
@@ -144,15 +148,27 @@ router.get(webPages.pageOfAGroup.url, (req, rsp) => {
 })
 
 router.get(webPages.pageOfAMovie.url, (req, rsp) => {
-    
     const view = new HandleBarsView(webPages.pageOfAMovie.view)
     const token = getTokenFromCookie(req, rsp)
     services.getMovie(req.params.movieID, token).then(movie => {
+
         view.options.movieName = movie.name
+        view.options.movieDescription = movie.description
         view.options.movieDuration = ` (${totalMinutesToHoursAndMinutes(movie.duration)})`
         view.options.imageURL = movie.imageURL
+        view.options.movieDirectors = movie.director
+        view.options.movieActors = movie.actors
 
+        view.options.shadowWebPath = shadowWebPath
+        view.options.movieID = req.params.movieID
         view.options.getListOfGroupsURI = server.apiRoutes.getGroups
+
+        view.options.actorsList = movie.actorsList.map(actor => {
+            return {
+                actorName: actor.name,
+                actorPage: webPages.pageOfAnActor.setUrl(actor.id)
+            }
+        })
         
         rsp.render(view.file, view.options)
     }).catch(e => {
@@ -200,7 +216,17 @@ router.get(webPages.topMovies.url, (req, rsp) => {
 
         rsp.render(view.file, view.options)
     })
-    //rsp.render(view.file, view.options)
+})
+
+router.get(webPages.pageOfAnActor.url, (req, rsp) => {
+    const view = new HandleBarsView(webPages.pageOfAnActor.view)
+    const token = getTokenFromCookie(req, rsp)
+    services.getActor(req.params.actorID, token).then(actor => {
+        view.options.actorName = actor.name
+        view.options.birthDate = actor.birthDate
+        view.options.imageURL = actor.image
+        rsp.render(view.file, view.options)
+    })
 })
 
 export default router
@@ -224,7 +250,7 @@ export const shadowWebRoutes = {
         setUrl: (groupID) => { return `${shadowWebPath}/groups/update/${groupID}` } 
     },
     addMovieToGroup: {
-        url: `${shadowWebPath}/groups/update/:groupID/:movieID`,
+        url: `${shadowWebPath}/groups/:groupID/:movieID`,
         setUrl: (groupID, movieID) => { return `${shadowWebPath}/groups/${groupID}/${movieID}` } 
     }
 }
@@ -276,7 +302,7 @@ router.post(shadowWebRoutes.removeMovie.url, (req, resp, next) => {
     const groupID = req.body.groupID
     const movieID = req.body.movieID
     services.removeMovieFromGroup(groupID, movieID, token).then(_ => {
-        resp.setHeader('Location', `/groups/${groupID}`)
+        resp.setHeader('Location', webPages.pageOfAGroup.setUrl(groupID))
         .status(302)
         .end()
     }).catch(next)
@@ -299,7 +325,7 @@ router.post(shadowWebRoutes.addMovieToGroup.url, (req, resp, next) => {
     const token = getTokenFromCookie(req, resp)
     console.log(JSON.stringify(req.body))
     const groupID = req.params.groupID
-    const movieID = 
+    const movieID = req.params.movieID
     services.addMovieToGroup(movieID, groupID, token).then(msg => {
         console.log(msg.msg)
         resp.setHeader('Location', `/groups/${groupID}`)

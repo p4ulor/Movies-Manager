@@ -551,7 +551,7 @@
 					"response": []
 				},
 				{
-					"name": "Get movie by ID from IMDB",
+					"name": "Get movie by ID from IMDB (or maybe cache)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -583,6 +583,96 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get actor from IMDB (or maybe cache)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}{{api}}/actor/:actorID",
+							"host": [
+								"{{host}}{{api}}"
+							],
+							"path": [
+								"actor",
+								":actorID"
+							],
+							"variable": [
+								{
+									"key": "actorID",
+									"value": "nm0000235"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get actor from IMDB (or maybe cache)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/actor/:actorID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"actor",
+										":actorID"
+									],
+									"variable": [
+										{
+											"key": "actorID",
+											"value": "nm0000235"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "182"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"b6-k/5gLuXwI5K74MjlT+BuZevqOaM\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 30 Dec 2022 20:39:51 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"nm0000235\",\n    \"image\": \"https://m.media-amazon.com/images/M/MV5BMjMxNzk1MTQyMl5BMl5BanBnXkFtZTgwMDIzMDEyMTE@._V1_Ratio1.0000_AL_.jpg\",\n    \"name\": \"Uma Thurman\",\n    \"birthDate\": \"1970-5-29\"\n}"
+						}
+					]
 				}
 			]
 		},

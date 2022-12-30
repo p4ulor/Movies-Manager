@@ -95,6 +95,13 @@ export async function getMovie(movieID, token){
     } catch(e) { throw e }    
 }
 
+export async function getActor(actorID, token){
+    try {
+        const userAPIKey = (await dataMem.tryFindUserBy_(false, token)).api_key
+        return await dataMem.getActorFromDBorIMDB(actorID, userAPIKey)
+    } catch(e) { throw e }    
+}
+
 // Auxiliary functions:
 function isAStringAndNotEmpty(value) {
     return typeof value == 'string' && value != ""

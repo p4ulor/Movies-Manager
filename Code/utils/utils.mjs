@@ -18,6 +18,7 @@ export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check 
  * @returns {string} returns something like: 2h 45m
  */
 export function totalMinutesToHoursAndMinutes(totalMinutes) {
+    if(totalMinutes==null) return "A series?"
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
     return `${hours}h ${minutes}m`

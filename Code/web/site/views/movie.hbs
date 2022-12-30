@@ -1,6 +1,9 @@
 <div class="text-center" id="movieDiv">
     <h2>{{movieName}}</h2>
-    <h3>{{movieDuration}}</h3>
+    <p>{{movieDescription}}</p>
+    <h4>Duration: {{movieDuration}}</h4>
+    <h5>Director(s): {{movieDirectors}}</h5>
+    <h5>Actors: {{movieActors}}</h5>
     <div>
         <img src={{imageURL}} style="max-width: 20%; height: auto;"></img>
     </div>
@@ -8,7 +11,12 @@
     <button onclick="openSelector()" class="btn-space btn btn-primary btn-space">Add to a group</button>
 
     {{!-- <button onclick="ay()" class="btn-space btn btn-primary btn-space" >Remove movie from group</button> --}} {{!-- Maybe todo --}}
-        
+</div>
+<div class="text-center">
+    {{#each actorsList}}
+        {{> actorsItem}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
+        <hr>
+    {{/each}}
 </div>
 
 <script>
@@ -22,40 +30,50 @@
         function getGroups(){ //https://stackoverflow.com/questions/34558264/fetch-api-with-cookie
             fetch(uri, { method: "GET", credentials: 'same-origin', body: null}).then(async response => { 
                 if(!response.ok){
-                    return response.json().then(message => {
+                    response.json().then(message => {
                         let alertMsg = `Error ${response.status}`
                         alertMsg = alertMsg.concat(`, ${message.error}`)
                         alert(alertMsg)
-                        return null
                     })
+                } else {
+                    try { 
+                        //console.log(await response.clone().text())
+                        response.json().then(arrayGroups => { //changed from await to then because it suddently stopped working 1 day after???!!!
+                            console.log(arrayGroups)
+                            showGroupsList(arrayGroups)
+                        })
+                    }
+                    catch(e) { alert("Error converting to json->"+e); isOpen = false }
                 }
-                try { 
-                    let groupsArray = await response.json()
-                    showGroupsList(groupsArray)
-                }
-                catch(e) { console.log("Error converting to json->"+e) }
             }).catch(e => {
-                alert("Fetch error ->"+e)
+                alert("Fetch error ->"+e); isOpen = false
             })
         }
 
-        function createForm(){
-            const selector = document.getElementById("selector");
-            let groupID = selector.value
-            console.log(groupID)
-            const func = {{{function_addMovieToGroupSetURL}}} //(see handlebars registered helpers in server.mjs)  https://handlebarsjs.com/guide/#html-escaping
-            const host = getHandlBarsOptionString(`${{{host}}}`)
+        function updateFormActionURL(theSelector, form){
+            console.log(`Selected group of id=${theSelector.value}`)
 
-            document.createElement("form")
-            form.method = "POST"
-            form.action = `${host}${func(groupID)}`
+            const groupID = theSelector.value
+            const movieID = getHandlBarsOptionString(`${{{movieID}}}`)
+
+            //const form = document.getElementById("form") //this will result in null! so we need to receive the form as input when setting this up for the 1st time
+            
+            //(groupID, movieID) => { return `${shadowWebPath}/groups/${groupID}/${movieID}` }
+            const func = {{{function_addMovieToGroupSetURL}}} //(see handlebars registered helpers in server.mjs)  https://handlebarsjs.com/guide/#html-escaping
+            const shadowWebPath = getHandlBarsOptionString(`${{{shadowWebPath}}}`) //used in the func!
+            const path = func(groupID, movieID)
+            const host = getHandlBarsOptionString(`${{{host}}}`)
+            form.action = `${host}${path}`
         }
 
         function showGroupsList(groupsArray){
-            const form = createForm()
+            const form = document.createElement("form")
+            form.id = "form"
+            form.method = "POST"
 
             const selector = document.createElement("select")
             selector.id="selector"
+            selector.onchange = () => updateFormActionURL(selector, form)
 
             for (const group of groupsArray) {
                 let option = document.createElement("option")
@@ -64,12 +82,21 @@
                 selector.appendChild(option)
             }
 
-            document.getElementById("movieDiv").append(selector)
+            updateFormActionURL(selector, form) //triggers a default setup
+
+            const addButton = document.createElement("button")
+            addButton.innerHTML = "Add"
+            addButton.type = "submit"
+
+            form.appendChild(selector)
+            form.appendChild(addButton)
+
+            document.getElementById("movieDiv").append(form)
         }
         getGroups()
     }
 
     function getHandlBarsOptionString(str){
-        return str.substring(1, str.length) //because the '$' is included in the string...
+        return str.substring(1, str.length) //because the '$' is included in the string... this seems to only occurr inside scripts
     }
 </script>
