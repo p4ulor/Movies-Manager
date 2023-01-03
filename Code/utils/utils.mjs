@@ -1,4 +1,4 @@
-import { Group } from "../data/cmdb-data-mem.mjs"
+import { Group } from "../data/cmdb-data-objs.mjs"
 
 export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!
     var propsKeys = Object.keys(props)

@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "8cc30252-ffee-41ad-b3de-705cbaa0d594",
+		"_postman_id": "2cd0967b-1583-49c1-a42f-652ecb113fff",
 		"name": "IPW",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24004812"
+		"_exporter_id": "24168930"
 	},
 	"item": [
 		{
@@ -59,6 +59,304 @@
 									],
 									"path": [
 										"signup"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Elastic",
+					"item": [
+						{
+							"name": "Create Index User Elastic",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"paulo23\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_000000\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9200/users/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Index User Elastic",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create User in Index",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"id\": \"1\",\r\n  \"name\": \"bbb\",\r\n  \"groups\": [],\r\n  \"token\": \"dd0e98a8-e611-4d6f-a952-aa45534ea27e\",\r\n  \"hash\": \"4c93b0b217134dd5df577ea0d1b74a9375e5c7bc390b9b1811ead8a2b7ecd9c9\",\r\n  \"salt\": \"b20e249f4c570a46d213abb30120937c\",\r\n  \"api_key\": \"aaa\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9200/users/_doc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_doc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create User in Index With ID",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9200/users/_doc/carlos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_doc",
+										"carlos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Indexs",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:9200/_all",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"_all"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Lista users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:9200/users/_search",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user with Index",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9200/users/_doc/BZX-eIUBn-XL_4_FuVDZ",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_doc",
+										"BZX-eIUBn-XL_4_FuVDZ"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get MAX User.id",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sort\": [\r\n        {\r\n        \"id\": {\r\n            \"order\": \"desc\"\r\n        }\r\n        }\r\n    ],\r\n    \"size\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9200/users/_search?size=0",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_search"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get MAX Group.id",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "    {\r\n        \"sort\": [\r\n          {\r\n            \"id\": {\r\n              \"order\": \"desc\"\r\n            }\r\n          }\r\n        ],\r\n        \"size\": 1\r\n      }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9200/groups/_search?size=0",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"groups",
+										"_search"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User with GroupID in group[]",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"doc\": {\r\n        \"id\":0,\r\n        \"name\":\"carlos\",\r\n        \"groups\":[\"EZV0eYUBn-XL_4_Fp1Ax\"],\r\n        \"token\":\"de955d81-cd1c-4a93-86af-76424ade4101\",\r\n        \"hash\":\"9f445ba651ae501cf4c81b0b71ba064429c186aee095c21683f6fbd421234a8a\",\r\n        \"salt\":\"9403646fcd9e295768b21afb94ed72a9\",\r\n        \"api_key\":\"k_8puzazju\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9200/users/_update/BpUFeYUBn-XL_4_Fp1Bp",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_update",
+										"BpUFeYUBn-XL_4_Fp1Bp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User by _id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:9200/users/_doc/BpUFeYUBn-XL_4_Fp1Bp",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_doc",
+										"BpUFeYUBn-XL_4_Fp1Bp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search User by token",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:9200/users/_search?q=token:de955d81-cd1c-4a93-86af-76424ade4101",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "token:de955d81-cd1c-4a93-86af-76424ade4101"
+										}
 									]
 								}
 							},
@@ -184,6 +482,51 @@
 									],
 									"path": [
 										"creategroup"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Elastic",
+					"item": [
+						{
+							"name": "List of Groups",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:9200/groups/_search",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"groups",
+										"_search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Group with _id",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9200/groups/_doc/B5U7eYUBn-XL_4_Fo1Cl",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"groups",
+										"_doc",
+										"B5U7eYUBn-XL_4_Fo1Cl"
 									]
 								}
 							},

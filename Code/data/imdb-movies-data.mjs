@@ -3,12 +3,12 @@
 import fetch from "node-fetch"
 import { BadRequest } from "../utils/errors-and-bodies.mjs"
 import { processPaging } from "../utils/paging.mjs"
-import { Actor, Movie, MovieActor } from "./cmdb-data-mem.mjs"
+import { Actor, Movie, MovieActor } from "./cmdb-data-objs.mjs"
 
-const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}`
-const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${key}`
-const IMDB_searchMovie = (key, searchTerms) => `https://imdb-api.com/en/API/SearchMovie/${key}/${searchTerms}`
-const IMDB_getActorById = (key, actorID) => `https://imdb-api.com/en/API/Name/${key}/${actorID}`
+const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}` //https://imdb-api.com/api/#Title-header
+const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${key}` //https://imdb-api.com/api/#Top250Movies-header
+const IMDB_searchMovie = (key, searchTerms) => `https://imdb-api.com/en/API/SearchMovie/${key}/${searchTerms}` //https://imdb-api.com/api/#SearchMovie-header
+const IMDB_getActorById = (key, actorID) => `https://imdb-api.com/en/API/Name/${key}/${actorID}` //https://imdb-api.com/api/#Name-header
 
 /**
  * @param {string} api_key 
