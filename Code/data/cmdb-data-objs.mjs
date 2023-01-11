@@ -2,7 +2,7 @@ export class Group {
     /* #movies */ //We thinked about using private members https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields https://stackoverflow.com/a/52237988/9375488
 
     /** https://stackoverflow.com/a/31420719/9375488 https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
-     * @param {number} id
+     * @param {string} id
      * @param {string} name
      * @param {string} description
      * @param {boolean} isPrivate
@@ -81,7 +81,7 @@ class MoviePreview {
 
 export class User {
     /**
-     * @param {number} id ignore this id when using ElasticUser
+     * @param {string} id 
      * @param {string} name
      * @param {Array<Group>} groups
      * @param {string} token
@@ -94,13 +94,13 @@ export class User {
     }
 }
 
-export class ElasticUser {
-    /**
-     * @param {string} elasticID 
-     * @param {User} user 
-     */
-    constructor(elasticID, user){
-        this.elasticID = elasticID; this.user = user
-    }
-}
+//export class ElasticUser {
+//     /**
+//     * @param {string} elasticID 
+//     * @param {User} user 
+//     */
+//    constructor(elasticID, user){
+//        this.elasticID = elasticID; this.user = user
+//    }
+//}
 

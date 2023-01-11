@@ -3,11 +3,13 @@
 import * as imdbAPI from './imdb-movies-data.mjs'
 import fetch from "node-fetch"
 import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-bodies.mjs';
-import { User, ElasticUser, Group, Movie, Actor} from './cmdb-data-objs.mjs'
+//import { User, ElasticUser, Group, Movie, Actor} from './cmdb-data-objs.mjs'
+import { User, Group, Movie, Actor} from './cmdb-data-objs.mjs'
 
 const crypto = await import('node:crypto')
 const baseURL= "http://localhost:9200/"
 const insert = "_doc?refresh=wait_for"
+const refresh = "?refresh=wait_for"
 const obtain = (elasticSearch) => { return `_doc/${elasticSearch}` } 
 const updateBody = (obj) => { return {doc: obj}}
 
@@ -16,10 +18,10 @@ let userIDCount = 0
 let groupIDCount = 0
 
 function nextUserID (){
-    return 0
+    return "0"
 }
 function nextGroupID (){
-    return 0
+    return "0"
 }
 
 export async function createUser(name, password, api_key){
@@ -28,19 +30,30 @@ export async function createUser(name, password, api_key){
         const saltAndHashedPW = hashPassword(password)
         const token = crypto.randomUUID()
         const newUserIDvalue = nextUserID()
-        const newUser = new User(newUserIDvalue , name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
+        var newUser = new User(newUserIDvalue , name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
         console.log("New user -> ", newUser)
         
         return fetx(`users/${insert}`, "POST", newUser).then(obj => {
-            return {token: newUser.token, userID: newUser.id}
+            newUser.id = obj._id
+            console.log("Object New User -> " + JSON.stringify(updateBody(newUser)))
+            return fetx(`users/_update/${obj._id}${refresh}`, "POST", (updateBody(newUser)))
+                .then(obj =>{
+                    return {token: newUser.token, userID: newUser.id}
+                })
+            //return {token: newUser.token, userID: newUser.id}
         })
 
     } catch(e) { throw e }
 }
-
+/**
+ * 
+ * @param {*} name 
+ * @param {*} password 
+ * @returns {token,id} / false
+ */
 export async function loginUser(name, password){
     try {
-        const userFound = (await tryFindUserBy_(false, false, name, false)).user
+        const userFound = await tryFindUserBy_(false, false, name, false)
         if(verifyPassword(password, userFound.hash, userFound.salt)) return {token: userFound.token, userID: userFound.id}
         return false
     } catch(e) { throw e }
@@ -54,32 +67,48 @@ export async function loginUser(name, password){
  * @param {*} isPrivate 
  * @returns 
  */
+
 export async function createGroupForUser(userID, name, description, isPrivate){
     try {
-        const elasticUser = (await tryFindUserBy_(userID, null, null, false))
-        const userGroups = elasticUser.user.groups
+        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+        const user = await tryFindUserBy_(userID, null, null, false)
+        var userGroups = user.groups
 
-        const group = new Group(null, name, description)
-        return fetx(`groups/${insert}`, "POST", group).then(obj => {
-            console.log("Object inserted -> " + JSON.stringify(obj))
-            userGroups.push(obj._id)
-        }).then( userGroup => {
-            console.log("Inserted group -> " + JSON.stringify(userGroup))
-            console.log("User to be updated -> " + JSON.stringify(elasticUser.user))
-            const UserTBI = elasticUser.user
-            return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(UserTBI))
+        var group = new Group(nextGroupID, name, description, true)
+
+        return fetx(`groups/${insert}`, "POST", group)
+            .then(obj => {
+                console.log("Object inserted -> " + JSON.stringify(group))
+                group.id = obj._id
+                console.log("Object to be updated -> " + JSON.stringify(group))
+            
+            return fetx(`groups/_update/${group.id}`, "POST", updateBody(group))
                 .then(obj =>{
+                    userGroups.push(obj._id)
                     return obj._id
-                })   
-        })
+                })
+            })
+            .then( userGroup => {
+                console.log("Inserted group -> " + JSON.stringify(userGroup))
+                //console.log("User to be updated -> " + JSON.stringify(elasticUser.user))
+                console.log("User to be updated -> " + JSON.stringify(user))
+                //const UserTBI = elasticUser.user
+                //return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(UserTBI))
+                return fetx(`users/_update/${user.id}`, "POST", updateBody(user))
+                    .then(obj =>{
+                        return obj._id
+                    })   
+            })
     } catch(e) { throw e }
 }
 
 export async function addMovieToGroupOfAUser(userID, movieID, groupID){
     try {
 
-        const elasticUser = (await tryFindUserBy_(userID, null, null, false))
-        if (elasticUser.user.groups.find(groupID)){
+        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+        //if (elasticUser.user.groups.find(groupID)){
+        const user = await tryFindUserBy_(userID, null, null, false)
+        if (user.user.groups.find(groupID)){
             return fetx(`groups/_doc/${groupID}`, "GET").then(obj => {
                 console.log(JSON.stringify(obj))
                 if(obj.hits.hits.length==0) return null
@@ -97,10 +126,11 @@ export async function addMovieToGroupOfAUser(userID, movieID, groupID){
 
 export async function getGroupListOfAUser(skip, limit, userID){
     try {
-        const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+        const user = await tryFindUserBy_(userID, null, null, false)
 
         //const user = (await tryFindUserBy_(userID, null, null, false)).user
-        const groupsFound = elasticUser.user.groups.slice(skip, skip+limit).map(group => { 
+        const groupsFound = user.groups.slice(skip, skip+limit).map(group => { 
             return fetx(`groups/_doc/${group}`, "GET").then(obj => {
                 console.log(JSON.stringify(obj))
                 if(obj.found==false) return null
@@ -125,7 +155,7 @@ export async function updateGroup(userID, groupID, name, description){
             group.description = description
             return group
         }).then(newGroup =>{
-            return fetx(`users/_update/${groupID}`, "POST", updateBody(newGroup))
+            return fetx(`groups/_update/${groupID}`, "POST", updateBody(newGroup))
                 .then(obj =>{
                     return obj._id
                 })   
@@ -142,9 +172,11 @@ export async function updateGroup(userID, groupID, name, description){
  */
 export async function deleteGroup(groupID, userID){
     try {
-        const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+        const user = await tryFindUserBy_(userID, null, null, false)
         let indice = 0
-        elasticUser.user.groups.forEach(group =>{
+        //elasticUser.user.groups.forEach(group =>{
+        user.groups.forEach(group =>{
             ++indice
             if (group == groupID){
                 return fetx(`groups/_doc/${group}`, "DELETE", )
@@ -152,8 +184,10 @@ export async function deleteGroup(groupID, userID){
                     return obj.result
                 }).then (result =>{
                     if (result == "deleted"){
-                        elasticUser.user.groups.slice(indice,indice+1)
-                        return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(elasticUser.user))
+                        //elasticUser.user.groups.slice(indice,indice+1)
+                        user.groups.slice(indice,indice + 1)
+                        //return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(elasticUser.user))
+                        return fetx(`users/_update/${user.id}`, "POST", updateBody(user))
                             .then(obj =>{
                             return obj._id
                             })
@@ -189,25 +223,29 @@ export async function getGroup(groupID, userID){
  */
 export async function removeMovieFromGroup(groupID, movieID, token){
     try {
-        let group2 = fetx( `groups/_doc/${groupID}`, "GET").then(obj => {
+        let group = fetx( `groups/_doc/${groupID}`, "GET").then(obj => {
             console.log(JSON.stringify(obj))
             if(obj.found==false) return null
-            return (obj._id, obj._source).Group
+            return (obj._id, obj._source)
         })
-
-        
-        const elasticUser = (await tryFindUserBy_(userID, null, null, false))
+ 
         let indice = 0
-        elasticUser.user.groups.forEach(group =>{
+        group._source.movies.forEach(movie =>{
             ++indice
-            if (group == groupID){
-                return fetx(`groups/_doc/${group}`, "DELETE", )
+            if (movie == movieID){
+                return fetx(`movies/_doc/${movieID}`, "DELETE", )
                 .then(obj =>{
                     return obj.result
                 }).then (result =>{
                     if (result == "deleted"){
-                        elasticUser.user.groups.slice(indice,indice+1)
-                        return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(elasticUser.user))
+                        group._source.movies.slice(indice,indice + 1)
+                        let movieToRemove = fetx( `movies/_doc/${movieID}`, "GET").then(obj => {
+                            console.log(JSON.stringify(obj))
+                            if(obj.found==false) return null
+                            return obj._source
+                        })
+                        group._source.totalDuration -= movieToRemove.duration
+                        return fetx(`groups/_doc/${groupID}`, "POST", updateBody(group._source))
                             .then(obj =>{
                             return obj._id
                             })
@@ -215,20 +253,7 @@ export async function removeMovieFromGroup(groupID, movieID, token){
                 })   
             }
         })
-
-
-
-
-
-        const user = await tryFindUserBy_(null, token, null, false)
-        const groupIndex = getIndexOfAGroupOfAUserById(user.groups, groupID)
-        const group = user.groups[groupIndex]
-        const movieIndex = getIndexOfAMovieOfAGroup(group, movieID)
-        const movieToRemove = await getMovieFromDBorIMDB(movieID, user.token)
-
-        group.movies.splice(movieIndex, 1)
-        group.totalDuration -= movieToRemove.duration
-        return {msg: `Deleted movie -> ${movieToRemove.name} from group -> ${group.name}`}
+        return {msg: `Deleted movie -> ${movieToRemove.name} from group -> ${group._source.name}`}
     } catch(e) { throw e }
 }
 
@@ -252,7 +277,7 @@ function verifyPassword(pw, hashedPassword, usersSalt){
  * @param {string} token 
  * @param {string} name 
  * @param {boolean} onlyCheckIfItExists 
- * @return {Promise<ElasticUser | boolean>}
+ * @return {Promise<user | boolean>}
  */
 export async function tryFindUserBy_(id, token, name, onlyCheckIfItExists) {
     let search = ""
@@ -266,7 +291,9 @@ export async function tryFindUserBy_(id, token, name, onlyCheckIfItExists) {
             return fetx( `users/_doc/${id}`, "GET").then(obj => {
                 console.log(JSON.stringify(obj))
                 if(obj.found==false) return null
-                return new ElasticUser(obj._id, obj._source)
+                //return new ElasticUser(obj._id, obj._source)
+                obj._source.id = obj._id
+                return obj._source
             })
         }
         if(name) {
@@ -274,7 +301,9 @@ export async function tryFindUserBy_(id, token, name, onlyCheckIfItExists) {
             return fetx(`users/_search?q=name:${name}`, "GET").then(obj => {
                 console.log(JSON.stringify(obj))
                 if(obj.hits.hits.length==0) return null
-                return new ElasticUser(obj.hits.hits[0]._id, obj.hits.hits[0]._source)
+                //return new ElasticUser(obj.hits.hits[0]._id, obj.hits.hits[0]._source)
+                obj.hits.hits[0]._source.id = obj.hits.hits[0]._id
+                return obj.hits.hits[0]._source
             })
         }
         if(token) {
@@ -282,7 +311,9 @@ export async function tryFindUserBy_(id, token, name, onlyCheckIfItExists) {
             return fetx(`users/_search?q=token:${token}`, "GET").then(obj => {
                 console.log(JSON.stringify(obj))
                 if(obj.hits.hits.length==0) return null
-                return new ElasticUser(obj.hits.hits[0]._id, obj.hits.hits[0]._source)
+                //return new ElasticUser(obj.hits.hits[0]._id, obj.hits.hits[0]._source)
+                obj.hits.hits[0]._source.id = obj.hits.hits[0]._id
+                return obj.hits.hits[0]._source
             })
         }
         else return null
