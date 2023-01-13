@@ -1,0 +1,48 @@
+<mxfile host="65bd71144e">
+    <diagram id="fUY1U6cvfsAP15bfOzN2" name="Page-1">
+        <mxGraphModel dx="786" dy="355" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.995;exitY=0.42;exitDx=0;exitDy=0;entryX=0.002;entryY=0.284;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=21;exitPerimeter=0;" parent="1" source="JgVVG7As5LAIsYe_8Jjb-1" target="JgVVG7As5LAIsYe_8Jjb-3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-1" value="id: string&lt;br&gt;name: string&lt;br&gt;groups: Array &amp;lt;string&amp;gt; (groupIDs)&lt;br&gt;token: string&lt;br&gt;hash: string&lt;br&gt;salt: string&lt;br&gt;api_key: string" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="80" width="220" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-2" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;User&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="50" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1.008;exitY=0.655;exitDx=0;exitDy=0;entryX=0.001;entryY=0.223;entryDx=0;entryDy=0;fontSize=21;exitPerimeter=0;entryPerimeter=0;" parent="1" source="JgVVG7As5LAIsYe_8Jjb-3" target="JgVVG7As5LAIsYe_8Jjb-6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-3" value="id: string&lt;br&gt;name: string&lt;br&gt;description: string&lt;br&gt;isPrivate: boolean&lt;br&gt;movies: Array&amp;lt;string&amp;gt; (movieIDs)&lt;br&gt;totalDuration: number (minutes)" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="80" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-4" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;Group&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="50" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-5" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;Movie&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="50" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;fontSize=21;" parent="1" source="JgVVG7As5LAIsYe_8Jjb-6" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="800" y="140" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-6" value="id: string&lt;br&gt;name: string&lt;br&gt;description: string&lt;br&gt;imageURL: string&lt;br&gt;duration: number&lt;br&gt;director: string&lt;br&gt;actorsList: Array&amp;lt;string&amp;gt; (actorIDs)" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="530" y="80" width="220" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-7" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;Actor&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="890" y="50" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="JgVVG7As5LAIsYe_8Jjb-8" value="id: string&lt;br&gt;name: string&lt;br&gt;imageURL: string&lt;br&gt;birthDate: string" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="810" y="80" width="220" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="We thought about&lt;br&gt;having the users have the groups stored inside them, like&lt;br&gt;groups: Array&amp;lt;Groups&amp;gt; to simplify some operations, since the groups of a user are directly and uniquely tied to him.&lt;br&gt;&lt;br&gt;But this would make our entities&lt;br&gt;less extensible and more complex. which&amp;nbsp;&lt;br&gt;would hurt performance everytime we wanted to read or write data to our DB&lt;br&gt;&lt;br&gt;So, we decided to make Group, a separate entity" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="94" y="260" width="336" height="190" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

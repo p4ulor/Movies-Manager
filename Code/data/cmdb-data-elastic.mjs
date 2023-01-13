@@ -1,215 +1,155 @@
-'use strict'
+'use strict' //lembrar q o prof disse q isto podia dar problemas em certos sitios nao era?
 
+const crypto = await import('node:crypto') //https://nodejs.org/api/crypto.html#crypto
 import * as imdbAPI from './imdb-movies-data.mjs'
-import fetch from "node-fetch"
-import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-bodies.mjs';
-//import { User, ElasticUser, Group, Movie, Actor} from './cmdb-data-objs.mjs'
-import { User, Group, Movie, Actor} from './cmdb-data-objs.mjs'
+import { BadRequest, Conflict, Forbidden, NotFound, ServerError } from '../utils/errors-and-codes.mjs';
+import { User, UserObj, Group, GroupObj, Movie, MovieObj, Actor, ActorObj, assignGroup} from './cmdb-data-objs.mjs'
+import * as elasticFetch from '../utils/elastic-fetch.mjs'
+import * as bodies from '../utils/req-resp-bodies.mjs'
 
-const crypto = await import('node:crypto')
-const baseURL= "http://localhost:9200/"
-const insert = "_doc?refresh=wait_for"
-const refresh = "?refresh=wait_for"
-const obtain = (elasticSearch) => { return `_doc/${elasticSearch}` } 
-const updateBody = (obj) => { return {doc: obj}}
-
-// TODO: think about this
-let userIDCount = 0
-let groupIDCount = 0
-
-function nextUserID (){
-    return "0"
+export const ourIndexes = {
+    users: "users",
+    groups: "groups",
+    movies: "movies",
+    actors: "actors"
 }
-function nextGroupID (){
-    return "0"
+
+export function createOurIndexes(){ 
+    Object.values(ourIndexes).forEach(indexName => {
+        elasticFetch.createIndex(indexName)
+        console.log("created", indexName)
+    })
 }
 
 export async function createUser(name, password, api_key){
     try {
-        if(await tryFindUserBy_(false, false, name, true)) throw new Conflict(`There's already a user with name=${name}`)
         const saltAndHashedPW = hashPassword(password)
         const token = crypto.randomUUID()
-        const newUserIDvalue = nextUserID()
-        var newUser = new User(newUserIDvalue , name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
+        let newUser = new UserObj(name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
         console.log("New user -> ", newUser)
-        
-        return fetx(`users/${insert}`, "POST", newUser).then(obj => {
-            newUser.id = obj._id
-            console.log("Object New User -> " + JSON.stringify(updateBody(newUser)))
-            return fetx(`users/_update/${obj._id}${refresh}`, "POST", (updateBody(newUser)))
-                .then(obj =>{
-                    return {token: newUser.token, userID: newUser.id}
-                })
-            //return {token: newUser.token, userID: newUser.id}
-        })
 
+        return elasticFetch.create(ourIndexes.users, newUser).then(obj => {
+            newUser.id = obj._id
+            return new bodies.LoginResponse(newUser.token, newUser.id)
+        })
     } catch(e) { throw e }
 }
 /**
- * 
- * @param {*} name 
- * @param {*} password 
- * @returns {token,id} / false
+ * @param {UserObj} userObj 
+ * @param {string} passwordProvided 
+ * @returns {Promise<false | {token: any; userID: any;}>}
  */
-export async function loginUser(name, password){
+export async function loginUser(userObj, passwordProvided){
     try {
-        const userFound = await tryFindUserBy_(false, false, name, false)
-        if(verifyPassword(password, userFound.hash, userFound.salt)) return {token: userFound.token, userID: userFound.id}
+        if(verifyPassword(passwordProvided, userObj.hash, userObj.salt)) return new bodies.LoginResponse(userObj.token, userObj.id)
         return false
     } catch(e) { throw e }
 }
 
 /**
- * 
- * @param {*} userID 
- * @param {*} name 
- * @param {*} description 
- * @param {*} isPrivate 
- * @returns 
+ * @param {string} userID 
+ * @param {string} name 
+ * @param {string} description 
+ * @param {boolean} isPrivate 
  */
-
 export async function createGroupForUser(userID, name, description, isPrivate){
     try {
-        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
-        const user = await tryFindUserBy_(userID, null, null, false)
-        var userGroups = user.groups
+        let user = await getUserByID(userID)
 
-        var group = new Group(nextGroupID, name, description, true)
+        let group = new GroupObj(name, description, true)
 
-        return fetx(`groups/${insert}`, "POST", group)
-            .then(obj => {
-                console.log("Object inserted -> " + JSON.stringify(group))
-                group.id = obj._id
-                console.log("Object to be updated -> " + JSON.stringify(group))
+        elasticFetch.create(ourIndexes.groups, group).then(obj =>{
+            user.userObj.groups.push(obj._id)
+            elasticFetch.update(ourIndexes.users, user.id, user.userObj).then(obj =>{
             
-            return fetx(`groups/_update/${group.id}`, "POST", updateBody(group))
-                .then(obj =>{
-                    userGroups.push(obj._id)
-                    return obj._id
-                })
-            })
-            .then( userGroup => {
-                console.log("Inserted group -> " + JSON.stringify(userGroup))
-                //console.log("User to be updated -> " + JSON.stringify(elasticUser.user))
-                console.log("User to be updated -> " + JSON.stringify(user))
-                //const UserTBI = elasticUser.user
-                //return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(UserTBI))
-                return fetx(`users/_update/${user.id}`, "POST", updateBody(user))
-                    .then(obj =>{
-                        return obj._id
-                    })   
-            })
+            })   
+        })
     } catch(e) { throw e }
 }
 
 export async function addMovieToGroupOfAUser(userID, movieID, groupID){
     try {
-
-        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
-        //if (elasticUser.user.groups.find(groupID)){
-        const user = await tryFindUserBy_(userID, null, null, false)
-        if (user.user.groups.find(groupID)){
-            return fetx(`groups/_doc/${groupID}`, "GET").then(obj => {
-                console.log(JSON.stringify(obj))
-                if(obj.hits.hits.length==0) return null
-                return obj.hits.hits[0]._source
-            }).then(group => {
-                group.movies.push(movieID)
-                return fetx(`groups/_update/${groupID}`, "POST", updateBody(group))
-                .then(obj =>{
-                    return obj._id
-                })
+        const user = await getUserByID(userID)
+        const movie = await getMovieFromDBorIMDB(movieID, user.userObj.api_key, false)
+        elasticFetch.get(ourIndexes.groups, groupID).then(obj => {
+            console.log(JSON.stringify(obj))
+            if(obj.found==false) return null
+            return obj._source
+        }).then(group => {
+            console.log("Group obtained", JSON.stringify(group))
+            const theGroup = assignGroup(group) //just so we make use of the .addMovie() function
+            theGroup.addMovie(movie.id, movie.duration)
+            elasticFetch.update(ourIndexes.groups, groupID, theGroup).then(obj =>{
+                
             })
-        } else return console.error("Group not Found for User");
+        })
     } catch(e) { throw e }
 }
 
 export async function getGroupListOfAUser(skip, limit, userID){
     try {
-        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
-        const user = await tryFindUserBy_(userID, null, null, false)
-
-        //const user = (await tryFindUserBy_(userID, null, null, false)).user
-        const groupsFound = user.groups.slice(skip, skip+limit).map(group => { 
-            return fetx(`groups/_doc/${group}`, "GET").then(obj => {
+        const user = await getUserByID(userID)
+        const groupsFound = user.user.groups.slice(skip, skip+limit).map(group => {
+            return elasticFetch.get(ourIndexes.groups, group.id).then(obj => {
                 console.log(JSON.stringify(obj))
-                if(obj.found==false) return null
+                if(obj.found==false) throw new NotFound(`The user w/ id=${userID} doesn't have a group whose id=${groupID}`)
                 return obj._source
-            }).then (allgroup => {
-                return {id: group, name: allgroup.name}
+            }).then (grup => {
+                return new bodies.GroupsItemListResponse(grup.id, grup.name)
             })
         })
-        return await groupsFound
+        return new bodies.GroupsListResponse(groupsFound)
     } catch(e) { throw e }
 }
 
 export async function updateGroup(userID, groupID, name, description){
     try {
-
-        return fetx(`groups/_doc/${groupID}`, "GET").then(obj => {
-            console.log(JSON.stringify(obj))
-            if(obj.found==false) return null
-            return obj._source
-        }).then(group =>{
-            group.name = name
-            group.description = description
-            return group
-        }).then(newGroup =>{
-            return fetx(`groups/_update/${groupID}`, "POST", updateBody(newGroup))
-                .then(obj =>{
-                    return obj._id
-                })   
+        elasticFetch.get(ourIndexes.groups, groupID).then(obj => {
+            if(obj.found==false) throw new NotFound(`The user w/ id=${userID} doesn't have a group whose id=${groupID}`)
+            const group = new Group(obj._id, obj._source)
+            group.groupObj.name = name
+            group.groupObj.description = description
+            elasticFetch.update(ourIndexes.groups, groupID, group.groupObj).then(obj => {
+                console.log(`updatedGroup ->`, JSON.stringify(obj))
+            })
         })
-        return {id: groupID, name: newGroup.name, description: newGroup.description}
     } catch(e) { throw e }
 }
 
 /**
- * @type {msg: string}
  * @param {number} groupID
  * @param {number} userID
- * @returns {Promise<Message>}
  */
 export async function deleteGroup(groupID, userID){
     try {
-        //const elasticUser = (await tryFindUserBy_(userID, null, null, false))
-        const user = await tryFindUserBy_(userID, null, null, false)
+        const user = await getUserByID(userID)
         let indice = 0
-        //elasticUser.user.groups.forEach(group =>{
-        user.groups.forEach(group =>{
-            ++indice
-            if (group == groupID){
-                return fetx(`groups/_doc/${group}`, "DELETE", )
-                .then(obj =>{
-                    return obj.result
-                }).then (result =>{
-                    if (result == "deleted"){
-                        //elasticUser.user.groups.slice(indice,indice+1)
-                        user.groups.slice(indice,indice + 1)
-                        //return fetx(`users/_update/${elasticUser.elasticID}`, "POST", updateBody(elasticUser.user))
-                        return fetx(`users/_update/${user.id}`, "POST", updateBody(user))
-                            .then(obj =>{
-                            return obj._id
-                            })
-                    }
-                })   
+
+        if(!user.groups.some(id =>{ return id==groupID})) throw new NotFound(`The user w/ id=${userID} doesn't have a group whose id=${groupID}`)
+
+        return elasticFetch.delite(ourIndexes.groups, groupID).then(obj =>{
+            if (obj.result == "deleted"){
+                user.groups.slice(indice, indice + 1)
+                elasticFetch.update(ourIndexes.users, userID, user.user).then(obj =>{
+                    console.log(`deleteGroup elastic response ->`, JSON.stringify(obj))
+                    return new bodies.GeneralServerResponse(`Deleted group w/ id -> ${groupID} from user -> ${user.user.name}`)
+                })
             }
-        })
-        return {msg: `Deleted group -> ${groupID}`}
+            else throw new ServerError(`Deletion of group w/ id=${groupID} failed`)
+        })   
     } catch(e) { throw e }
 }
 
 /**
  * @param {number} groupID
- * @param {number} userID
  * @returns {Promise<Group>}
  */
-export async function getGroup(groupID, userID){
+export async function getGroup(groupID){
     try {
-        let group = fetx( `groups/_doc/${groupID}`, "GET").then(obj => {
+        elasticFetch.get(ourIndexes.groups, groupID).then(obj => {
             console.log(JSON.stringify(obj))
             if(obj.found==false) return null
-            return (obj._id, obj._source).Group
+            return new Group(obj._id, obj._source)
         })
     } catch(e) { throw e }
 }
@@ -221,39 +161,23 @@ export async function getGroup(groupID, userID){
  * @param {string} token 
  * @returns {Promise<Message>}
  */
-export async function removeMovieFromGroup(groupID, movieID, token){
+export async function removeMovieFromGroup(groupID, movieID, userID){
     try {
-        let group = fetx( `groups/_doc/${groupID}`, "GET").then(obj => {
+        let group = await elasticFetch.get(ourIndexes.groups, groupID).then(obj => {
             console.log(JSON.stringify(obj))
-            if(obj.found==false) return null
-            return (obj._id, obj._source)
+            if(obj.found==false) throw new NotFound(`Group w/ ID=${groupID} not found`)
+            return new Group(obj._id, obj._source)
         })
  
-        let indice = 0
-        group._source.movies.forEach(movie =>{
-            ++indice
-            if (movie == movieID){
-                return fetx(`movies/_doc/${movieID}`, "DELETE", )
-                .then(obj =>{
-                    return obj.result
-                }).then (result =>{
-                    if (result == "deleted"){
-                        group._source.movies.slice(indice,indice + 1)
-                        let movieToRemove = fetx( `movies/_doc/${movieID}`, "GET").then(obj => {
-                            console.log(JSON.stringify(obj))
-                            if(obj.found==false) return null
-                            return obj._source
-                        })
-                        group._source.totalDuration -= movieToRemove.duration
-                        return fetx(`groups/_doc/${groupID}`, "POST", updateBody(group._source))
-                            .then(obj =>{
-                            return obj._id
-                            })
-                    }
-                })   
-            }
-        })
-        return {msg: `Deleted movie -> ${movieToRemove.name} from group -> ${group._source.name}`}
+        let wasMovieRemovedSuccessful = group.group.removeMovie(movieID)
+
+        if(wasMovieRemovedSuccessful) {
+            return elasticFetch.create(ourIndexes.groups, group.group).then(obj =>{
+                console.log("removeMovieFromGroup result -> ", JSON.stringify(obj))
+                return new bodies.GeneralServerResponse(`Deleted movie w/ id -> ${movieID} from group -> ${group.group.name}`)
+            })
+        }
+        else throw new NotFound(`Movie w/ id=${movieID} in group w/ id=${groupID} not found`)
     } catch(e) { throw e }
 }
 
@@ -270,94 +194,65 @@ function verifyPassword(pw, hashedPassword, usersSalt){
     return hashedPassword === hash
 }
 
-//Auxiliary function for querying. When used for createUser, onlyCheckIfItExists=true. Just to say if a user w/ same name exists
-//For all the other uses, a call to this function is intended to return the user
+//Auxiliary functions for searching actors or movies in our DB (or IMDB if it doesn't exist)
+
 /**
- * @param {number} id 
- * @param {string} token 
- * @param {string} name 
+ * @param {string} token //used for services to know if a user exists
+ * @param {string} name //used to check if there's already a user with a name of a user to be registered
  * @param {boolean} onlyCheckIfItExists 
- * @return {Promise<user | boolean>}
+ * @returns {Promise <User | boolean | undefined}
  */
-export async function tryFindUserBy_(id, token, name, onlyCheckIfItExists) {
-    let search = ""
-    if(id || id===0) search = "id"
-    if(name) search = "name"
-    if(token) search = "token"
- 
-    function userFound(){ 
-        if(id || id===0 ) {
-            console.log("Doc_ID " + id)
-            return fetx( `users/_doc/${id}`, "GET").then(obj => {
-                console.log(JSON.stringify(obj))
-                if(obj.found==false) return null
-                //return new ElasticUser(obj._id, obj._source)
-                obj._source.id = obj._id
-                return obj._source
-            })
-        }
+export async function tryFindUserBy_(token, name, onlyCheckIfItExists){
+    function userFound(){
         if(name) {
             console.log("Name " + name)
-            return fetx(`users/_search?q=name:${name}`, "GET").then(obj => {
-                console.log(JSON.stringify(obj))
+            return elasticFetch.search(ourIndexes.users, "name", name).then(obj => {
+                console.log("Performed elastic search->",JSON.stringify(obj))
                 if(obj.hits.hits.length==0) return null
-                //return new ElasticUser(obj.hits.hits[0]._id, obj.hits.hits[0]._source)
-                obj.hits.hits[0]._source.id = obj.hits.hits[0]._id
-                return obj.hits.hits[0]._source
+                return new User(obj.hits.hits[0]._id , obj.hits.hits[0]._source)
             })
         }
         if(token) {
             console.log("Token " + token)
-            return fetx(`users/_search?q=token:${token}`, "GET").then(obj => {
-                console.log(JSON.stringify(obj))
+            return elasticFetch.search(ourIndexes.users, "token", token).then(obj => {
+                console.log("Performed elastic search->",JSON.stringify(obj))
                 if(obj.hits.hits.length==0) return null
-                //return new ElasticUser(obj.hits.hits[0]._id, obj.hits.hits[0]._source)
-                obj.hits.hits[0]._source.id = obj.hits.hits[0]._id
-                return obj.hits.hits[0]._source
+                return new User(obj.hits.hits[0]._id , obj.hits.hits[0]._source)
             })
         }
         else return null
     }
 
     const user_Found = await userFound()
-
     if(onlyCheckIfItExists) return user_Found!=null
-    if(!user_Found) throw new NotFound("User not found")
     return user_Found
 }
 
-function getIndexOfAGroupOfAUserById(groupsOfTheUser, groupID){ //DONT DELETE YET. AUXILIARY FUNCTION
-    let index = -1
-    const groupFound = groupsOfTheUser.find(group => {
-        index++
-        return group.id==groupID
+/**
+ * @param {number} id 
+ * @param {string} token 
+ * @param {string} name 
+ * @param {boolean} onlyCheckIfItExists 
+ * @return {Promise<User>}
+ */
+export async function getUserByID(id) {
+    if(!id || id<1) throw new Error(`Invalid ID=${id}`)
+
+    return elasticFetch.get(ourIndexes.users, id).then(obj => {
+        console.log(JSON.stringify(obj))
+        if(obj.found==false) throw new NotFound(`User with id=${id} not found`)
+        return new User(obj._id , obj._source)
     })
-
-    if(!groupFound) throw new BadRequest(`Group with id ${groupID} not found`)
-    return index
-}
-
-function getIndexOfAMovieOfAGroup(group, movieID) {  //DONT DELETE YET. AUXILIARY FUNCTION
-    let index = -1
-    const movieFound = group.movies.find(movieID => {
-        index++
-        return movieID==movieID
-    })
-
-    if(!movieFound) throw new BadRequest(`Movie with id ${movieID} not found`)
-    return index
 }
 
 /**
  * @param {string} movieID 
- * @returns {Movie | undefined} A movie if found or undefined otherwise
+ * @returns {Promise<MovieObj | null>} A movie if found or null otherwise
  */
 async function findMovieInServerDB(movieID){
-    return await fetx(`movies/_search?q=id:${id}`, "GET").then(movie => {
-        console.log(`Found movie in server DB -> ${JSON.stringify(movie)}`)
-        return movie.hits.hits[0]._source
-    }).catch(e => {
-        return undefined
+    return await elasticFetch.get(ourIndexes.movies, movieID).then(obj => {
+        if(obj.found==false) return null
+        return new Movie(obj._id, obj._source) 
     })
 }
 
@@ -365,33 +260,36 @@ async function findMovieInServerDB(movieID){
  * @param {string} movieID
  * @param {string} api_key
  * @param {boolean} justShowPreview If true shows id, name and description of movie, otherwise returns all info of Movie
- * @returns {Promise<Movie>} either gets the movie from our DB if exists or imdb if not
+ * @returns {Promise<MovieObj>} either gets the movie from our DB if exists or imdb if not
  */
 export async function getMovieFromDBorIMDB(movieID, api_key, justShowPreview){
     console.log("Called getMovieFromDB_or_IMDB", `Preview: ${justShowPreview}`)
     if(typeof movieID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`userAPIKey and movieID must be provided. userAPIKey=${api_key}. movieID=${movieID}`)
-    let movie = findMovieInServerDB(movieID)
-    if(movie==undefined){
+    let movie = await findMovieInServerDB(movieID)
+    if(!movie){
         movie = await imdbAPI.imdb_getMovie(api_key, movieID)
-        if(movie==null) throw new BadRequest(`Movie w ID doesn't exist`)
+        if(movie==null) throw new BadRequest(`Movie w/ ID=${movieID} doesn't exist`)
 
-        fetx(`movies/${insert}`, "POST", movie).then(obj => {
+        //Add obtained movie to our DB
+        elasticFetch.create(ourIndexes.movies, movie).then(obj => {
             console.log(`Inserted movie -> ${JSON.stringify(movie)} to our DB`)
         })
+    } 
+    else console.log("Obtained movie from our DB")
 
-    } else console.log("Obtained movie from our DB")
     if(justShowPreview) return movie.getPreview()
     else return movie
 }
 
 /**
  * @param {string} actorID 
- * @returns {Actor | undefined} A actor if found or undefined otherwise
+ * @returns {Actor | null} A actor if found or null otherwise
  */
 function findActorInServerDB(actorID){
-    return fetx(`users/_search?q=id:${actorID}`, "GET").then(actor => {
-        console.log(`Actor obtained from our DB -> ${JSON.stringify(actor)}`)
-        return actor.hits.hits[0]._source
+    return elasticFetch.get(ourIndexes.actors, actorID).then(obj => {
+        if(obj.found==false) return null
+        console.log(`Actor obtained from our DB -> ${JSON.stringify(obj)}`)
+        return new Actor(obj._id, obj._source) 
     })
 }
 
@@ -399,15 +297,16 @@ export async function getActorFromDBorIMDB(actorID, api_key){
     console.log(`Called getActorFromDBorIMDB, actorID=${actorID}`)
     if(typeof actorID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`userAPIKey and actorID must be provided. userAPIKey=${api_key}. actorID=${actorID}`)
     let actor = findActorInServerDB(actorID)
-    if(actor==undefined){
+    if(!actor){
         actor = await imdbAPI.imdb_getActor(api_key, actorID)
         if(actor==null) throw new BadRequest(`Actor w ID=${actorID} doesn't exist`)
 
-        fetx(`actors/${insert}`, "POST", actor).then(obj => {
-            console.log(obj)
+        //Add obtained actor to our DB
+        elasticFetch.create(ourIndexes.actors, actor).then(obj => {
+            console.log(`Inserted movie -> ${JSON.stringify(actor)} to our DB`)
         })
-
-    } else console.log("Obtained actor from our DB")
+    } 
+    else console.log("Obtained actor from our DB")
     return actor
 }
 

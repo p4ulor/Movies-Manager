@@ -1,9 +1,9 @@
 // Contains functions responsible for using the IMDB API in order to get movies, using a users key (cmdb-imdb-api-access)
 
 import fetch from "node-fetch"
-import { BadRequest } from "../utils/errors-and-bodies.mjs"
+import { BadRequest } from "../utils/errors-and-codes.mjs"
 import { processPaging } from "../utils/paging.mjs"
-import { Actor, Movie, MovieActor } from "./cmdb-data-objs.mjs"
+import { Actor, MovieObj, MovieActor } from "./cmdb-data-objs.mjs"
 
 const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}` //https://imdb-api.com/api/#Title-header
 const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${key}` //https://imdb-api.com/api/#Top250Movies-header
@@ -30,7 +30,7 @@ export async function imdb_getMovie(api_key, movieID){
 }
 
 const extractMovieProperties = (obj) => { 
-    return new Movie(
+    return new MovieObj(
         obj.id, 
         obj.title,
         obj.plot,

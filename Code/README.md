@@ -32,7 +32,8 @@ or
 You can optionally install it globally since it's not a component that is part of our code, using the npm flag: -g. Run like: nodemon <file.mjs>. This will make so we don't have to restart the server everytime we make changes to our code, which can make developing faster and easier.
 - npm run dev
 
-Our database is a NoSQL and document structured database called [Elastic Search](https://www.elastic.co/downloads/elasticsearch) which was built using Java and runs w/ the JVM. It stores out data in JSON format, which is an advantage because we're using JS, so the there's a high interoperability between the database and our server. It can be accessed by an HTTP API and follows the REST principles. Elastic Search 8.5.3 is 600mb, once it is ran. An Elastic Search cluster is created once you run it, it's a group of one or more Elasticsearch nodes instances that are connected together, which store our data. Elastic Search is by default running in port 9200
+## About elastic search
+It's a NoSQL and document structured database called [Elastic Search](https://www.elastic.co/downloads/elasticsearch) which was built using Java and runs w/ the JVM. It stores out data in JSON format, which is an advantage because we're using JS, so the there's a high interoperability between the database and our server. It can be accessed by an HTTP API and follows the REST principles. Elastic Search 8.5.3 is 600mb, once it is ran. An Elastic Search cluster is created once you run it, it's a group of one or more Elasticsearch nodes instances that are connected together, which store our data. Elastic Search is by default running in port 9200
 ### Changes done to Elastic Search files in order to work easily
 #### In `elasticsearch-8.5.3/config/elasticsearch.yml`, add:
 1. ingest.geoip.downloader.enabled: false ([source](https://stackoverflow.com/a/72626114/9375488))
@@ -46,3 +47,10 @@ Our database is a NoSQL and document structured database called [Elastic Search]
 - - **enabled: false**
 - xpack.security.transport.ssl:
 - - **enabled: false**
+
+## Paths to consult data in the DB
+- http://localhost:9200/_cat
+- http://localhost:9200/_all
+- http://localhost:9200/_cat/indices
+- http://localhost:9200/users/_doc/{_id}
+- http://localhost:9200/movies/_search

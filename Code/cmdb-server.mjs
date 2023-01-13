@@ -3,13 +3,20 @@
 
 export const PORT = 1904
 
+export const ELASTIC_SEARCH = "http://localhost:9200"
+export const isDataSourceElastic = true
+
 console.log("Start setting up server")
+
+import { createOurIndexes } from './data/cmdb-data-elastic.mjs'
+if(isDataSourceElastic) createOurIndexes()
 
 import express from 'express'
 import hbs from 'hbs'
 import cors from 'cors'
 import cookieParser from 'cookie-parser' //https://expressjs.com/en/resources/middleware/cookie-parser.html
 import favicon from'serve-favicon'
+
 const app = express()
 //Middleware setup
 app.use(cors()) //Allows requests to skip the Same-origin policy and access resources from remote hosts https://blog.knoldus.com/a-guide-to-cors-in-node-js-with-express/#:~:text=start%20to%20learn%3A-,What%20is%20CORS%3F,-CORS%20stands%20for
@@ -31,7 +38,7 @@ app.use(express.static('./web/site/public')) //https://expressjs.com/en/starter/
 import * as api from './web/api/cmdb-web-api.mjs'
 export const apiPath = "/api"
 
-export const apiRoutes = {
+export const apiRoutes = { //TODO: review isto tem de estar aqui pq?
     getGroups: apiPath+'/groups'
 }
 

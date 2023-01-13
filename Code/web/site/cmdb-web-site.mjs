@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser'
 import * as server from '../../cmdb-server.mjs'
 import * as services from '../../services/cmdb-services.mjs'
 import { doesBodyContainProps, totalMinutesToHoursAndMinutes } from '../../utils/utils.mjs'
-import * as body from '../../utils/errors-and-bodies.mjs'
+import * as body from '../../utils/req-resp-bodies.mjs'
 
 const router = express.Router() //Let's us define a fragment of our express app that can be joined with other parts of our app https://expressjs.com/en/5x/api.html#router
 
@@ -56,7 +56,8 @@ const webPages = {
     },
     pageOfAMovie: {
         url: "/movies/:movieID",
-        view: "movie.hbs"
+        view: "movie.hbs",
+        setUrl: (movieID) => { return `/movies/${movieID}` }
     },
     searchMovies: {
         url: "/search",
@@ -102,7 +103,7 @@ router.get(webPages.mygroups.url, (req, rsp) => {
             view.options.groups.push(
                 {
                     groupName: group.name,
-                    groupPage: `/groups/${group.id}`
+                    groupPage: webPages.pageOfAGroup.setUrl(group.id)
                 }
             )
         })
@@ -134,7 +135,7 @@ router.get(webPages.pageOfAGroup.url, (req, rsp) => {
             return {
                 movieName: movie.name,
                 movieDuration: totalMinutesToHoursAndMinutes(movie.duration),
-                moviePage: `/movies/${movie.id}`,
+                moviePage: webPages.pageOfAMovie.setUrl(movie.id),
                 removeMovieRoute: shadowWebRoutes.removeMovie.setUrl(movie.id),
                 groupID: group.id,
                 movieID: movie.id
@@ -190,7 +191,7 @@ router.get(webPages.searchMovies.url, (req, rsp) => {
                 return {
                     movieName: movie.title,
                     movieDescription: movie.description,
-                    moviePage: `/movies/${movie.id}`
+                    moviePage: webPages.pageOfAMovie.setUrl(movie.id)
                 }
             })
             rsp.render(view.file, view.options)
@@ -210,7 +211,7 @@ router.get(webPages.topMovies.url, (req, rsp) => {
             return {
                 movieName: movie.name,
                 movieDuration: "",
-                moviePage: `/movies/${movie.id}`
+                moviePage: webPages.pageOfAMovie.setUrl(movie.id)
             }
         })
 
@@ -260,7 +261,7 @@ export const shadowWebRoutes = {
 router.post(shadowWebRoutes.login, (req, resp, next) => {
     doesBodyContainProps(req.body, body.UserLoginRequest)
 
-    services.userSignInOrLogin(req.body, false)
+    services.userSignUpOrLogin(req.body, false)
     .then(tokenAnduserID => {
         processLoginOrRegister(req, resp, tokenAnduserID)
     })
@@ -270,7 +271,7 @@ router.post(shadowWebRoutes.login, (req, resp, next) => {
 router.post(shadowWebRoutes.register, (req, resp, next) => {
     doesBodyContainProps(req.body, body.UserLoginRequest)
 
-    services.userSignInOrLogin(req.body, true)
+    services.userSignUpOrLogin(req.body, true)
     .then(tokenAnduserID => {
         processLoginOrRegister(req, resp, tokenAnduserID)
     })
@@ -280,7 +281,7 @@ router.post(shadowWebRoutes.register, (req, resp, next) => {
 router.post(shadowWebRoutes.newGroup, (req, resp, next) => {
     const token = getTokenFromCookie(req, resp)
     services.createGroup(req.body.name, req.body.description, false, token).then(groupID => {
-        resp.setHeader('Location', `/mygroups`)
+        resp.setHeader('Location', webPages.mygroups.url)
         .status(302)
         .end()
     })
@@ -291,7 +292,7 @@ router.post(shadowWebRoutes.deleteGroup.url, (req, resp, next) => {
     const token = getTokenFromCookie(req, resp)
     
     services.deleteGroup(req.params.groupID, token).then(_ => {
-        resp.setHeader('Location', `/mygroups`)
+        resp.setHeader('Location', webPages.mygroups.url)
         .status(302)
         .end()
     }).catch(next)
@@ -315,7 +316,7 @@ router.post(shadowWebRoutes.updateGroup.url, (req, resp, next) => {
     const newGroupName = req.body.groupName
     const newGroupDescription =  req.body.groupDescription
     services.updateGroup(groupID, newGroupName, newGroupDescription, token).then(_ => {
-        resp.setHeader('Location', `/groups/${groupID}`)
+        resp.setHeader('Location', webPages.pageOfAGroup.setUrl(groupID))
         .status(302)
         .end()
     }).catch(next)
@@ -328,7 +329,7 @@ router.post(shadowWebRoutes.addMovieToGroup.url, (req, resp, next) => {
     const movieID = req.params.movieID
     services.addMovieToGroup(movieID, groupID, token).then(msg => {
         console.log(msg.msg)
-        resp.setHeader('Location', `/groups/${groupID}`)
+        resp.setHeader('Location', webPages.pageOfAGroup.setUrl(groupID))
         .status(302)
         .end()
     }).catch(next)
@@ -346,7 +347,7 @@ function processLoginOrRegister(req, resp, tokenAnduserID){
     resp.cookie("userName", req.body.name)
     resp.cookie('token', tokenAnduserID.token, { expires: tomorrow })
     resp.cookie('userID', tokenAnduserID.userID, { expires: tomorrow }) //actually I dont remember why I return and store the id
-    resp.setHeader('Location', `/`) // OR -> resp.redirect(`/`)
+    resp.setHeader('Location', webPages.home.url) // OR -> resp.redirect(`/`)
         .status(302)
         .end()
 }
@@ -357,6 +358,6 @@ function getUserNameFromCookie(req){
 
 function getTokenFromCookie(req, resp){
     const token = req.cookies.token
-    if(token==undefined) resp.setHeader('Location', `/login`).status(302).end()
+    if(token==undefined) resp.setHeader('Location', webPages.login.url).status(302).end()
     else return token
 }

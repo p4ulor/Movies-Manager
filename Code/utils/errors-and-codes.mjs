@@ -39,35 +39,8 @@ export class Conflict extends Error {
     }
 }
 
-//Expected Request bodies
-
-export const newUserRequest = {
-    name: "",
-    password: "",
-    api_key: ""
-}
-
-export const UserLoginRequest = {
-    name: "",
-    password: "",
-}
-
-export const newGroupRequest = {
-    name: "",
-    description: "",
-    isPrivate: true
-}
-
-export const updateGroupRequest = {
-    groupName: "",
-    groupDescription: ""
-}
-
-// Server response bodies
-export const imdb_API_KeyInvalid = {
-    errorMessage: "Invalid API Key"
-}
-
-export const generalServerResponse = {
-    msg: ""
+export class ServerError extends Error {
+    constructor(message) { super(message)
+        this.code = statusCodes.INTERNAL_SERVER_ERROR
+    }
 }

@@ -1,7 +1,7 @@
 'use strict'
 
 import * as imdbAPI from './imdb-movies-data.mjs'
-import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-bodies.mjs';
+import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-codes.mjs';
 import { Group, Actor, MovieActor, User, Movie} from './cmdb-data-objs.mjs'
 
 const crypto = await import('node:crypto')
