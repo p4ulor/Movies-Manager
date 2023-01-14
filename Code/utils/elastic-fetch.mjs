@@ -1,6 +1,13 @@
 import { ELASTIC_SEARCH } from "../cmdb-server.mjs"
 import fetch from "node-fetch"
 
+export async function doesIndexExist(indexName){
+    const uri = doesIndexExistUri(indexName)
+    return await fetch(uri, {method: "HEAD"}).then(response => 
+        response.ok
+    )
+}
+
 export async function createIndex(indexName){
     const uri = createIndexUri(indexName)
     easyFetch(uri, "PUT")
@@ -10,12 +17,12 @@ export async function createIndex(indexName){
  * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
  * @param {string} id the identifier of the entity
  */
-export async function get(index, id){
+export async function getDoc(index, id){
     const uri = getDocUri(index, id)
     return easyFetch(uri)
 }
 
-export async function search(index, field, value){
+export async function searchDoc(index, field, value){
     const uri = searchDocUri(index, field, value)
     return easyFetch(uri)
 }
@@ -25,7 +32,7 @@ export async function search(index, field, value){
  * @param {string} id the identifier of the entity
  * @param {Object} body the new data
  */
-export async function update(index, id, body) {
+export async function updateDoc(index, id, body) {
     const uri = updateDocUri(index, id)
     return easyFetch(uri, "POST", updateBody(body))
 }
@@ -34,8 +41,13 @@ export async function update(index, id, body) {
  * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
  * @param {Object} body the new data
  */
-export async function create(index, body) {
+export async function createDoc(index, body) {
     const uri = createDocUri(index)
+    return easyFetch(uri, "POST", body)
+}
+
+export async function createDocWithID(index, body, id) {
+    const uri = createDocWithIDUri(index, id)
     return easyFetch(uri, "POST", body)
 }
 
@@ -43,7 +55,7 @@ export async function create(index, body) {
  * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
  * @param {string} id the identifier of the entity
  */
-export async function delite(index, id){ //because delete is a reserved word
+export async function deleteDoc(index, id){
     const uri = deleteDocUri(index, id)
     return easyFetch(uri, "DELETE")
 }
@@ -69,11 +81,13 @@ async function easyFetch(uri, method, body = undefined) {
     )
 }
 
+const doesIndexExistUri = (index) => `${ELASTIC_SEARCH}/${index}`
 const searchDocUri = (index, field, value) => `${ELASTIC_SEARCH}/${index}/_search?q=${field}:${value}` 
 const getDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_doc/${id}`
 const createDocUri = (index) => `${ELASTIC_SEARCH}/${index}/_doc/?refresh=wait_for`
+const createDocWithIDUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_doc/${id}?refresh=wait_for`
 const createIndexUri = (index) => `${ELASTIC_SEARCH}/${index}`
-const updateDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_update/${id}`
+const updateDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_update/${id}?refresh=wait_for`
 const deleteDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_doc/${id}?refresh=wait_for`
 
 const updateBody = (body) => { return {doc: body}}

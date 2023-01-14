@@ -55,10 +55,10 @@ export class GroupsListResponse {
 
 export class GroupsItemListResponse {
     /**
-     * @param {string} groupID 
-     * @param {string} groupName 
+     * @param {string} id 
+     * @param {string} name 
      */
-    constructor(groupID, groupName){
-        this.groupID = groupID; this.groupName = groupName
+    constructor(id, name){
+        this.id = id; this.name = name
     }
 }

@@ -1,26 +1,28 @@
+import { removeIndex } from "../utils/utils.mjs";
+
 export class GroupMovie {
     /**
-     * We are storing the movied in each Group, tied to it's duration, so that when the user decided to delete the movie, it won't be required to 
+     * We are storing the movies in each Group, tied to it's duration, so that when the user decided to delete the movie, it won't be required to 
      * get the entire movie, just to get it's duration and decrement it to the totalDuration
-     * @param {string} movieID 
+     * @param {string} id
+     * @param {string} name
      * @param {number} duration 
      */
-    constructor(movieID, duration){ 
-        this.movieID = movieID; this.duration = duration
+    constructor(id, name, duration){ 
+        this.id = id; this.name = name; this.duration = duration
     }
 }
 
 export class GroupObj {
     /** https://stackoverflow.com/a/31420719/9375488 https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
-     * @param {string} id
      * @param {string} name
      * @param {string} description
      * @param {boolean} isPrivate (not really in use)
      * @param {Array<GroupMovie>} movies movie id and duration
      * @param {number} totalDuration
      */
-    constructor(id, name, description, isPrivate, movies, totalDuration){
-        this.id = id, this.name = name, this.description = description, this.isPrivate = true,
+    constructor(name, description, isPrivate, movies, totalDuration){
+        this.name = name, this.description = description, this.isPrivate = true,
         this.movies = (movies) ? movies : []
         this.totalDuration = (totalDuration) ? totalDuration : 0
 
@@ -28,11 +30,11 @@ export class GroupObj {
          * @param {string} newMovieID 
          * @param {number} duration
          */
-        this.addMovie = function addMovie(newMovieID, duration){
+        this.addMovie = function addMovie(newMovieID, movieName, duration){
             if(!newMovieID instanceof String) throw new Error("Can only remove moviesIDs using an identifier that's a string")
             duration = new Number(duration) //when duration==null (in case of a series/show) the new Number(duration) will return 0
             if(isNaN(duration)) throw new Error("Can only add movies with valid duration of type number")
-            this.movies.push(new GroupMovie(newMovieID, duration))
+            this.movies.push(new GroupMovie(newMovieID, movieName, duration))
             this.totalDuration = duration + this.totalDuration
         }
 
@@ -52,7 +54,7 @@ export class GroupObj {
                 else return false
             })
             if(movieIndexToRemove==-1) return false
-            this.movies.slice(movieIndexToRemove, movieIndexToRemove+1)
+            this.movies = removeIndex(this.movies, movieIndexToRemove)
             this.totalDuration = this.totalDuration - duration
             return true
         }
@@ -90,7 +92,7 @@ export class ActorObj {
 
 export class Actor { //this insures compatability between data-mem and data-elastic
     /**
-    * @param {string} id 
+    * @param {string} id //the same as the imdb key of the actor
     * @param {ActorObj} actorObj 
     */
     constructor(id, actorObj){ 
@@ -113,7 +115,6 @@ export class MovieActor {
 
 export class MovieObj {
     /**
-     * @param {string} id 
      * @param {string} name 
      * @param {string} description 
      * @param {string} imageURL A link
@@ -121,8 +122,8 @@ export class MovieObj {
      * @param {string} director or directors
      * @param {Array<MovieActor>} actorsList
      */
-     constructor(id, name, description, imageURL, duration, director, actorsList){
-        this.id = id; this.name = name; this.description = description; this.imageURL = imageURL; 
+     constructor(name, description, imageURL, duration, director, actorsList){
+        this.name = name; this.description = description; this.imageURL = imageURL; 
         this.duration = duration; this.director = director; this.actorsList = actorsList
         
         this.getPreview = function getPreview(){
@@ -133,7 +134,7 @@ export class MovieObj {
 
 export class Movie { //this insures compatability between data-mem and data-elastic. id must be string because of elastic
     /**
-    * @param {string} id 
+    * @param {string} id //the same as the imdb key of the movie
     * @param {MovieObj} movieObj 
     */
     constructor(id, movieObj){ 

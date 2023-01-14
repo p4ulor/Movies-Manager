@@ -5,6 +5,7 @@ import * as server from '../../cmdb-server.mjs'
 import * as services from '../../services/cmdb-services.mjs'
 import { doesBodyContainProps, totalMinutesToHoursAndMinutes } from '../../utils/utils.mjs'
 import * as body from '../../utils/req-resp-bodies.mjs'
+import { Response } from 'node-fetch'
 
 const router = express.Router() //Let's us define a fragment of our express app that can be joined with other parts of our app https://expressjs.com/en/5x/api.html#router
 
@@ -98,8 +99,8 @@ router.get(webPages.mygroups.url, (req, rsp) => {
     view.options.groups = []
     view.options.createGroupPage = webPages.createGroup.url
     const token = getTokenFromCookie(req, rsp)
-    services.getGroupList(0, 3, token).then(arrayOfGroups => {
-        arrayOfGroups.forEach(group => {
+    services.getGroupList(0, 10, token).then(arrayOfGroups => {
+        arrayOfGroups.groups.forEach(group => {
             view.options.groups.push(
                 {
                     groupName: group.name,
@@ -126,12 +127,12 @@ router.get(webPages.pageOfAGroup.url, (req, rsp) => {
     const token = getTokenFromCookie(req, rsp)
     services.getGroup(req.params.groupID, token).then(group => {
         view.options.groupID = group.id
-        view.options.groupName = group.name
-        view.options.groupDescription = group.description
-        view.options.totalDuration = totalMinutesToHoursAndMinutes(group.totalDuration)
+        view.options.groupName = group.groupObj.name
+        view.options.groupDescription = group.groupObj.description
+        view.options.totalDuration = totalMinutesToHoursAndMinutes(group.groupObj.totalDuration)
         view.options.updateGroupRoute = shadowWebRoutes.updateGroup.setUrl(group.id)
         view.options.deleteGroupRoute = shadowWebRoutes.deleteGroup.setUrl(group.id)
-        view.options.movies = group.movies.map(movie => {
+        view.options.movies = group.groupObj.movies.map(movie => {
             return {
                 movieName: movie.name,
                 movieDuration: totalMinutesToHoursAndMinutes(movie.duration),
@@ -153,18 +154,18 @@ router.get(webPages.pageOfAMovie.url, (req, rsp) => {
     const token = getTokenFromCookie(req, rsp)
     services.getMovie(req.params.movieID, token).then(movie => {
 
-        view.options.movieName = movie.name
-        view.options.movieDescription = movie.description
-        view.options.movieDuration = ` (${totalMinutesToHoursAndMinutes(movie.duration)})`
-        view.options.imageURL = movie.imageURL
-        view.options.movieDirectors = movie.director
-        view.options.movieActors = movie.actors
+        view.options.movieName = movie.movieObj.name
+        view.options.movieDescription = movie.movieObj.description
+        view.options.movieDuration = ` (${totalMinutesToHoursAndMinutes(movie.movieObj.duration)})`
+        view.options.imageURL = movie.movieObj.imageURL
+        view.options.movieDirectors = movie.movieObj.director
+        view.options.movieActors = movie.movieObj.actors
 
         view.options.shadowWebPath = shadowWebPath
         view.options.movieID = req.params.movieID
         view.options.getListOfGroupsURI = server.apiRoutes.getGroups
 
-        view.options.actorsList = movie.actorsList.map(actor => {
+        view.options.actorsList = movie.movieObj.actorsList.map(actor => {
             return {
                 actorName: actor.name,
                 actorPage: webPages.pageOfAnActor.setUrl(actor.id)
@@ -186,12 +187,12 @@ router.get(webPages.searchMovies.url, (req, rsp) => {
         const skip = new Number(view.options.pageNumber) * 5 - 5
         const token = getTokenFromCookie(req, rsp)
         services.searchMovie(req.query.searchTerms, skip, 5, token).then(result => {
-            view.options.movies = result.found.map(movie => {
+            view.options.movies = result.found.map(movieResultItem => {
                 //console.log(movie)
                 return {
-                    movieName: movie.title,
-                    movieDescription: movie.description,
-                    moviePage: webPages.pageOfAMovie.setUrl(movie.id)
+                    movieName: movieResultItem.title,
+                    movieDescription: movieResultItem.description,
+                    moviePage: webPages.pageOfAMovie.setUrl(movieResultItem.id)
                 }
             })
             rsp.render(view.file, view.options)
@@ -223,9 +224,9 @@ router.get(webPages.pageOfAnActor.url, (req, rsp) => {
     const view = new HandleBarsView(webPages.pageOfAnActor.view)
     const token = getTokenFromCookie(req, rsp)
     services.getActor(req.params.actorID, token).then(actor => {
-        view.options.actorName = actor.name
-        view.options.birthDate = actor.birthDate
-        view.options.imageURL = actor.image
+        view.options.actorName = actor.actorObj.name
+        view.options.birthDate = actor.actorObj.birthDate
+        view.options.imageURL = actor.actorObj.image
         rsp.render(view.file, view.options)
     })
 })
@@ -280,7 +281,8 @@ router.post(shadowWebRoutes.register, (req, resp, next) => {
 
 router.post(shadowWebRoutes.newGroup, (req, resp, next) => {
     const token = getTokenFromCookie(req, resp)
-    services.createGroup(req.body.name, req.body.description, false, token).then(groupID => {
+    services.createGroup(req.body.name, req.body.description, false, token).then(isDone => {
+        console.log(`User redirected. Is operation done? ${isDone}`)
         resp.setHeader('Location', webPages.mygroups.url)
         .status(302)
         .end()
@@ -341,12 +343,16 @@ router.get('*', function(req, res){
 })
 
 
+/**
+ * @param {express.Request} req 
+ * @param {express.Response} resp 
+ * @param {body.LoginResponse} tokenAnduserID 
+ */
 function processLoginOrRegister(req, resp, tokenAnduserID){
     let tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     resp.cookie("userName", req.body.name)
     resp.cookie('token', tokenAnduserID.token, { expires: tomorrow })
-    resp.cookie('userID', tokenAnduserID.userID, { expires: tomorrow }) //actually I dont remember why I return and store the id
     resp.setHeader('Location', webPages.home.url) // OR -> resp.redirect(`/`)
         .status(302)
         .end()

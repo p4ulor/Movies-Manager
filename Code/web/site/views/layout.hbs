@@ -67,7 +67,7 @@
         }
 
         window.addEventListener("load", ()=>{
-            const isUserLoggedIn = getCookie("userID")
+            const isUserLoggedIn = getCookie("token") //todoooooooooo this is bad/cheap design
             console.log(isUserLoggedIn)
             if(isUserLoggedIn!=""){
                 addNewNavItem("My Groups", "/mygroups")
@@ -88,8 +88,7 @@
                         document.cookie = document.cookie + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
                     }
                     //clear cookies manually demonstration:
-                    //document.cookie = "userID" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;' //https://stackoverflow.com/a/10593045/9375488
-                    //document.cookie = "token" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+                    //document.cookie = "token" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'//https://stackoverflow.com/a/10593045/9375488
                     //document.cookie = "userName"...
                 }
             }

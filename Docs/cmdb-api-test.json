@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "2cd0967b-1583-49c1-a42f-652ecb113fff",
+		"_postman_id": "3af36da6-a43b-4d36-8fe5-9aabd74da445",
 		"name": "IPW",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24168930"
+		"_exporter_id": "24004812"
 	},
 	"item": [
 		{
@@ -142,12 +142,21 @@
 							"response": []
 						},
 						{
-							"name": "Create User in Index With ID",
+							"name": "Create User with Index With ID",
 							"request": {
 								"method": "PUT",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"NodeApplication\",\r\n    \"groups\": [],\r\n    \"token\": \"b9e1c3ce-7b90-4bec-a48d-8a2b12756932\",\r\n    \"hash\": \"c90793e7cb66c9001c2554ace3bcd31ff9f28e5e4cdde0ab4f25be51a5dafc10\",\r\n    \"salt\": \"123403a5b2d49f7b7c975f35bb4914f3\",\r\n    \"api_key\": \"k_25f649os\" \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
-									"raw": "http://localhost:9200/users/_doc/carlos",
+									"raw": "http://localhost:9200/users/_doc/XQLDrIUBlCiQ4o3uDp9C",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -156,7 +165,7 @@
 									"path": [
 										"users",
 										"_doc",
-										"carlos"
+										"XQLDrIUBlCiQ4o3uDp9C"
 									]
 								}
 							},
@@ -205,7 +214,7 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:9200/users/_doc/BZX-eIUBn-XL_4_FuVDZ",
+									"raw": "http://localhost:9200/users/_doc/fHsmqIUBlXEbTxQeKvbj",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -214,7 +223,7 @@
 									"path": [
 										"users",
 										"_doc",
-										"BZX-eIUBn-XL_4_FuVDZ"
+										"fHsmqIUBlXEbTxQeKvbj"
 									]
 								}
 							},
@@ -361,6 +370,35 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Update user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"doc\": {\r\n        \"name\": \"NodeApplication\",\r\n        \"groups\": [],\r\n        \"token\": \"b9e1c3ce-7b90-4bec-a48d-8a2b12756932\",\r\n        \"hash\": \"c90793e7cb66c9001c2554ace3bcd31ff9f28e5e4cdde0ab4f25be51a5dafc10\",\r\n        \"salt\": \"123403a5b2d49f7b7c975f35bb4914f3\",\r\n        \"api_key\": \"k_25f649os\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9200/users/_update/XQLDrIUBlCiQ4o3uDp9C",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_update",
+										"XQLDrIUBlCiQ4o3uDp9C"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -371,7 +409,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo23aaab\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_000000\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaa\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_25f649os\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -397,7 +435,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo\",\r\n    \"password\": \"ay\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaa\",\r\n    \"password\": \"ay\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -531,6 +569,43 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Delete the INDEX groups",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:9200/groups",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"groups"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check if index groups exists",
+							"request": {
+								"method": "HEAD",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9200/groups",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"groups"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -615,7 +690,7 @@
 							"variable": [
 								{
 									"key": "groupID",
-									"value": "1"
+									"value": "kXuCqIUBlXEbTxQe_vZT"
 								},
 								{
 									"key": "movieID",
@@ -821,6 +896,39 @@
 		{
 			"name": "IMDB-API",
 			"item": [
+				{
+					"name": "Elastic",
+					"item": [
+						{
+							"name": "Delete all actors",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n \"query\": {\r\n \"match_all\": {}\r\n }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9200/users/_delete_by_query",
+									"host": [
+										"localhost"
+									],
+									"port": "9200",
+									"path": [
+										"users",
+										"_delete_by_query"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
 				{
 					"name": "Search movies by name",
 					"request": {

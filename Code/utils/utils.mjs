@@ -21,3 +21,17 @@ export function totalMinutesToHoursAndMinutes(totalMinutes) {
     const minutes = totalMinutes % 60
     return `${hours}h ${minutes}m`
 }
+
+/**
+ * 
+ * @param {Array<any>} array 
+ * @param {number} index 
+ */
+export function removeIndex(array, index){
+    if(array.length==0) return
+    if(index < 0) throw new Error("Invalid index")
+    if(index > array.length-1) console.log("Note, the index is greater than the size of the array")
+    if(array.length==1) array = array.slice(1,1)
+    else array = array.slice(index, index+1)
+    return array
+}

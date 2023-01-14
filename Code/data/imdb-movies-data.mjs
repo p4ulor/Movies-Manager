@@ -3,7 +3,7 @@
 import fetch from "node-fetch"
 import { BadRequest } from "../utils/errors-and-codes.mjs"
 import { processPaging } from "../utils/paging.mjs"
-import { Actor, MovieObj, MovieActor } from "./cmdb-data-objs.mjs"
+import { Actor, MovieObj, MovieActor, ActorObj, Movie } from "./cmdb-data-objs.mjs"
 
 const IMDB_getMovieById = (key, movieID) => `https://imdb-api.com/en/API/Title/${key}/${movieID}` //https://imdb-api.com/api/#Title-header
 const IMDB_top250Movies = (key) => `https://imdb-api.com/en/API/Top250Movies/${key}` //https://imdb-api.com/api/#Top250Movies-header
@@ -12,7 +12,8 @@ const IMDB_getActorById = (key, actorID) => `https://imdb-api.com/en/API/Name/${
 
 /**
  * @param {string} api_key 
- * @param {string} movieID 
+ * @param {string} movieID
+ * @return {Promise<Movie | null>}
  */
 export async function imdb_getMovie(api_key, movieID){
     if(typeof movieID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`api_key and movieID must be provided. api_key=${api_key}. movieID=${movieID}`)
@@ -20,7 +21,7 @@ export async function imdb_getMovie(api_key, movieID){
     return fetch(URI).then(response => {
         return response.json().then(obj => {
             const movieWithOurProps = extractMovieProperties(obj)
-            console.log("Movie obtained from imdb API -> "+JSON.stringify(movieWithOurProps))
+            console.log("\nMovie obtained from imdb API -> "+JSON.stringify(movieWithOurProps), "\n")
             return movieWithOurProps
         })
     }).catch(e => {
@@ -30,8 +31,7 @@ export async function imdb_getMovie(api_key, movieID){
 }
 
 const extractMovieProperties = (obj) => { 
-    return new MovieObj(
-        obj.id, 
+    return new Movie(obj.id, MovieObj(
         obj.title,
         obj.plot,
         obj.image,
@@ -40,7 +40,7 @@ const extractMovieProperties = (obj) => {
         obj.actorList.map(actor => {
             return new MovieActor(actor.id, actor.name)
         })
-    )
+    ))
 }
 
 let cachedTopResults = []
@@ -70,7 +70,7 @@ export async function imdb_getTopMovies(numOfTop, api_key){
                 topNmovies.push(getTopMoviesItemArrayObjProperties(cachedTopResults[i]))
             }
             const jsonResponse = {top: topNmovies}
-            console.log("Top movies obtained ="+JSON.stringify(jsonResponse))
+            console.log("\nTop movies obtained ="+JSON.stringify(jsonResponse), "\n")
             return jsonResponse
         })
     }).catch(e => {
@@ -90,6 +90,13 @@ let cachedResults = new Array({ //this initialization is solely to give the type
     results: {}
 })
 
+/**
+ * @param {string} searchTerms 
+ * @param {number} skip 
+ * @param {number} limit 
+ * @param {string} api_key 
+ * @returns {Promise<MovieSearchResult | null>}
+ */
 export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
     const moviesFound = []
 
@@ -104,10 +111,10 @@ export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
         const paging = processPaging(skip, limit, results.length)
         if(paging!=null){
             for (let i = paging.startIndex; i <= paging.limitIndex; i++){
-                moviesFound.push(searchMovieObjProperties(results[i]))
+                moviesFound.push(new MovieSearchResultItem(results[i]))
             }
         }
-        return {found: moviesFound}
+        return new MovieSearchResult(moviesFound)
     }
     /* *************************************************** */
 
@@ -121,11 +128,12 @@ export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
             const paging = processPaging(skip, limit, resultsArray.length)
             if(paging!=null){
                 for (let i = paging.startIndex; i <= paging.limitIndex; i++){
-                    moviesFound.push(searchMovieObjProperties(resultsArray[i]))
+                    
+                    moviesFound.push(new MovieSearchResultItem(resultsArray[i]))
                 }
             }
-            const jsonResponse = {found: moviesFound}
-            console.log("Movies obtained ="+JSON.stringify(jsonResponse))
+            const jsonResponse = new MovieSearchResult(moviesFound)
+            console.log("\nMovies obtained ="+JSON.stringify(jsonResponse), "\n")
             return jsonResponse
         })
     }).catch(e => {
@@ -134,19 +142,36 @@ export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
     })
 }
 
-const searchMovieObjProperties = (obj) => { return { 
-    id: obj.id,
-    title: obj.title,
-    description: obj.description
-}}
+class MovieSearchResult {
+    /**
+     * @type {found: Array<MovieSearchResultItem>} found
+     * @property {found}
+     * @param {Array<MovieSearchResultItem>} items 
+     */
+    constructor(items){
+        this.found = items
+    }
+}
+
+class MovieSearchResultItem {
+    /**
+     * @property {string} id
+     * @property {string} title
+     * @property {string} description
+     * @param {Object} obj 
+     */
+    constructor(obj){
+        this.id = obj.id; this.title = obj.title; this.description = this.description
+    }
+}
 
 export async function imdb_getActor(api_key, actorID){
     if(typeof actorID!= 'string' || typeof api_key!= 'string') throw new BadRequest(`api_key and actorID must be provided. api_key=${api_key}. actorID=${actorID}`)
     let URI = IMDB_getActorById(api_key, actorID)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
-            const actor = new Actor(actorID, obj.image, obj.name, obj.birthDate)
-            console.log("Actor obtained from imdb API -> "+JSON.stringify(actor))
+            const actor = new Actor(actorID, new ActorObj(obj.image, obj.name, obj.birthDate))
+            console.log("\nActor obtained from imdb API -> "+JSON.stringify(actor),"\n")
             return actor
         })
     }).catch(e => {

@@ -73,7 +73,7 @@ export async function deleteGroup(groupID, token){
 /**
  * @param {number} groupID 
  * @param {string} token 
- * @returns {data.GroupObj} A group
+ * @returns {Promise<Group>} 
  */
 export async function getGroup(groupID, token){
     try {
@@ -93,16 +93,16 @@ export async function removeMovieFromGroup(groupID, movieID, token){
 
 export async function getTopMovies(numOfTopMovies, token){
     try {
-        const foundUser = await data.tryFindUserBy_(false, token)
+        const foundUser = await getUserByToken(token)
         if(!foundUser) throw new utils.NotFound("User not found")
-        const userAPIKey = foundUser.api_key
+        const userAPIKey = foundUser.userObj.api_key
         return await imdbAPI.imdb_getTopMovies(numOfTopMovies, userAPIKey)
     } catch(e) { throw e }
 }
 
 export async function searchMovie(searchTerms, skip, limit, token){
     try {
-        const userAPIKey = (await getUserByToken(token)).api_key
+        const userAPIKey = (await getUserByToken(token)).userObj.api_key
         if(skip==undefined) skip = 0
         if(limit==undefined) limit = 10
         return await imdbAPI.imdb_searchMovie(searchTerms, skip, limit, userAPIKey)
@@ -111,14 +111,14 @@ export async function searchMovie(searchTerms, skip, limit, token){
 
 export async function getMovie(movieID, token){
     try {
-        const userAPIKey = (await getUserByToken(token)).api_key
+        const userAPIKey = (await getUserByToken(token)).userObj.api_key
         return await data.getMovieFromDBorIMDB(movieID, userAPIKey)
     } catch(e) { throw e }    
 }
 
 export async function getActor(actorID, token){
     try {
-        const userAPIKey = (await getUserByToken(token)).api_key
+        const userAPIKey = (await getUserByToken(token)).userObj.api_key
         return await data.getActorFromDBorIMDB(actorID, userAPIKey)
     } catch(e) { throw e }    
 }
