@@ -13,34 +13,31 @@ export async function createIndex(indexName){
     easyFetch(uri, "PUT")
 }
 
-/**
- * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
- * @param {string} id the identifier of the entity
- */
 export async function getDoc(index, id){
     const uri = getDocUri(index, id)
     return easyFetch(uri)
 }
 
+/**
+ * @param {string} index Unique index identifier (entity, like "users", "movies", "actors" etc)
+ * @param {string} field the name of the field
+ * @param {Object} value
+ */
 export async function searchDoc(index, field, value){
     const uri = searchDocUri(index, field, value)
     return easyFetch(uri)
 }
 
 /**
- * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
+ * @param {string} index Unique index identifier (entity, like "users", "movies", "actors" etc)
  * @param {string} id the identifier of the entity
- * @param {Object} body the new data
+ * @param {Object} body an objected with a consistent structure for that index
  */
 export async function updateDoc(index, id, body) {
     const uri = updateDocUri(index, id)
     return easyFetch(uri, "POST", updateBody(body))
 }
 
-/**
- * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
- * @param {Object} body the new data
- */
 export async function createDoc(index, body) {
     const uri = createDocUri(index)
     return easyFetch(uri, "POST", body)
@@ -51,10 +48,6 @@ export async function createDocWithID(index, body, id) {
     return easyFetch(uri, "POST", body)
 }
 
-/**
- * @param {string} index Unique index identifier (entity, like users, movies, actors etc)
- * @param {string} id the identifier of the entity
- */
 export async function deleteDoc(index, id){
     const uri = deleteDocUri(index, id)
     return easyFetch(uri, "DELETE")

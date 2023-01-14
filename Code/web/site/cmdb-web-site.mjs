@@ -271,7 +271,6 @@ router.post(shadowWebRoutes.login, (req, resp, next) => {
 
 router.post(shadowWebRoutes.register, (req, resp, next) => {
     doesBodyContainProps(req.body, body.UserLoginRequest)
-
     services.userSignUpOrLogin(req.body, true)
     .then(tokenAnduserID => {
         processLoginOrRegister(req, resp, tokenAnduserID)
@@ -283,20 +282,15 @@ router.post(shadowWebRoutes.newGroup, (req, resp, next) => {
     const token = getTokenFromCookie(req, resp)
     services.createGroup(req.body.name, req.body.description, false, token).then(isDone => {
         console.log(`User redirected. Is operation done? ${isDone}`)
-        resp.setHeader('Location', webPages.mygroups.url)
-        .status(302)
-        .end()
+        redirect(resp, webPages.mygroups.url)
     })
     .catch(next)
 })
 
 router.post(shadowWebRoutes.deleteGroup.url, (req, resp, next) => {
     const token = getTokenFromCookie(req, resp)
-    
     services.deleteGroup(req.params.groupID, token).then(_ => {
-        resp.setHeader('Location', webPages.mygroups.url)
-        .status(302)
-        .end()
+        redirect(resp, webPages.mygroups.url)
     }).catch(next)
 })
 
@@ -305,9 +299,7 @@ router.post(shadowWebRoutes.removeMovie.url, (req, resp, next) => {
     const groupID = req.body.groupID
     const movieID = req.body.movieID
     services.removeMovieFromGroup(groupID, movieID, token).then(_ => {
-        resp.setHeader('Location', webPages.pageOfAGroup.setUrl(groupID))
-        .status(302)
-        .end()
+        redirect(resp, webPages.pageOfAGroup.setUrl(groupID))
     }).catch(next)
 })
 
@@ -318,9 +310,7 @@ router.post(shadowWebRoutes.updateGroup.url, (req, resp, next) => {
     const newGroupName = req.body.groupName
     const newGroupDescription =  req.body.groupDescription
     services.updateGroup(groupID, newGroupName, newGroupDescription, token).then(_ => {
-        resp.setHeader('Location', webPages.pageOfAGroup.setUrl(groupID))
-        .status(302)
-        .end()
+        redirect(resp, webPages.pageOfAGroup.setUrl(groupID))
     }).catch(next)
 })
 
@@ -331,9 +321,7 @@ router.post(shadowWebRoutes.addMovieToGroup.url, (req, resp, next) => {
     const movieID = req.params.movieID
     services.addMovieToGroup(movieID, groupID, token).then(msg => {
         console.log(msg.msg)
-        resp.setHeader('Location', webPages.pageOfAGroup.setUrl(groupID))
-        .status(302)
-        .end()
+        redirect(resp, webPages.pageOfAGroup.setUrl(groupID))
     }).catch(next)
 })
 
@@ -341,7 +329,6 @@ router.get('*', function(req, res){
     const view = new HandleBarsView('notFound.hbs', 'Not found')
     res.status(404).render(view.file, view.options);
 })
-
 
 /**
  * @param {express.Request} req 
@@ -353,7 +340,15 @@ function processLoginOrRegister(req, resp, tokenAnduserID){
     tomorrow.setDate(tomorrow.getDate() + 1)
     resp.cookie("userName", req.body.name)
     resp.cookie('token', tokenAnduserID.token, { expires: tomorrow })
-    resp.setHeader('Location', webPages.home.url) // OR -> resp.redirect(`/`)
+    redirect(resp, webPages.home.url)
+}
+
+/**
+ * @param {express.Response} resp 
+ * @param {string} url 
+ */
+function redirect(resp, url){
+    resp.setHeader('Location', url) // OR -> resp.redirect(`/`)
         .status(302)
         .end()
 }
@@ -364,6 +359,6 @@ function getUserNameFromCookie(req){
 
 function getTokenFromCookie(req, resp){
     const token = req.cookies.token
-    if(token==undefined) resp.setHeader('Location', webPages.login.url).status(302).end()
+    if(token==undefined) redirect(resp, webPages.login.url)
     else return token
 }

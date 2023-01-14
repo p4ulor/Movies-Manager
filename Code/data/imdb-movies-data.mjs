@@ -25,13 +25,13 @@ export async function imdb_getMovie(api_key, movieID){
             return movieWithOurProps
         })
     }).catch(e => {
-        console.log("Movie not found?"+e)
+        console.log("Movie not found? Invalid API key?"+e)
         return null
     })
 }
 
 const extractMovieProperties = (obj) => { 
-    return new Movie(obj.id, MovieObj(
+    return new Movie(obj.id, new MovieObj(
         obj.title,
         obj.plot,
         obj.image,

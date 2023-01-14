@@ -78,16 +78,16 @@ export async function addMovieToGroupOfAUser(userID, movieID, groupID){
     try {
         const user = await getUserByID(userID)
         const movie = await getMovieFromDBorIMDB(movieID, user.userObj.api_key, false)
-        elasticFetch.getDoc(ourIndexes.groups, groupID).then(obj => {
+        return await elasticFetch.getDoc(ourIndexes.groups, groupID).then(obj => {
             console.log(JSON.stringify(obj))
             if(obj.found==false) return null
             return obj._source
-        }).then(group => {
+        }).then(async group => {
             console.log("Group obtained", JSON.stringify(group))
             const theGroup = assignGroup(group) //just so we make use of the .addMovie() function
             theGroup.addMovie(movie.id, movie.movieObj.name, movie.movieObj.duration)
-            elasticFetch.updateDoc(ourIndexes.groups, groupID, theGroup).then(obj =>{
-                
+            return await elasticFetch.updateDoc(ourIndexes.groups, groupID, theGroup).then(obj =>{
+                return new bodies.GeneralServerResponse(`Added movie -> ${movie.movieObj.name}`)
             })
         })
     } catch(e) { throw e }
@@ -176,13 +176,14 @@ export async function removeMovieFromGroup(groupID, movieID, userID){
             if(obj.found==false) throw new NotFound(`Group w/ ID=${groupID} not found`)
             return new Group(obj._id, obj._source)
         })
- 
-        let wasMovieRemovedSuccessful = group.group.removeMovie(movieID)
+        
+        const theGroup = assignGroup(group.groupObj) //just so we make use of the .addMovie() function
+        let wasMovieRemovedSuccessful = theGroup.removeMovie(movieID)
 
         if(wasMovieRemovedSuccessful) {
-            return elasticFetch.createDoc(ourIndexes.groups, group.group).then(obj =>{
+            return await elasticFetch.updateDoc(ourIndexes.groups, groupID, theGroup).then(obj =>{
                 console.log("removeMovieFromGroup result -> ", JSON.stringify(obj))
-                return new bodies.GeneralServerResponse(`Deleted movie w/ id -> ${movieID} from group -> ${group.group.name}`)
+                return new bodies.GeneralServerResponse(`Deleted movie w/ id -> ${movieID} from group -> ${theGroup.name}`)
             })
         }
         else throw new NotFound(`Movie w/ id=${movieID} in group w/ id=${groupID} not found`)
@@ -280,7 +281,7 @@ export async function getMovieFromDBorIMDB(movieID, api_key, justShowPreview){
         if(movie==null) throw new BadRequest(`Movie w/ ID=${movieID} doesn't exist`)
 
         //Add obtained movie to our DB
-        elasticFetch.createDocWithID(ourIndexes.movies, movie, movie.id).then(obj => {
+        elasticFetch.createDocWithID(ourIndexes.movies, movie.movieObj, movie.id).then(obj => {
             console.log(`\nInserted movie -> ${JSON.stringify(movie)} to our DB\n`)
         })
     } 

@@ -3,7 +3,6 @@
     <p>{{movieDescription}}</p>
     <h4>Duration: {{movieDuration}}</h4>
     <h5>Director(s): {{movieDirectors}}</h5>
-    <h5>Actors: {{movieActors}}</h5>
     <div>
         <img src={{imageURL}} style="max-width: 20%; height: auto;"></img>
     </div>
@@ -12,7 +11,9 @@
 
     {{!-- <button onclick="ay()" class="btn-space btn btn-primary btn-space" >Remove movie from group</button> --}} {{!-- Maybe todo --}}
 </div>
+
 <div class="text-center">
+    <h5>Actors: {{movieActors}}</h5>
     {{#each actorsList}}
         {{> actorsItem}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
         <hr>
@@ -40,7 +41,7 @@
                         //console.log(await response.clone().text())
                         response.json().then(arrayGroups => { //changed from await to then because it suddently stopped working 1 day after???!!!
                             console.log(arrayGroups)
-                            showGroupsList(arrayGroups)
+                            showGroupsList(arrayGroups.groups)
                         })
                     }
                     catch(e) { alert("Error converting to json->"+e); isOpen = false }

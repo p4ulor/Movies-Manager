@@ -47,7 +47,7 @@ export class GroupObj {
             if(!movieID instanceof String) throw new Error("Can only remove moviesIDs using an identifier that's a string")
             let duration = 0
             const movieIndexToRemove = this.movies.findIndex(movieIDAndDuration => { 
-                if(id==movieIDAndDuration.movieID){
+                if(movieID==movieIDAndDuration.id){
                     duration = movieIDAndDuration.duration
                     return true
                 }
@@ -65,7 +65,7 @@ export class GroupObj {
  * @param {Object} obj hopefully an GroupObj
  */
 export function assignGroup(obj){
-    return new GroupObj(obj.id, obj.name, obj.description, obj.isPrivate, obj.movies, obj.totalDuration)
+    return new GroupObj(obj.name, obj.description, obj.isPrivate, obj.movies, obj.totalDuration)
 }
 
 
