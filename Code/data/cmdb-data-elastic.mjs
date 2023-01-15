@@ -33,8 +33,7 @@ export async function createUser(name, password, api_key){
         console.log("New user -> ", newUser)
 
         return elasticFetch.createDoc(ourIndexes.users, newUser).then(obj => {
-            newUser.id = obj._id
-            return new bodies.LoginResponse(newUser.token, newUser.id)
+            return new bodies.LoginResponse(newUser.token, obj._id)
         })
     } catch(e) { throw e }
 }
@@ -62,10 +61,14 @@ export async function createGroupForUser(userID, name, description, isPrivate){
     } catch(e) { throw e }
 }
 
-export async function addMovieToGroupOfAUser(userID, movieID, groupID){
+/**
+ * @param {string} api_key 
+ * @param {string} movieID 
+ * @param {string} groupID 
+ */
+export async function addMovieToGroupOfAUser(api_key, movieID, groupID){
     try {
-        const user = await getUserByID(userID)
-        const movie = await getMovieFromDBorIMDB(movieID, user.userObj.api_key, false)
+        const movie = await getMovieFromDBorIMDB(movieID, api_key, false)
         return await elasticFetch.getDoc(ourIndexes.groups, groupID).then(obj => {
             console.log(JSON.stringify(obj))
             if(obj.found==false) return null
@@ -98,10 +101,10 @@ export async function getGroupListOfAUser(skip, limit, userID){
     } catch(e) { throw e }
 }
 
-export async function updateGroup(userID, groupID, name, description){
+export async function updateGroup(groupID, name, description){
     try {
         elasticFetch.getDoc(ourIndexes.groups, groupID).then(obj => {
-            if(obj.found==false) throw new NotFound(`The user w/ id=${userID} doesn't have a group whose id=${groupID}`)
+            if(obj.found==false) throw new NotFound(`Group whose id=${groupID} not found`)
             const group = new Group(obj._id, obj._source)
             group.groupObj.name = name
             group.groupObj.description = description
@@ -157,7 +160,7 @@ export async function getGroup(groupID){
  * @param {string} token 
  * @returns {Promise<Message>}
  */
-export async function removeMovieFromGroup(groupID, movieID, userID){
+export async function removeMovieFromGroup(groupID, movieID){
     try {
         let group = await elasticFetch.getDoc(ourIndexes.groups, groupID).then(obj => {
             console.log(JSON.stringify(obj))
@@ -166,7 +169,7 @@ export async function removeMovieFromGroup(groupID, movieID, userID){
         })
         
         const theGroup = assignGroup(group.groupObj) //just so we make use of the .addMovie() function
-        let wasMovieRemovedSuccessful = theGroup.removeMovie(movieID)
+        const wasMovieRemovedSuccessful = theGroup.removeMovie(movieID)
 
         if(wasMovieRemovedSuccessful) {
             return await elasticFetch.updateDoc(ourIndexes.groups, groupID, theGroup).then(obj =>{
@@ -215,9 +218,6 @@ export async function tryFindUserBy_(token, name, onlyCheckIfItExists){
 
 /**
  * @param {number} id 
- * @param {string} token 
- * @param {string} name 
- * @param {boolean} onlyCheckIfItExists 
  * @return {Promise<User>}
  */
 export async function getUserByID(id) {
@@ -279,7 +279,6 @@ export async function getMovieFromDBorIMDB(movieID, api_key, justShowPreview){
 }
 
 /**
- * 
  * @param {string} actorID 
  * @param {string} api_key 
  * @returns {Promise<Actor>}

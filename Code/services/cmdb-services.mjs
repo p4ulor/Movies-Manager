@@ -1,5 +1,12 @@
-//import * as data from '../data/cmdb-data-mem.mjs'
-import * as data from '../data/cmdb-data-elastic.mjs'
+//import { isDataSourceElastic } from '../cmdb-server.mjs'
+//import * as data from `${isDataSourceElastic ? '../data/cmdb-data-elastic.mjs' : '../data/cmdb-data-mem.mjs'}`
+
+let data = await import('../data/cmdb-data-mem.mjs') //We're performing initialization just to have intellisense during development
+import('../cmdb-server.mjs').then(async servermjsLoaded =>{ //😈 this prevents "trying to access isDataSourceElastic before initialization"
+    if(servermjsLoaded.isDataSourceElastic) data = await import('../data/cmdb-data-elastic.mjs')
+    else data = await import('../data/cmdb-data-mem.mjs')
+})
+
 import * as imdbAPI from '../data/imdb-movies-data.mjs'
 import * as codes from '../utils/errors-and-codes.mjs'
 import * as bodies from '../utils/req-resp-bodies.mjs'
@@ -36,7 +43,7 @@ export async function addMovieToGroup(movieID, groupID, token){
     try { 
         const user = await getUserByToken(token)
         if(!isThisUserTheOwnerOfThisGroup(user.userObj, groupID)) throw new codes.Forbidden("You're not the owner of this group")
-        return await data.addMovieToGroupOfAUser(user.id, movieID, groupID) 
+        return await data.addMovieToGroupOfAUser(user.userObj.api_key, movieID, groupID) 
     } catch(e) { throw e }
 }
 
@@ -60,7 +67,7 @@ export async function updateGroup(groupID, groupName, groupDescription, token){
         if(!isAStringAndNotEmpty(groupDescription)) throw new codes.BadRequest("Group description must be a non-empty string")
         const user = await getUserByToken(token)
         if(!isThisUserTheOwnerOfThisGroup(user.userObj, groupID)) throw new codes.Forbidden("You're not the owner of this group")
-        return await data.updateGroup(user.id, groupID, groupName, groupDescription)
+        return await data.updateGroup(groupID, groupName, groupDescription)
     } catch(e) { throw e }
 }
 

@@ -3,7 +3,8 @@ import { removeIndex } from "../utils/utils.mjs";
 export class GroupMovie {
     /**
      * We are storing the movies in each Group, tied to it's duration, so that when the user decided to delete the movie, it won't be required to 
-     * get the entire movie, just to get it's duration and decrement it to the totalDuration
+     * get the entire movie, just to get it's duration and decrement it to the totalDuration. Also when a group is consulted, this will avoid performing several API
+     *  calls just to get the names... or duration at the cost of duplicate data
      * @param {string} id
      * @param {string} name
      * @param {number} duration 
@@ -18,7 +19,7 @@ export class GroupObj {
      * @param {string} name
      * @param {string} description
      * @param {boolean} isPrivate (not really in use)
-     * @param {Array<GroupMovie>} movies movie id and duration
+     * @param {Array<GroupMovie>} movies movie id, name and duration. Name and duration are used here to avoid excessive API requests
      * @param {number} totalDuration
      */
     constructor(name, description, isPrivate, movies, totalDuration){

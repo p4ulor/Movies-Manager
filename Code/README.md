@@ -1,4 +1,4 @@
-## In order too use, first install the dependencies in package.json 
+## In order to use, first install the dependencies in package.json 
 - npm install
 
 ## Plain run:

@@ -69,6 +69,11 @@ export async function getGroup(req, rsp){
     tryCatch(async () => {
         const token = getHeaderToken(req)
         const [groupIDPathParam] = doesPathContain_Query_or_Path_Params(req, [new Param("groupID", true)], true)
+
+        //TODO: Apply paging for the amount of movies returned
+        const [skiQueryParam] = doesPathContain_Query_or_Path_Params(req, [new Param("skip", true)])
+        const [limitQueryParam] = doesPathContain_Query_or_Path_Params(req, [new Param("limit", true)])
+
         const res = await services.getGroup(groupIDPathParam, token).catch((e) => { throw e})
         rsp.status(codes.statusCodes.OK).json(res)
     }, rsp)

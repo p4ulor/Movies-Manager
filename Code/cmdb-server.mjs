@@ -4,9 +4,9 @@
 export const PORT = 1904
 
 export const ELASTIC_SEARCH = "http://localhost:9200"
-export const isDataSourceElastic = true
+export const isDataSourceElastic = true //true
 
-console.log("Start setting up server")
+console.log("Start setting up server", `dataSource -> ${isDataSourceElastic ? "elasticSearch" : "memory"}`)
 
 import { createOurIndexes } from './data/cmdb-data-elastic.mjs'
 if(isDataSourceElastic) createOurIndexes()
