@@ -1,6 +1,5 @@
 'use strict' //lembrar q o prof disse q isto podia dar problemas em certos sitios nao era?
 
-const crypto = await import('node:crypto') //https://nodejs.org/api/crypto.html#crypto
 import * as imdbAPI from './imdb-movies-data.mjs'
 import { BadRequest, Conflict, Forbidden, NotFound, ServerError } from '../utils/errors-and-codes.mjs';
 import { User, UserObj, Group, GroupObj, Movie, MovieObj, Actor, ActorObj, assignGroup} from './cmdb-data-objs.mjs'
@@ -28,8 +27,8 @@ export function createOurIndexes(){
 
 export async function createUser(name, password, api_key){
     try {
-        const saltAndHashedPW = hashPassword(password)
-        const token = crypto.randomUUID()
+        const saltAndHashedPW = utils.hashPassword(password)
+        const token = utils.crypto.randomUUID()
         let newUser = new UserObj(name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
         console.log("New user -> ", newUser)
 
@@ -37,17 +36,6 @@ export async function createUser(name, password, api_key){
             newUser.id = obj._id
             return new bodies.LoginResponse(newUser.token, newUser.id)
         })
-    } catch(e) { throw e }
-}
-/**
- * @param {UserObj} userObj 
- * @param {string} passwordProvided 
- * @returns {Promise<false | {token: any; userID: any;}>}
- */
-export async function loginUser(userObj, passwordProvided){
-    try {
-        if(verifyPassword(passwordProvided, userObj.hash, userObj.salt)) return new bodies.LoginResponse(userObj.token, userObj.id)
-        return false
     } catch(e) { throw e }
 }
 
@@ -190,19 +178,6 @@ export async function removeMovieFromGroup(groupID, movieID, userID){
     } catch(e) { throw e }
 }
 
-//Auxiliary functions for the password operations:
-//https://blog.loginradius.com/engineering/password-hashing-with-nodejs/
-function hashPassword(pw){ //https://nodejs.org/api/crypto.html#cryptopbkdf2syncpassword-salt-iterations-keylen-digest     
-    const salt = crypto.randomBytes(16).toString('hex')
-    const hashedPassword = crypto.pbkdf2Sync(pw, salt,  100, 32, `sha512`).toString(`hex`)
-    return {salt, hashedPassword}
-}
-
-function verifyPassword(pw, hashedPassword, usersSalt){
-    const hash = crypto.pbkdf2Sync(pw, usersSalt, 100, 32, `sha512`).toString(`hex`)
-    return hashedPassword === hash
-}
-
 //Auxiliary functions for searching actors or movies in our DB (or IMDB if it doesn't exist)
 
 /**
@@ -324,25 +299,4 @@ export async function getActorFromDBorIMDB(actorID, api_key){
     } 
     else console.log("Obtained actor from our DB")
     return actor
-}
-
-/**
- * @param {string} method Must be "POST", "GET", etc
- * @param {Object} body 
- */
-async function fetx(path, method, body){
-    return fetch(baseURL + path, {
-        method: method, 
-        body : (body || method!="GET" || method!="DELETE") ? JSON.stringify(body) : null ,
-        headers: { "Content-Type": "application/json" , "Accept" : "application/json"}
-    }).then(rsp => {
-        return rsp.json().then(obj => {
-            console.log(`Fetch result -> ${JSON.stringify(obj)}`)
-            return obj
-        }).catch(e => {
-            console.log("Error parsing to json -> "+e)
-        })
-    }).catch(e => {
-        console.log("Request error -> "+e)
-    })
 }

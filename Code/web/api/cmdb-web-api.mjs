@@ -168,11 +168,24 @@ function getHeaderToken(req){
     catch(e) { throw new codes.Forbidden("You are not logged in / You have no authorization to perform this action")}
 }
 
+/**
+ * Gets bearer token, if there's no bearer token header. it try to gets the cookie. On fail, throws forbidden exception
+ * @param {Request} req 
+ * @returns {string} token
+ */
+function getPassportToken(req){
+    try {  
+        let token = req.user.token //if user is not defined, .token will throw cannot read property of undefined error, thus the catch
+        return token
+    } 
+    catch(e) { throw new codes.Forbidden("You are not logged in / You have no authorization to perform this action")}
+}
+
 async function tryCatch(func, rsp){ //this cuts down 3 lines per api/controller method
     if(typeof func !== 'function') throw new Error("Can't use this function like this. param 'func' must be a function")
     try {
         await func()
-    } catch(e) {
+    } catch(e) { //e.code is a property that's added to our list of Exceptions
         if(e.code) rsp.status(e.code).json({error: e.message})
         else rsp.status(codes.statusCodes.INTERNAL_SERVER_ERROR).json({error: e.message})
     }

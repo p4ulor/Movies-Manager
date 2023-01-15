@@ -17,6 +17,7 @@
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
     "node-fetch": "^3.2.10",
+    "passport": "^0.6.0",
     "serve-favicon": "^2.5.0",
     "swagger-ui-express": "^4.6.0",
     "yamljs": "^0.3.0"

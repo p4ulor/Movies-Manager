@@ -3,6 +3,7 @@
 import * as imdbAPI from './imdb-movies-data.mjs'
 import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-codes.mjs';
 import { Group, Actor, MovieActor, User, Movie} from './cmdb-data-objs.mjs'
+import * as utils from '../utils/utils.mjs'
 
 const crypto = await import('node:crypto')
 
@@ -72,20 +73,12 @@ let nextGroupID = () => {
 export async function createUser(name, password, api_key){
     try {
         if(await tryFindUserBy_(false, false, name, true)) throw new Conflict(`There's already a user with name=${name}`)
-        const saltAndHashedPW = hashPassword(password)
+        const saltAndHashedPW = utils.hashPassword(password)
         const token = crypto.randomUUID()
         const newUser = new User(nextUserID(), name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key)
         console.log("New user -> ", newUser)
         users.push(newUser)
         return {token: token, userID: newUser.id}
-    } catch(e) { throw e }
-}
-
-export async function loginUser(name, password){
-    try {
-        const userFound = await tryFindUserBy_(false, false, name, false)
-        if(verifyPassword(password, userFound.hash, userFound.salt)) return {token: userFound.token, userID: userFound.id}
-        return false
     } catch(e) { throw e }
 }
 
@@ -210,19 +203,6 @@ export async function removeMovieFromGroup(groupID, movieID, token){
         group.totalDuration -= movieToRemove.duration
         return {msg: `Deleted movie -> ${movieToRemove.name} from group -> ${group.name}`}
     } catch(e) { throw e }
-}
-
-//Auxiliary functions for the password operations:
-//https://blog.loginradius.com/engineering/password-hashing-with-nodejs/
-function hashPassword(pw){ //https://nodejs.org/api/crypto.html#cryptopbkdf2syncpassword-salt-iterations-keylen-digest     
-    const salt = crypto.randomBytes(16).toString('hex')
-    const hashedPassword = crypto.pbkdf2Sync(pw, salt,  100, 32, `sha512`).toString(`hex`)
-    return {salt, hashedPassword}
-}
-
-function verifyPassword(pw, hashedPassword, usersSalt){
-    const hash = crypto.pbkdf2Sync(pw, usersSalt, 100, 32, `sha512`).toString(`hex`)
-    return hashedPassword === hash
 }
 
 //Auxiliary function for querying. When used for createUser, onlyCheckIfItExists=true. Just to say if a user w/ same name exists

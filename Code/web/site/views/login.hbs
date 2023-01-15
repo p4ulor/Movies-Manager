@@ -1,14 +1,29 @@
-<div class="row justify-content-md-center">
-    <form method="POST" action="{{host}}{{loginRoute}}">
+<div class="text-center">
+    {{#if wrongPW}} {{!-- https://handlebarsjs.com/guide/builtin-helpers.html#if --}}
+        <h3>Wrong password</h3>
+        </br>
+    {{/if}}
+
+    {{!-- <form method="POST" action="{{host}}{{loginRoute}}"> --}}
         <label>Username</label>
-        <input type="text" name="name" required></input>
+        <input type="text" name="name" {{!-- required --}}></input>
         </br>
         <label>Password</label>
-        <input type="password" name="password" required</input>
+        <input type="password" name="password" {{!-- required --}}</input>
         </br>
-        <button type="submit">Login</button>
-    </form>
+        <button onclick="submit()">Login</button>
+        {{!-- <button type="submit">Login</button> --}}
+    {{!-- </form> --}}
     <button onclick="location.href='{{host}}{{registerPage}}'">Register</button> {{!-- Interesting solution https://stackoverflow.com/a/2906611/9375488 --}}
 </div>
+
+{{!-- Importing scripts Handlebars way, but it's limited because we can't use import --}}
+{{!-- <script>
+    {{{script}}}
+</script> --}}
+
+{{!-- Importing scripts express way, which allows the use of import --}}
+<script src="/js/client-fetch.js"></script> {{!-- Since pure javascript doesn't support imports, we use HTML as the means of "importing" https://stackoverflow.com/a/950146/9375488 --}}
+<script src="/js/login.js"></script> {{!-- Thanks to line 84 at "app.use('/js', express.static()..." in cmdb-server.mjs. It can't be an .mjs or it won't load/associate the functions mentioned here like submit() --}}
 
 {{!-- The 'name' property is used for the form to parse the inputs and place them in the json body as fields--}}

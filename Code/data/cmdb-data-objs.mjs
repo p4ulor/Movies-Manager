@@ -158,7 +158,7 @@ export class UserObj {
      * @param {string} name
      * @param {Array<string>} groups group id's
      * @param {string} token
-     * @param {string} hash
+     * @param {string} hash hashed PW
      * @param {string} salt
      * @param {string} api_key
      */

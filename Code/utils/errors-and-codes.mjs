@@ -12,35 +12,41 @@ export const statusCodes = {
 export class BadRequest extends Error {
     constructor(message) { super(message)
         this.code = statusCodes.BAD_REQUEST
+        this.name = BadRequest.name
     }
 }
 
 export class NotFound extends Error {
     constructor(message) { super(message)
         this.code = statusCodes.NOT_FOUND
+        this.name = NotFound.name
     }
 }
 
 export class Forbidden extends Error {
     constructor(message) { super(message)
         this.code = statusCodes.FORBIDDEN
+        this.name = Forbidden.name
     }
 }
 
 export class Unauthorized extends Error {
     constructor(message) { super(message)
         this.code = statusCodes.UNAUTHORIZED
+        this.name = Unauthorized.name
     }
 }
 
 export class Conflict extends Error {
     constructor(message) { super(message)
         this.code = statusCodes.CONFLICT
+        this.name = Conflict.name
     }
 }
 
 export class ServerError extends Error {
     constructor(message) { super(message)
         this.code = statusCodes.INTERNAL_SERVER_ERROR
+        this.name = ServerError.name
     }
 }
