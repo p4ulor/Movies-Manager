@@ -13,6 +13,9 @@
 or
 - npm run start
 
+### Dev run (auto re-runs on code changes)
+- npm run dev
+
 ### Run mocha tests
 - npm run test
 
@@ -22,6 +25,8 @@ The server is well structured, given the fact that we used JSdocs and classes, w
 We dont have repetitive hardcoded URI's, and we wrote many utility functions. 
 
 We perform several request error checks, and return appropriate errors describing the problems
+
+A big perk of our application is that we cache the search results and top movies obtained from the IMDB API. And we store in our DB all movies and actors consulted. We do this in order to reduce API calls to IMDB to the minimum.
 
 ## Description of the application structure in client
 The client side application mostly uses HTML forms for GET, PUT, POST and DELETE requests. As requested for this fase, it was supposed to change from HTML forms to client-side fetches. And the only write-request we are performing client side without HTML forms is the Login. 

@@ -1,4 +1,5 @@
 import * as errors from './errors-and-codes.mjs'
+
 export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check the type!
     var propsKeys = Object.keys(props)
     let missingProp = undefined
@@ -14,7 +15,7 @@ export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check 
 
 /**
  * @param {number} totalMinutes 
- * @returns {string} returns something like: 2h 45m
+ * @returns {string} returns like: 2h 45m
  */
 export function totalMinutesToHoursAndMinutes(totalMinutes) {
     if(totalMinutes==null) return "A series?"
@@ -38,6 +39,7 @@ export function removeIndex(array, index){
 }
 
 export const crypto = await import('node:crypto') //https://nodejs.org/api/crypto.html#crypto
+
 //https://blog.loginradius.com/engineering/password-hashing-with-nodejs/
 export function hashPassword(pw){ //https://nodejs.org/api/crypto.html#cryptopbkdf2syncpassword-salt-iterations-keylen-digest     
     const salt = crypto.randomBytes(16).toString('hex')

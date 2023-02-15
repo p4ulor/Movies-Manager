@@ -6,6 +6,9 @@
 or
 - npm run start
 
+## Dev run (auto re-runs on code changes)
+- npm run dev
+
 ## Run mocha tests
 - npm run test
 

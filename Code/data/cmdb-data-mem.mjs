@@ -69,7 +69,6 @@ let nextGroupID = () => {
 
 export async function createUser(name, password, api_key){
     try {
-        if(await tryFindUserBy_(false, false, name, true)) throw new Conflict(`There's already a user with name=${name}`)
         const saltAndHashedPW = utils.hashPassword(password)
         const token = crypto.randomUUID()
         const newUser = new User(nextUserID(), new UserObj(name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key))
@@ -100,7 +99,7 @@ export async function createGroupForUser(userID, name, description, isPrivate){
         userGroups.push(id)
         groupsLibrary.push(groupToAdd)
         console.log("User's new data -> "+JSON.stringify(user))
-        return true
+        return id
     } catch(e) { throw e }
 }
 
@@ -203,6 +202,12 @@ export async function removeMovieFromGroup(groupID, movieID){
 
 //Auxiliary function for querying. When used for createUser, onlyCheckIfItExists=true. Just to say if a user w/ same name exists
 //For all the other uses, a call to this function is intended to return the user
+/**
+ * @param {string} token 
+ * @param {string} name 
+ * @param {boolean} onlyCheckIfItExists 
+ * @returns 
+ */
 export async function tryFindUserBy_(token, name, onlyCheckIfItExists) {
     let search = ""
     //if(id || id===0) search = "id"

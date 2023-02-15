@@ -14,7 +14,7 @@ export const UserLoginRequest = {
 export const newGroupRequest = {
     name: "",
     description: "",
-    isPrivate: true
+    //isPrivate: true
 }
 
 export const updateGroupRequest = {
@@ -30,9 +30,7 @@ export const imdb_API_KeyInvalid = {
 }
 
 export class GeneralServerResponse {
-    /**
-     * @param {string} msg 
-     */
+    /** @param {string} msg */
     constructor(msg){
         this.msg = msg
     }
@@ -41,6 +39,13 @@ export class GeneralServerResponse {
 export class LoginResponse{
     constructor(token, userID){
         this.userID = userID; this.token = token
+    }
+}
+
+export class GroupCreatedResponse{
+    /** @param {string | number} id */
+    constructor(id){
+        this.id = id.toString()
     }
 }
 

@@ -50,12 +50,15 @@ export async function createGroupForUser(userID, name, description, isPrivate){
 
         let group = new GroupObj(name, description, true)
 
+        let createdGroupID = ""
+
         return await elasticFetch.createDoc(ourIndexes.groups, group).then(async obj =>{
             user.userObj.groups.push(obj._id)
             console.log("Created the group")
+            createdGroupID = obj._id
             return await elasticFetch.updateDoc(ourIndexes.users, user.id, user.userObj).then(obj =>{
                 console.log("Linked the created group to the user")
-                return true
+                return createdGroupID
             })   
         })
     } catch(e) { throw e }

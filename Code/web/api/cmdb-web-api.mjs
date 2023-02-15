@@ -7,7 +7,7 @@ export async function signUpUser(req, rsp) {
     tryCatch(async () => {
         doesBodyContainProps(req.body, body.newUserRequest)
         const tokenAnduserID = await services.userSignUpOrLogin(req.body, true).catch((e) => { throw e})
-        rsp.status(codes.statusCodes.OK).json(tokenAnduserID)
+        rsp.status(codes.statusCodes.OK).json(tokenAnduserID) //or .end() or text/plain with: send("text")
     }, rsp)
 }
 
@@ -23,8 +23,8 @@ export async function createGroup(req, rsp){
     tryCatch(async () => {
         const token = getHeaderToken(req)
         doesBodyContainProps(req.body, body.newGroupRequest)
-        const res = await services.createGroup(req.body.name, req.body.description, req.body.isPrivate, token).catch((e) => { throw e})
-        rsp.status(codes.statusCodes.OK).json(res) //I must have the .json() to respond or the client will wait forever? Hmmm
+        const id = await services.createGroup(req.body.name, req.body.description, req.body.isPrivate, token).catch((e) => { throw e})
+        rsp.status(codes.statusCodes.OK).json(new body.GroupCreatedResponse(id))
     }, rsp)
 }
 
@@ -164,13 +164,14 @@ function doesPathContain_Query_or_Path_Params(req, arrayOfParams, isPathParams, 
  * @returns {string} token
  */
 function getHeaderToken(req){
-    try {  
-        let token
-        try { token = req.headers['authorization'].split(" ")[1]} catch(e){}
-        if(token==undefined) return req.cookies.token
-        else return token
-    } 
-    catch(e) { throw new codes.Forbidden("You are not logged in / You have no authorization to perform this action")}
+    let token
+    try { token = req.headers['authorization'].split(" ")[1]} 
+    catch(e){ //if the cookie wasnt found in authorization, check if its in the cookie
+        token = req.cookies.token
+        if(token==undefined) 
+            throw new codes.Forbidden("You are not logged in / You have no authorization to perform this action")
+    }
+    return token
 }
 
 /**

@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "3af36da6-a43b-4d36-8fe5-9aabd74da445",
-		"name": "IPW",
+		"_postman_id": "c7c6c6f0-9cdc-42cf-b468-19747d808208",
+		"name": "IPW Copy",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24004812"
+		"_exporter_id": "24168930"
 	},
 	"item": [
 		{
@@ -409,7 +409,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaa\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_25f649os\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaaa2\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_25f649os\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -426,16 +426,84 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Create user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"paulo23aaabaaaaaa2\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_25f649os\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{api}}/users",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3b-gTzyeaR9w+iWlGeujmjjXq5dLN8\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 13:22:26 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userID\": 2,\n    \"token\": \"2cad913f-544f-4dff-9be8-9c6cf8844bef\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Login user",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaa\",\r\n    \"password\": \"ay\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo\",\r\n    \"password\": \"ay\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -452,7 +520,72 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Login user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"paulo\",\r\n    \"password\": \"ay\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{api}}/login",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "59"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3b-dxDI7K1K2B8PlwHu3iKB1ikPDoQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 13:37:24 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userID\": 0,\n    \"token\": \"f7c59d82-8a6a-436d-96e0-dd2758a37ab1\"\n}"
+						}
+					]
 				}
 			]
 		},
@@ -643,7 +776,72 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Create group",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"myfavmovies\",\r\n    \"description\": \"of all time\",\r\n    \"isPrivate\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{api}}/groups",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "4"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"4-X/5TO4MPCKAyY0ipFgr6/IraRNs\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:58:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\r\n    \"id\": \"2\"\r\n}"
+						}
+					]
 				},
 				{
 					"name": "Add movie to a group",
@@ -690,7 +888,7 @@
 							"variable": [
 								{
 									"key": "groupID",
-									"value": "kXuCqIUBlXEbTxQe_vZT"
+									"value": "1"
 								},
 								{
 									"key": "movieID",
@@ -699,7 +897,92 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Add movie to a group",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{api}}/groups/:groupID/:movieID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups",
+										":groupID",
+										":movieID"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": "",
+											"description": "Group Id to be inserted ",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "1"
+										},
+										{
+											"key": "movieID",
+											"value": "tt0443453"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "30"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1e-FJ0guzJERNLCV5vR94RK9ywK8mE\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 18:55:38 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"msg\": \"Added movie -> Borat\"\n}"
+						}
+					]
 				},
 				{
 					"name": "List All Groups of a User",
@@ -732,7 +1015,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "List All Groups of a User",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/groups?limit=3",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "98"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"62-KO7qumsnXLu2bIUYpW7gwZUFRbA\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:59:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"groups\": [\n        {\n            \"id\": \"0\",\n            \"name\": \"fav\"\n        },\n        {\n            \"id\": \"1\",\n            \"name\": \"watch later\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"myfavmovies\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "Delete Group of a User",
@@ -773,7 +1118,77 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Delete Group of a User",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/groups/:groupID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups",
+										":groupID"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "53"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"35-Kx5wx2KbgVOQOoa69EXHw+NMeec\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:59:29 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"msg\": \"Deleted group w/ id -> 0 from user -> paulo\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Update group",
@@ -816,7 +1231,75 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Update group",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"groupName\": \"watch in 1 year\",\r\n    \"groupDescription\": \"zzzzzzzzzzz\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{api}}/groups/:groupID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups",
+										":groupID"
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:59:43 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
 				},
 				{
 					"name": "Get group by ID",
@@ -850,7 +1333,70 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get group by ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/groups/:groupID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups",
+										":groupID"
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "238"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"ee-LjLav0XxUv+KrxqsCPbev9q49QQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 18:00:01 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"1\",\n    \"groupObj\": {\n        \"name\": \"watch in 1 year\",\n        \"description\": \"zzzzzzzzzzz\",\n        \"isPrivate\": true,\n        \"movies\": [\n            {\n                \"id\": \"tt0120663\",\n                \"name\": \"Eyes Wide Shut\",\n                \"duration\": 159\n            },\n            {\n                \"id\": \"tt0110912\",\n                \"name\": \"Pulp Fiction\",\n                \"duration\": 154\n            }\n        ],\n        \"totalDuration\": 313\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "Remove movie from group",
@@ -889,6 +1435,110 @@
 							]
 						}
 					},
+					"response": [
+						{
+							"name": "Remove movie from group",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/groups/:groupID/:movieID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"groups",
+										":groupID",
+										":movieID"
+									],
+									"variable": [
+										{
+											"key": "groupID",
+											"value": "1"
+										},
+										{
+											"key": "movieID",
+											"value": "tt0110912"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "72"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"48-SdewhWu9EX8kCe5uP7uS7B8x6R0\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 18:00:13 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"msg\": \"Deleted movie w/ id -> tt0110912 from group -> watch in 1 year\"\n}"
+						}
+					]
+				},
+				{
+					"name": "{{host}}{{api}}/groups",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{carlosElasticToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"myfavmovies\",\r\n    \"description\": \"of all time\",\r\n    \"isPrivate\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}{{api}}/groups",
+							"host": [
+								"{{host}}{{api}}"
+							],
+							"path": [
+								"groups"
+							]
+						}
+					},
 					"response": []
 				}
 			]
@@ -914,13 +1564,13 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:9200/users/_delete_by_query",
+									"raw": "localhost:9200/actors/_delete_by_query",
 									"host": [
 										"localhost"
 									],
 									"port": "9200",
 									"path": [
-										"users",
+										"actors",
 										"_delete_by_query"
 									]
 								}
@@ -965,7 +1615,74 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Search movies by name",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/movies/search?searchTerms=the&limit=10",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"movies",
+										"search"
+									],
+									"query": [
+										{
+											"key": "searchTerms",
+											"value": "the"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "469"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"1d5-DCqLpXbXpr/WmsMK3tBRlYGy9C8\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:41:24 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"found\": [\n        {\n            \"id\": \"tt3581920\",\n            \"title\": \"The Last of Us\"\n        },\n        {\n            \"id\": \"tt13406094\",\n            \"title\": \"The White Lotus\"\n        },\n        {\n            \"id\": \"tt9764362\",\n            \"title\": \"The Menu\"\n        },\n        {\n            \"id\": \"tt11813216\",\n            \"title\": \"The Banshees of Inisherin\"\n        },\n        {\n            \"id\": \"tt1520211\",\n            \"title\": \"The Walking Dead\"\n        },\n        {\n            \"id\": \"tt14208870\",\n            \"title\": \"The Fabelmans\"\n        },\n        {\n            \"id\": \"tt13833688\",\n            \"title\": \"The Whale\"\n        },\n        {\n            \"id\": \"tt14138650\",\n            \"title\": \"The Pale Blue Eye\"\n        },\n        {\n            \"id\": \"tt11247158\",\n            \"title\": \"The Legend of Vox Machina\"\n        },\n        {\n            \"id\": \"tt7587890\",\n            \"title\": \"The Rookie\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "Get top movies",
@@ -999,7 +1716,70 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get top movies",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/movies/top?top=5",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"movies",
+										"top"
+									],
+									"query": [
+										{
+											"key": "top",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "294"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"126-Epu9OYKbDkSbL/I56KsVTYUEnvo\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:45:17 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"top\": [\n        {\n            \"id\": \"tt0111161\",\n            \"rank\": \"1\",\n            \"name\": \"The Shawshank Redemption\"\n        },\n        {\n            \"id\": \"tt0068646\",\n            \"rank\": \"2\",\n            \"name\": \"The Godfather\"\n        },\n        {\n            \"id\": \"tt0468569\",\n            \"rank\": \"3\",\n            \"name\": \"The Dark Knight\"\n        },\n        {\n            \"id\": \"tt0071562\",\n            \"rank\": \"4\",\n            \"name\": \"The Godfather Part II\"\n        },\n        {\n            \"id\": \"tt0050083\",\n            \"rank\": \"5\",\n            \"name\": \"12 Angry Men\"\n        }\n    ]\n}"
+						}
+					]
 				},
 				{
 					"name": "Get movie by ID from IMDB (or maybe cache)",
@@ -1033,52 +1813,25 @@
 							]
 						}
 					},
-					"response": []
-				},
-				{
-					"name": "Get actor from IMDB (or maybe cache)",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}{{api}}/actor/:actorID",
-							"host": [
-								"{{host}}{{api}}"
-							],
-							"path": [
-								"actor",
-								":actorID"
-							],
-							"variable": [
-								{
-									"key": "actorID",
-									"value": "nm0000235"
-								}
-							]
-						}
-					},
 					"response": [
 						{
-							"name": "Get actor from IMDB (or maybe cache)",
+							"name": "Get movie by ID from IMDB (or maybe cache)",
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}{{api}}/actor/:actorID",
+									"raw": "{{host}}{{api}}/movies/:movieID",
 									"host": [
 										"{{host}}{{api}}"
 									],
 									"path": [
-										"actor",
-										":actorID"
+										"movies",
+										":movieID"
 									],
 									"variable": [
 										{
-											"key": "actorID",
-											"value": "nm0000235"
+											"key": "movieID",
+											"value": "tt0118715"
 										}
 									]
 								}
@@ -1101,15 +1854,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "182"
+									"value": "1260"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"b6-k/5gLuXwI5K74MjlT+BuZevqOaM\""
+									"value": "W/\"4ec-n1yimkDVB5OedsNa3sAk4iDGQyc\""
 								},
 								{
 									"key": "Date",
-									"value": "Fri, 30 Dec 2022 20:39:51 GMT"
+									"value": "Thu, 09 Feb 2023 17:38:05 GMT"
 								},
 								{
 									"key": "Connection",
@@ -1121,7 +1874,104 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"id\": \"nm0000235\",\n    \"image\": \"https://m.media-amazon.com/images/M/MV5BMjMxNzk1MTQyMl5BMl5BanBnXkFtZTgwMDIzMDEyMTE@._V1_Ratio1.0000_AL_.jpg\",\n    \"name\": \"Uma Thurman\",\n    \"birthDate\": \"1970-5-29\"\n}"
+							"body": "{\n    \"id\": \"tt0118715\",\n    \"movieObj\": {\n        \"name\": \"The Big Lebowski\",\n        \"description\": \"Ultimate L.A. slacker Jeff \\\"The Dude\\\" Lebowski, mistaken for a millionaire of the same name, seeks restitution for a rug ruined by debt collectors, enlisting his bowling buddies for help while trying to find the millionaire's miss...\",\n        \"imageURL\": \"https://m.media-amazon.com/images/M/MV5BMTQ0NjUzMDMyOF5BMl5BanBnXkFtZTgwODA1OTU0MDE@._V1_Ratio0.6762_AL_.jpg\",\n        \"duration\": \"117\",\n        \"director\": \"Joel Coen, Ethan Coen\",\n        \"actorsList\": [\n            {\n                \"id\": \"nm0000313\",\n                \"name\": \"Jeff Bridges\"\n            },\n            {\n                \"id\": \"nm0000422\",\n                \"name\": \"John Goodman\"\n            },\n            {\n                \"id\": \"nm0000194\",\n                \"name\": \"Julianne Moore\"\n            },\n            {\n                \"id\": \"nm0000114\",\n                \"name\": \"Steve Buscemi\"\n            },\n            {\n                \"id\": \"nm0399663\",\n                \"name\": \"David Huddleston\"\n            },\n            {\n                \"id\": \"nm0000450\",\n                \"name\": \"Philip Seymour Hoffman\"\n            },\n            {\n                \"id\": \"nm0005346\",\n                \"name\": \"Tara Reid\"\n            },\n            {\n                \"id\": \"nm0600657\",\n                \"name\": \"Philip Moon\"\n            },\n            {\n                \"id\": \"nm0671032\",\n                \"name\": \"Mark Pellegrino\"\n            },\n            {\n                \"id\": \"nm0001780\",\n                \"name\": \"Peter Stormare\"\n            },\n            {\n                \"id\": \"nm0281359\",\n                \"name\": \"Flea\"\n            },\n            {\n                \"id\": \"nm0901024\",\n                \"name\": \"Torsten Voges\"\n            },\n            {\n                \"id\": \"nm0319541\",\n                \"name\": \"Jimmie Dale Gilmore\"\n            },\n            {\n                \"id\": \"nm0444940\",\n                \"name\": \"Jack Kehler\"\n            },\n            {\n                \"id\": \"nm0001806\",\n                \"name\": \"John Turturro\"\n            },\n            {\n                \"id\": \"nm0393841\",\n                \"name\": \"James G. Hoosier\"\n            },\n            {\n                \"id\": \"nm0502458\",\n                \"name\": \"Carlos Leon\"\n            },\n            {\n                \"id\": \"nm0123738\",\n                \"name\": \"Terrence Burton\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get actor from IMDB (or maybe cache)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pauloToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}{{api}}/actor/:actorID",
+							"host": [
+								"{{host}}{{api}}"
+							],
+							"path": [
+								"actor",
+								":actorID"
+							],
+							"variable": [
+								{
+									"key": "actorID",
+									"value": "nm0000230"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get actor from IMDB (or maybe cache)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{api}}/actor/:actorID",
+									"host": [
+										"{{host}}{{api}}"
+									],
+									"path": [
+										"actor",
+										":actorID"
+									],
+									"variable": [
+										{
+											"key": "actorID",
+											"value": "nm0000230"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "195"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"c3-gv0FjM/j9QFfhiIb6ESdZkXvR2M\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Feb 2023 17:55:48 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"nm0000230\",\n    \"actorObj\": {\n        \"image\": \"https://m.media-amazon.com/images/M/MV5BMTQwMTk3NDU2OV5BMl5BanBnXkFtZTcwNTA3MTI0Mw@@._V1_Ratio0.6751_AL_.jpg\",\n        \"name\": \"Sylvester Stallone\",\n        \"birthDate\": null\n    }\n}"
 						}
 					]
 				}
@@ -1142,7 +1992,63 @@
 					]
 				}
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Main page",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "html",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "text/html; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "3696"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"e70-eUswFSZYb2tle/sJXvoz03mgCmM\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 09 Feb 2023 17:45:55 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "\r\n\n<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <link href=\"/bootstrap.min.css\" rel=\"stylesheet\">\n        <title>Home</title>\n    </head>\n    <body>\n        <nav class=\"navbar navbar-expand-sm bg-dark navbar-dark\">\n            <div class=\"container-fluid\">\n                <ul class=\"navbar-nav\" id=\"navBarUnorderedList\">\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\" href=\"/\">Home</a>\n                    </li>\n                </ul>\n                <ul class=\"navbar-nav ml-auto\">\n                    <li class=\"nav-item ml-auto\">\n                        <a class=\"nav-link float-right\" id=\"loginLink\" href=\"/login\">Login</a>\n                    </li>\n                </ul>\n            </div>\n        </nav>\n        <div class=\"text-center\">\n            <h2>Welcome</h2>\n            <p>Welcome to Chelas Movie Database. Manage your groups of movies and consult the groups of other users</p>\n            <p>But for now, here's a beautiful image to look at:</p>\n            <img class=\"img-fluid\" src=\"https://img3.goodfon.com/wallpaper/nbig/4/58/logo-wallpaper-sport-football-sl-benfica.jpg\">\r\n\n        </div>\n    </body>\n    <script>\r\n        function getCookie(cname) { //https://www.w3schools.com/js/js_cookies.asp#:~:text=path%3D/%22%3B%0A%7D-,function%20getCookie(cname),-%7B%0A%C2%A0%C2%A0let\r\n            let name = cname + \"=\"\r\n            let ca = document.cookie.split(';');\r\n            for(let i = 0; i < ca.length; i++) {\r\n                let c = ca[i]\r\n                while (c.charAt(0) == ' ') {\r\n                c = c.substring(1)\r\n                }\r\n                if (c.indexOf(name) == 0) {\r\n                return c.substring(name.length, c.length)\r\n                }\r\n            }\r\n            return \"\"\r\n        }\r\n\r\n        function addNewNavItem(name, link){\r\n            const newNavBarItem = document.createElement(\"li\")\r\n            newNavBarItem.className = \"nav-item\"\r\n\r\n            const anchor = document.createElement(\"a\")\r\n            anchor.className = \"nav-link\"\r\n            anchor.href = link\r\n            anchor.innerHTML = name\r\n            \r\n            newNavBarItem.append(anchor)\r\n            \r\n            document.getElementById(\"navBarUnorderedList\").appendChild(newNavBarItem)\r\n        }\r\n\r\n        window.addEventListener(\"load\", ()=>{\r\n            const isUserLoggedIn = getCookie(\"token\") //todoooooooooo this is bad/cheap design\r\n            console.log(isUserLoggedIn)\r\n            if(isUserLoggedIn!=\"\"){\r\n                addNewNavItem(\"My Groups\", \"/mygroups\")\r\n                addNewNavItem(\"Search for movies\", \"/search\")\r\n                addNewNavItem(\"Top movies\", \"/top\")\r\n\r\n                const logOut = document.getElementById(\"loginLink\")\r\n                logOut.innerHTML=\"Logout\"\r\n                logOut.href=\"/\"\r\n                logOut.onclick = () => {\r\n                    setTimeout(() => { \r\n                        logOut.innerHTML=\"Login\"\r\n                        logOut.href=\"/login\"\r\n                        logOut.onclick = null\r\n                    }, 500) //becuse otherwise it will instantly goes to /login...\r\n\r\n                    while(document.cookie!=''){  //clear all cookies\r\n                        document.cookie = document.cookie + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'\r\n                    }\r\n                    //clear cookies manually demonstration:\r\n                    //document.cookie = \"token\" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'//https://stackoverflow.com/a/10593045/9375488\r\n                    //document.cookie = \"userName\"...\r\n                }\r\n            }\r\n        })\r\n\r\n    \n    </script>\n</html>"
+				}
+			]
 		}
 	],
 	"event": [
@@ -1179,6 +2085,11 @@
 		{
 			"key": "api",
 			"value": "/api",
+			"type": "string"
+		},
+		{
+			"key": "carlosElasticToken",
+			"value": "e246a3cd-afd2-4625-88ff-d954c253101c",
 			"type": "string"
 		}
 	]

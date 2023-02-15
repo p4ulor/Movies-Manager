@@ -1,4 +1,4 @@
-import { ELASTIC_SEARCH } from "../cmdb-server.mjs"
+import { ELASTIC_SEARCH_URL } from "../cmdb-server.mjs"
 import fetch from "node-fetch"
 
 export async function doesIndexExist(indexName){
@@ -74,13 +74,13 @@ async function easyFetch(uri, method, body = undefined) {
     )
 }
 
-const doesIndexExistUri = (index) => `${ELASTIC_SEARCH}/${index}`
-const searchDocUri = (index, field, value) => `${ELASTIC_SEARCH}/${index}/_search?q=${field}:${value}` 
-const getDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_doc/${id}`
-const createDocUri = (index) => `${ELASTIC_SEARCH}/${index}/_doc/?refresh=wait_for`
-const createDocWithIDUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_doc/${id}?refresh=wait_for`
-const createIndexUri = (index) => `${ELASTIC_SEARCH}/${index}`
-const updateDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_update/${id}?refresh=wait_for`
-const deleteDocUri = (index, id) => `${ELASTIC_SEARCH}/${index}/_doc/${id}?refresh=wait_for`
+const doesIndexExistUri = (index) => `${ELASTIC_SEARCH_URL}/${index}`
+const searchDocUri = (index, field, value) => `${ELASTIC_SEARCH_URL}/${index}/_search?q=${field}:${value}` 
+const getDocUri = (index, id) => `${ELASTIC_SEARCH_URL}/${index}/_doc/${id}`
+const createDocUri = (index) => `${ELASTIC_SEARCH_URL}/${index}/_doc/?refresh=wait_for`
+const createDocWithIDUri = (index, id) => `${ELASTIC_SEARCH_URL}/${index}/_doc/${id}?refresh=wait_for`
+const createIndexUri = (index) => `${ELASTIC_SEARCH_URL}/${index}`
+const updateDocUri = (index, id) => `${ELASTIC_SEARCH_URL}/${index}/_update/${id}?refresh=wait_for`
+const deleteDocUri = (index, id) => `${ELASTIC_SEARCH_URL}/${index}/_doc/${id}?refresh=wait_for`
 
 const updateBody = (body) => { return {doc: body}}
