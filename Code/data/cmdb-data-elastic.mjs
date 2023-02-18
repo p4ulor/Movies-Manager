@@ -33,7 +33,7 @@ export async function createUser(name, password, api_key){
         console.log("New user -> ", newUser)
 
         return elasticFetch.createDoc(ourIndexes.users, newUser).then(obj => {
-            return new bodies.LoginResponse(newUser.token, obj._id)
+            return {token: token, id: obj._id}
         })
     } catch(e) { throw e }
 }
@@ -81,7 +81,7 @@ export async function addMovieToGroupOfAUser(api_key, movieID, groupID){
             const theGroup = assignGroup(group) //just so we make use of the .addMovie() function
             theGroup.addMovie(movie.id, movie.movieObj.name, movie.movieObj.duration)
             return await elasticFetch.updateDoc(ourIndexes.groups, groupID, theGroup).then(obj =>{
-                return new bodies.GeneralServerResponse(`Added movie -> ${movie.movieObj.name}`)
+                return {movie: movie.name}
             })
         })
     } catch(e) { throw e }
@@ -99,8 +99,8 @@ export async function getGroupListOfAUser(skip, limit, userID){
                 return new bodies.GroupsItemListResponse(group.id, group.groupObj.name)
             })
         })
-        const resolvedGroupsFound = await Promise.all(groupsFound) //https://stackoverflow.com/a/48273841/9375488
-        return new bodies.GroupsListResponse(resolvedGroupsFound)
+        const resolvedGroupsFound = await (Promise.all(groupsFound)) //https://stackoverflow.com/a/48273841/9375488
+        return resolvedGroupsFound
     } catch(e) { throw e }
 }
 
@@ -134,7 +134,7 @@ export async function deleteGroup(groupID, userID){
                 user.userObj.groups = utils.removeIndex(user.userObj.groups, groupIndexToRemove)
                 return await elasticFetch.updateDoc(ourIndexes.users, userID, user.userObj).then(obj =>{
                     console.log(`\ndeleteGroup elastic response ->\n`, JSON.stringify(obj))
-                    return new bodies.GeneralServerResponse(`Deleted group w/ id -> ${groupID} from user -> ${user.userObj.name}`)
+                    return {groupID: groupIndexToRemove.grupID, userName: user.userObj.name}
                 })
             }
             else throw new ServerError(`Deletion of group w/ id=${groupID} failed`)
@@ -177,7 +177,7 @@ export async function removeMovieFromGroup(groupID, movieID){
         if(wasMovieRemovedSuccessful) {
             return await elasticFetch.updateDoc(ourIndexes.groups, groupID, theGroup).then(obj =>{
                 console.log("removeMovieFromGroup result -> ", JSON.stringify(obj))
-                return new bodies.GeneralServerResponse(`Deleted movie w/ id -> ${movieID} from group -> ${theGroup.name}`)
+                return {movieID: movieID , groupName: theGroup.name}
             })
         }
         else throw new NotFound(`Movie w/ id=${movieID} in group w/ id=${groupID} not found`)

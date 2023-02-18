@@ -24,16 +24,16 @@ The server is well structured, given the fact that we used JSdocs and classes, w
 
 We dont have repetitive hardcoded URI's, and we wrote many utility functions. 
 
-We perform several request error checks, and return appropriate errors describing the problems
+We perform several request error checks, and return appropriate errors describing the problems.
 
 A big perk of our application is that we cache the search results and top movies obtained from the IMDB API. And we store in our DB all movies and actors consulted. We do this in order to reduce API calls to IMDB to the minimum.
 
 ## Description of the application structure in client
-The client side application mostly uses HTML forms for GET, PUT, POST and DELETE requests. As requested for this fase, it was supposed to change from HTML forms to client-side fetches. And the only write-request we are performing client side without HTML forms is the Login. 
+The client side application mostly uses HTML forms for GET, PUT, POST and DELETE requests. As requested for this phase, it was supposed to change from HTML forms to client-side fetches. And the only write-request we are performing client side without HTML forms is at the Login. 
 
-Given the request of this phase, we decided that we would expect to write more client side javascript to obtain consult the DOM to get input values before performing fetch requests, so we created a folder /scripts/ inside /web/site/ to split and organize Handlebars views from scripts. We also configured our solution in a way that avoids repetitive code. Per example, we expected that the fetch() function would be called more repeatedly, so we wrote a fetx() function in /web/site/scripts/ which would be "imported" in HTML for places where we needed the fetx(), this would reduce repetitive code and simplify our HTTP requests to the API
+Given the request of this phase, we decided that we would expect to write more client side javascript to obtain consulting the DOM to get input values before performing fetch requests, so we created a folder /scripts/ inside /web/site/ to split and organize Handlebars views from scripts. We also configured our solution in a way that avoids repetitive code. For example, we expected that the fetch() function would be called more repeatedly, so we wrote a fetx() function in /web/site/scripts/ which would be "imported" in HTML for places where we needed the fetx(), this would reduce repetitive code and simplify our HTTP requests to the API.
 
-We could have performed better error validations on the client-side
+We could have performed better error validations on the client-side.
 
 ## Description of the mapping between the ElastictSearch’s Cmdb documents and the web application objects model.
 For both elastic search and mem-data, the same objects definition were used, as defined in `Code/data/cmdb-data-objs.mjs`. The root object of each entity has an `id` and a wrapper object which contains the data itself of the object. This ensures compatability with elastic-search

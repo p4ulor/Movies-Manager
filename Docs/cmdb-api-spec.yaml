@@ -109,7 +109,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppError'                
   
-  /movies/{top}:
+  /movies/top:
     get:
       tags:
         - Movies
@@ -148,12 +148,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorUserNF' 
                 
-  /movies/:name/{limit}:
+  /movies/{searchTerms}{limit}:
     get:
       tags:
         - Movies
       summary: Returns the search by movie's name
       parameters:
+        - name: searchTerms
+          in: path
+          description: the name to search
+          required: true
+          schema:
+            type: string
+          example: "Valq"
         - name: limit
           in: path
           description: the list limit (max. 250)
@@ -209,7 +216,7 @@ paths:
                 description: Response with the group's id
                 properties:
                   id:
-                    type: number
+                    type: string
                     format: integer
                     description: the group's id
                     example: 3
@@ -304,11 +311,8 @@ paths:
               $ref: '#/components/schemas/UpdateGroupRequest'
       responses:
         200:
-          description: Returns details of updated group
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateGroupResponse'  
+          description: Returns only the status code
+
         400:
           description: Bad Request
           content:
@@ -335,7 +339,7 @@ paths:
       parameters:
         - name: groupID
           in: path
-          description: the Group's ID to delete
+          description: the group's identification to be deleted
           required: true
           schema:
             type: integer
@@ -366,7 +370,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorUserNF'               
                 
-  /groups/{limit}:
+  /groups{limit}:
     get:
       tags:
         - Groups
@@ -405,18 +409,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorUserNF' 
 
-  /groups/:groupID/:movieID:
+  /groups/{groupID}/{movieID}:
     put:
       tags:
         - Groups
       summary: Adds a Movie to a Group
-      requestBody:
-        description: Required information for adding a movie to a group.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddMovieRequest'
+      parameters:
+        - name: groupID
+          in: path
+          description: the group identification
+          required: true
+          schema:
+            type: string
+          example: "bTNrM4YBv9VMiSnF9NuU"
+        - name: movieID
+          in: path
+          description: the movie identification
+          required: true
+          schema:
+            type: string
+          example: "tt0443453"
+
       responses:
         200:
           description: Returns the information of the added movie.
@@ -429,7 +442,7 @@ paths:
                   msg:
                     type: string
                     description: the name of the added movie
-                    example: "Added movie -> {Name}"
+                    example: "Added movie -> {movieName}"
         400:
           description: Bad Request
           content:
@@ -464,7 +477,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RemoveMovieGroupResponse'              
+                $ref: '#/components/schemas/RemoveMovieGroupResponse'   
         400:
           description: Bad Request
           content:
@@ -485,11 +498,6 @@ paths:
                 $ref: '#/components/schemas/ErrorUserNF' 
                 
 components:
-  securitySchemes:
-    userAuth:
-      type: http
-      scheme: bearer
-
   schemas:
     ErrorUserNF:
       type: object
@@ -626,35 +634,19 @@ components:
           description: the group's description to update
           example: "Of action films"
           
-    UpdateGroupResponse:
-      description: The message that it was a successful deletion
-      required:
-         - groupID
-         - groupName
-         - groupDescription
-      properties:
-        groupID:
-          type: number
-          format: integer
-          description: Group's ID
-          example: 1        
-        groupName:
-          type: string
-          description: the group's new name
-          example: "watch in 1 year"
-        groupDescription:
-          type: string
-          description: the group's new description
-          example: "zzzzzz"
-
     UserTokenResponse:
       type: object
-      description: Response with the user's token
+      description: Response with the user's id and token
       properties:
+        userID:
+          type: string
+          description: the user token
+          example: 2
         token:
           type: string
           description: the user token
           example: "061bebd1-0d4b-43e4-b2d2-34f1be9e0cab"
+
         
     DeleteGroupResponse:
       type: object
@@ -663,7 +655,7 @@ components:
         msg:
           type: string
           description: Message 
-          example: "Deleted group -> {groupName}"
+          example: "Deleted group w/ id -> {groupID} from user -> {userName} "
           
     RemoveMovieGroupResponse:
       type: object
@@ -686,71 +678,84 @@ components:
         - totalDuration
       properties:
         id:
-          type: number
+          type: string
           format: integer
           description: Group's ID
           example: 1
-        name:
-          type: string
-          description: Group's name
-          example: watch later
-        description:
-          type: string
-          description: Group's description
-          example: No time
-        isPrivate:
-          type: boolean
-          description: Group's privacy
-          example: true
-        movies:
-          type: array
-          items:
-            type: object
-            description: Movies information
-            required:
-              - name
-              - id
-              - duration
-            properties:
-              name:
-                type: string
-                description: The movie's name
-                example: Eyes Wide Shut        
-              id:
-                type: string
-                description: The movie's ID
-                example: tt0120663              
-              duration:
-                type: number
-                format: integer
-                description: Duration (min) of the movie
-                example: 159
-        totalDuration:
-          type: number
-          format: integer
-          description: Total duration (min) of movies in group
-          example: 159        
+        groupObj:
+          type: object
+          description: Movies information
+          required:
+            - name
+            - description
+            - isPrivate
+            - movies
+            - totalDuration
+          properties:
+            name:
+              type: string
+              description: Group's name
+              example: watch later
+            description:
+              type: string
+              description: Group's description
+              example: No time
+            isPrivate:
+              type: boolean
+              description: Group's privacy
+              example: true
+            movies:
+              type: array
+              items:
+                type: object
+                description: Movies information
+                required:
+                  - id
+                  - name
+                  - duration
+                properties:
+                  id:
+                    type: string
+                    description: The movie's ID
+                    example: tt0120663        
+                  name:
+                    type: string
+                    description: The movie's name
+                    example: Eyes Wide Shut                            
+                  duration:
+                    type: number
+                    format: integer
+                    description: Duration (min) of the movie
+                    example: 159
+            totalDuration:
+              type: number
+              format: integer
+              description: Total duration (min) of movies in group
+              example: 159        
           
     ListOfGroupResponse:
-      description: The message that it was a successful deletion
-      type: array
-      items:
-        type: object
-        description: Group information
-        required:
-          - id
-          - name
-        properties:
-          id:
-            type: string
-            description: The group's ID
-            example: 1              
-          name:
-            type: string
-            description: The group's name
-            example: "watch in 1 year"
-
-
+      type: object
+      description: Group detail
+      required:
+        - groups
+      properties:
+        groups:
+          type: array
+          items:
+            description: Group information
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: string
+                description: The group's ID
+                example: 1
+              name:
+                type: string
+                description: The group's name
+                example: "watch in 1 year"
+    
     Top250Data:
       type: object
       description: Response with the list of most popular Movies
@@ -770,7 +775,7 @@ components:
                 description: The movie's ID
                 example: tt0111161              
               rank:
-                type: number
+                type: string
                 format: integer
                 description: The rank of the movie
                 example: 1
@@ -783,7 +788,7 @@ components:
       type: object
       description: Response with the list resulting from a search of a string
       properties:
-        top:
+        found:
           type: array
           items:
             type: object
@@ -791,7 +796,6 @@ components:
             required:
               - id
               - title
-              - description
             properties:
               id:
                 type: string
@@ -801,11 +805,7 @@ components:
                 type: string
                 description: The movie's name
                 example: The Boulet Brothers' Dragula
-              description:
-                type: string
-                description: The movie's small description
-                example: 2016– TV Series Dracmorda Boulet, Swanthula Boulet
-                
+
     CreateGroupRequest:
       description: Required info for creating a Group
       required:
@@ -825,13 +825,3 @@ components:
           type: boolean
           description: privacy of the group 
           example: true   
-    
-    AddMovieRequest:
-      description: Required info for adding a movie to a group.
-      required:
-        - id
-      properties:
-        id:
-          type: string
-          description: the movie's id
-          example: "tt0443453"

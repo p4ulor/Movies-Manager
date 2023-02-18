@@ -18,8 +18,9 @@ export async function userSignUpOrLogin(body, isSignUp) {
         if(!isAStringAndNotEmpty(body.name)) throw new error.BadRequest("User name must be a non-empty string")
         const foundUser = await data.tryFindUserBy_(false, body.name)
         if(isSignUp) {
-            if(foundUser) throw new Conflict(`There's already a user with name=${name}`)
-            return await (data.createUser(body.name, body.password, body.api_key))
+            if(foundUser) throw new error.Conflict(`There's already a user with name=${body.name}`)
+            let res = await (data.createUser(body.name, body.password, body.api_key))
+            return new bodies.LoginResponse(res.token, res.id)
         }
         else {
             if(!foundUser) throw new error.NotFound("User not found")
@@ -35,7 +36,8 @@ export async function createGroup(name, description, isPrivate, token){
     try {
         if(!isAStringAndNotEmpty(name)) throw new error.BadRequest("Group name must be a non-empty string")
         const userID = (await getUserByToken(token)).id
-        return await data.createGroupForUser(userID, name, description, isPrivate)  
+        let res = await (data.createGroupForUser(userID, name, description, isPrivate))
+        return new bodies.GroupCreatedResponse(res)
     } catch(e) { throw e }
 }
 
@@ -43,7 +45,8 @@ export async function addMovieToGroup(movieID, groupID, token){
     try { 
         const user = await getUserByToken(token)
         if(!isThisUserTheOwnerOfThisGroup(user.userObj, groupID)) throw new error.Forbidden("You're not the owner of this group")
-        return await data.addMovieToGroupOfAUser(user.userObj.api_key, movieID, groupID) 
+        let res = await (data.addMovieToGroupOfAUser(user.userObj.api_key, movieID, groupID))
+        return new bodies.GeneralServerResponse(`Added movie -> ${res.movie}`)
     } catch(e) { throw e }
 }
 
@@ -57,7 +60,9 @@ export async function getGroupList(skip, limit, token){
         const userID = (await getUserByToken(token)).id
         if(!skip)  skip = 0
         if(!limit) limit = 10
-        return data.getGroupListOfAUser(skip, limit, userID)
+        let res = await (data.getGroupListOfAUser(skip, limit, userID))
+
+        return new bodies.GroupsListResponse(res)
     } catch(e) { throw e }
 }
 
@@ -67,7 +72,7 @@ export async function updateGroup(groupID, groupName, groupDescription, token){
         if(!isAStringAndNotEmpty(groupDescription)) throw new error.BadRequest("Group description must be a non-empty string")
         const user = await getUserByToken(token)
         if(!isThisUserTheOwnerOfThisGroup(user.userObj, groupID)) throw new error.Forbidden("You're not the owner of this group")
-        return await data.updateGroup(groupID, groupName, groupDescription)
+        return await (data.updateGroup(groupID, groupName, groupDescription))
     } catch(e) { throw e }
 }
 
@@ -75,7 +80,8 @@ export async function deleteGroup(groupID, token){
     try {
         const user = await getUserByToken(token)
         if(!isThisUserTheOwnerOfThisGroup(user.userObj, groupID)) throw new error.Forbidden("You're not the owner of this group")
-        return await data.deleteGroup(groupID, user.id)
+        let res = await (data.deleteGroup(groupID, user.id))
+        return new bodies.GeneralServerResponse(`Deleted group w/ id -> ${res.groupID} from user -> ${res.userName}`)
     } catch(e) { throw e }
 }
 
@@ -96,7 +102,8 @@ export async function removeMovieFromGroup(groupID, movieID, token){
     try {
         const user = await getUserByToken(token)
         if(!isThisUserTheOwnerOfThisGroup(user.userObj, groupID)) throw new error.Forbidden("You're not the owner of this group")
-        return await data.removeMovieFromGroup(groupID, movieID, user.id)
+        let res = await (data.removeMovieFromGroup(groupID, movieID, user.id))
+        return new bodies.GeneralServerResponse(`Deleted movie w/ id -> ${res.movieID} from group -> ${res.groupName}`)
     } catch(e) { throw e }
 }
 

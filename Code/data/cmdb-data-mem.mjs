@@ -5,6 +5,7 @@ import { BadRequest, Conflict, Forbidden, NotFound } from '../utils/errors-and-c
 import { Group, Actor, MovieActor, User, Movie, UserObj, GroupObj, ActorObj, GroupMovie, MovieObj} from './cmdb-data-objs.mjs'
 import * as utils from '../utils/utils.mjs'
 import * as bodies from '../utils/req-resp-bodies.mjs'
+import { serve } from 'swagger-ui-express';
 
 const crypto = await import('node:crypto')
 
@@ -74,7 +75,7 @@ export async function createUser(name, password, api_key){
         const newUser = new User(nextUserID(), new UserObj(name, [], token, saltAndHashedPW.hashedPassword, saltAndHashedPW.salt, api_key))
         console.log("New user -> ", newUser)
         users.push(newUser)
-        return new bodies.LoginResponse(newUser.userObj.token, newUser.id)
+        return {token: newUser.userObj.token, id: newUser.id}
     } catch(e) { throw e }
 }
 
@@ -122,7 +123,7 @@ export async function addMovieToGroupOfAUser(api_key, movieID, groupID){
         group.groupObj.addMovie(movie.id, movie.movieObj.name, movie.movieObj.duration)
 
         console.log(`addMovieToGroupOfAUser: Group -> ${JSON.stringify(group)}`)
-        return new bodies.GeneralServerResponse(`Added movie -> ${movie.movieObj.name}`)
+        return {movie: movie.movieObj.name}
     } catch(e) { throw e }
 }
 
@@ -136,7 +137,7 @@ export async function getGroupListOfAUser(skip, limit, userID){
             }).catch(e => {throw e})
         })
         const resolvedGroupsFound = await Promise.all(groupsFound) //https://stackoverflow.com/a/48273841/9375488
-        return new bodies.GroupsListResponse(resolvedGroupsFound)
+        return resolvedGroupsFound
     } catch(e) { throw e }
 }
 
@@ -166,9 +167,10 @@ export async function deleteGroup(groupID, userID){
             return group.id==groupID
         })
         groupsLibrary.splice(indexToRemove, 1)
+
         console.log("Groups library new data -> "+JSON.stringify(groupsLibrary))
 
-        return new bodies.GeneralServerResponse(`Deleted group w/ id -> ${groupID} from user -> ${user.userObj.name}`)
+        return {groupID: groupID, userName: user.userObj.name}
     } catch(e) { throw e }
 }
 
@@ -194,7 +196,7 @@ export async function removeMovieFromGroup(groupID, movieID){
         const group = await getGroupByID(groupID)
         const wasMovieRemovedSuccessful = group.groupObj.removeMovie(movieID)
         if(wasMovieRemovedSuccessful){
-            return new bodies.GeneralServerResponse(`Deleted movie w/ id -> ${movieID} from group -> ${group.groupObj.name}`)
+            return {movieID: movieID , groupName: group.groupObj.name}
         } 
         else throw new NotFound(`Movie w/ id=${movieID} in group w/ id=${groupID} not found`)
     } catch(e) { throw e }
