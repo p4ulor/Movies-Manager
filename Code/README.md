@@ -23,10 +23,12 @@ or
 ### For creating the front-end UI (the view engine)
 - [hbs](https://www.npmjs.com/package/hbs)
 - [serve-favicon](https://www.npmjs.com/package/serve-favicon)
-## For tests
-- [mocha](https://www.npmjs.com/package/mocha) and [chai](https://www.npmjs.com/package/chai) - For Unit testing
+## For integrated tests
+- [mocha](https://www.npmjs.com/package/mocha) - A framework to run tests (which allows the use of other assertion libraries)
+- [chai](https://www.npmjs.com/package/chai) - The assertion library to use
 - [deep-equal-in-any-order](https://www.npmjs.com/package/deep-equal-in-any-order) - A plugin for chai that makes testing complex objects easier
 - [chai-http](https://www.npmjs.com/package/chai-http) - Used for doing HTTP requests in the tests
+- [supertest](https://www.npmjs.com/package/supertest) - Another assertion library for tests as requested in Part 3 of the assignment
 ## Regarding documentation
 - [yamljs](https://www.npmjs.com/package/yamljs)
 - [swagger-ui-express](https://www.npmjs.com/package/swagger-ui-express)

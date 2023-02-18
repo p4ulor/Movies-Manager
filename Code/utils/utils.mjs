@@ -8,7 +8,13 @@ export function doesBodyContainProps(body, props){ //note/TODO: it doesnt check 
             missingProp = key
             return false
         }
-        else return true
+        else {
+            if(typeof body[key] == 'string'){
+                const field = body[key]+""
+                if(field.trim().length==0) throw new errors.BadRequest(`Field '${key}' is empty or blank`)
+            }
+            return true
+        }
     })
     if(missingProp) throw new errors.BadRequest(`Missing field -> ${missingProp}`)
 }

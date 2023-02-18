@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "c7c6c6f0-9cdc-42cf-b468-19747d808208",
-		"name": "IPW Copy",
+		"_postman_id": "6db0cac3-6bab-4677-98dd-844684b13126",
+		"name": "IPW",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "24168930"
+		"_exporter_id": "24004812"
 	},
 	"item": [
 		{
@@ -759,7 +759,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"myfavmovies\",\r\n    \"description\": \"of all time\",\r\n    \"isPrivate\": true\r\n}",
+							"raw": "{\r\n    \"name\": \"myfavmovies\",\r\n    \"description\": \"of all time\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

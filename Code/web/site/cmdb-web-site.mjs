@@ -10,7 +10,7 @@ import * as path from 'node:path'
 
 const router = express.Router() //Let's us define a fragment of our express app that can be joined with other parts of our app https://expressjs.com/en/5x/api.html#router
 
-function getHost() { //we do it like this because this script is ran beforethe cmdb-server.mjs, so the server.PORT would cause and undefined reference exception
+function getHost() { //we do it like this because this script is ran beforethe cmdb-server.mjs, so the server.PORT would cause an undefined reference exception
     return `http://localhost:${server.PORT}`
 }
 
@@ -97,7 +97,7 @@ router.get(webPages.login.url, (req, rsp) => {
         if(req.query.wrongPW=="true") view.options.wrongPW = true
         view.options.loginRoute = shadowWebRoutes.login
         view.options.registerPage = webPages.register.url
-        view.options.script = fs.readFileSync(webPages.login.script).toString()
+        view.options.script = fs.readFileSync(webPages.login.script).toString() //no longer in use
         rsp.render(view.file, view.options)
     }, rsp)
 })
@@ -298,6 +298,7 @@ router.post(shadowWebRoutes.register, (req, resp) => {
 router.post(shadowWebRoutes.newGroup, (req, resp) => {
     tryCatch(async () => {
         const token = getTokenFromCookie(req, resp)
+        doesBodyContainProps(req.body, body.newGroupRequest)
         const isDone = await services.createGroup(req.body.name, req.body.description, false, token)
         console.log(`User to be redirected. Is operation done? ${isDone}`)
         redirect(resp, webPages.mygroups.url)
@@ -352,7 +353,8 @@ router.post(shadowWebRoutes.addMovieToGroup.url, (req, resp) => {
  */
  router.get(webPages.pageError.url, function(req, rsp){
     const view = new HandleBarsView(webPages.pageError.view, null)
-    if(req.query) view.options.msg = req.query.type
+    console.log(`Encoded query.type error = ${req.query.type}`)
+    if(req.query) view.options.msg = decodeURIComponent(req.query.type)
     else view.options.msg = "Internal Server Error"
     rsp.render(view.file, view.options)
 })
@@ -363,7 +365,6 @@ router.get('*', function(req, rsp){
         rsp.status(404).render(view.file, view.options);
     }, rsp)
 })
-
 
 /**
  * 
@@ -376,7 +377,7 @@ async function tryCatch(func, rsp){ //this cuts down 3 lines per api/controller 
         await func()
     } catch(e) {
         console.log(e)
-        redirect(rsp, webPages.pageError.setUrl(`${e.name}: ${e.message}`))
+        redirect(rsp, webPages.pageError.setUrl(encodeURIComponent(`${e.name}: ${e.message}`))) //https://stackoverflow.com/a/19038048
     }
 }
 
@@ -389,7 +390,7 @@ function processLoginOrRegister(req, resp, tokenAnduserID){
     let tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     resp.cookie("userName", req.body.name)
-    resp.cookie('token', tokenAnduserID.token, { expires: tomorrow })
+    resp.cookie('token', tokenAnduserID.token, { expires: tomorrow /* , httpOnly: true */ })
     redirect(resp, webPages.home.url)
 }
 
@@ -399,8 +400,7 @@ function processLoginOrRegister(req, resp, tokenAnduserID){
  */
 function redirect(resp, url){
     resp.setHeader('Location', url) // OR -> resp.redirect(`/`)
-        .status(302)
-        .end()
+        .status(302).end()
 }
 
 function getUserNameFromCookie(req){

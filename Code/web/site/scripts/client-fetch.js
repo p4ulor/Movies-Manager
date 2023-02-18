@@ -18,8 +18,8 @@ async function fetx(path, method, body){
             rsp.json().then(message => {
                 alert(`Error: ${rsp.statusText}. ${message.error}`)
                 //window.location=`/error?type=${response.statusText}` //omg I was using window.location.pathname and it was converting ? to %3F... https://stackoverflow.com/a/26377931/9375488
+                return null
             })
-            return null
         }
 
         try {
