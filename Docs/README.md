@@ -1,4 +1,4 @@
-- You can use the [swagger open-api editor](https://editor.swagger.io/) to consult the [open-api](./cmdb-api-spec.yaml) documentation or use VSC extensions
+- You can use the [swagger open-api editor](https://editor.swagger.io/) to consult the [open-api](./cmdb-api-spec.yaml) documentation or use a VSC extensions to view the API documentation
 - Use postman to open the [collection of tests](./cmdb-api-test.json)
 
 # Code report / documentation
@@ -22,11 +22,15 @@ or
 ## Description of the application structure in server
 The server is well structured, given the fact that we used JSdocs and classes, which also speeded up the development and reduced bugs during development.
 
+The `cmdb-server.mjs` contains a function that allows the initialization of the server. 
+
 We dont have repetitive hardcoded URI's, and we wrote many utility functions. 
 
 We perform several request error checks, and return appropriate errors describing the problems.
 
 A big perk of our application is that we cache the search results and top movies obtained from the IMDB API. And we store in our DB all movies and actors consulted. We do this in order to reduce API calls to IMDB to the minimum.
+
+We also allow the flexibility between the data storage have it's origin from the Elastic Search DB or from the program's memory
 
 ## Description of the application structure in client
 The client side application mostly uses HTML forms for GET, PUT, POST and DELETE requests. As requested for this phase, it was supposed to change from HTML forms to client-side fetches. And the only write-request we are performing client side without HTML forms is at the Login. 
@@ -43,7 +47,7 @@ For both elastic search and mem-data, the same objects definition were used, as 
 - id: `string` 
 ### UserObj
 - name: `string`
-- groups: `Array<string>`
+- groups: `Array<string>` (strings which are id's of groups)
 - token: `string`
 - hash: `string`
 - salt: `string`
@@ -55,7 +59,7 @@ For both elastic search and mem-data, the same objects definition were used, as 
 - name: `string` 
 - description: `string` 
 - isPrivate: `boolean`
-- movies: Array<GroupMovie>
+- movies: `Array<GroupMovie>` (cached id, name and duration of a movie in the group (avoid's repetitive and demanding data calls))
 - totalDuration: `number`
 
 **Entities that use and get information from the IMDB API:**
@@ -69,7 +73,7 @@ The id is the same as the id used by the IMDB-API
 - imageURL: `string`
 - duration: `number`
 - directors: `string` 
-- actorsList: `Array<MovieActor>`
+- actorsList: `Array<MovieActor>` (cached id and name of actors, (avoid's repetitive and demanding data calls))
 
 ## **Actor**
 - id: `string`

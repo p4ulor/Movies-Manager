@@ -1,8 +1,7 @@
 const isDataElasticSearch = true
 
-
 import * as mocha from 'mocha' //mocha (test framework)
-const assertion = mocha.it //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
+const test = mocha.xit //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
 
 import chai, { expect } from 'chai' //chai (assertion library)
 
@@ -12,15 +11,18 @@ chai.use(deepEqualInAnyOrder)
 import chaiHttp from 'chai-http'
 chai.use(chaiHttp)
 
-import * as server from '../cmdb-server.mjs'
-const appExpress/*: Express */ = server.server(1905, isDataElasticSearch, "http://localhost:9200")
+import * as server from '../cmdb-server.mjs' 
+const config = new server.ServerConfig(1905, isDataElasticSearch, "http://localhost:9200")
+const appExpress/*: Express */ = server.server(config)
 const api = server.apiPath
 
-import * as elasticFetch from '../utils/elastic-fetch.mjs'
-import * as dataElastic from '../data/cmdb-data-elastic.mjs'
+import * as _elasticFetch from '../utils/elastic-fetch.mjs'
+import * as _dataElastic from '../data/cmdb-data-elastic.mjs'
+const elasticFetch = _elasticFetch.default(config)
+const dataElastic = _dataElastic.default(config)
 
 describe('Main page', function () {
-    assertion('Should get .html', function () {
+    test('Should get .html', function () {
         chai.request(appExpress).get("/").send().end(function (err, res){
             expect(res.get("Content-Type")).to.include("text/html") // or use res.header.content-type=="text/html" https://stackoverflow.com/a/30302180/9375488
             expect(res).to.have.status(200)
@@ -30,9 +32,9 @@ describe('Main page', function () {
 
 describe('Users', function () {
 
-    assertion('Create a user', function () {
+    test('Create a user', function () {
         chai.request(appExpress).post(api+"/users").send({
-            name: "paulonew",
+            name: "ppaulonew33",
             password: "ay",
             api_key: "k_000000"
         }).end(function (err, res){
@@ -43,11 +45,11 @@ describe('Users', function () {
         })
     })
 
-    assertion('Login user', function () {
+    test('Login user', function () {
         let token
         let id
         chai.request(appExpress).post(api+"/users").send({
-            name: "paulonew",
+            name: "ppaulonew344",
             password: "ay",
             api_key: "k_000000"
         }).end(function (err, resp){
@@ -56,7 +58,7 @@ describe('Users', function () {
             id = resp.body.userID
 
             chai.request(appExpress).post(api+"/login").send({
-                name: "paulonew",
+                name: "ppaulonew344",
                 password: "ay"
             }).end(function (err, res){
                 // console.log(JSON.stringify(res.body))

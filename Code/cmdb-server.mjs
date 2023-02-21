@@ -1,15 +1,9 @@
 // Application Entry Point. 
 // Registers all HTTP API routes and starts the server
 
-export let PORT = 1904
-
-export let ELASTIC_SEARCH_URL = "http://localhost:9200"
-export let isDataSourceElastic = false //true
-
 console.log("Start setting up server")
 
-import { createOurIndexes } from './data/cmdb-data-elastic.mjs'
-
+// Dependencies imports
 import express from 'express'
 import expressSession from 'express-session' //because passport uses expressSession
 import passport from 'passport' 
@@ -20,34 +14,27 @@ import favicon from 'serve-favicon'
 
 import * as path from 'node:path'
 
-import * as api from './web/api/cmdb-web-api.mjs'
+//My files imports
+import * as theApi from './web/api/cmdb-web-api.mjs'
 export const apiPath = "/api"
 export const apiRoutes = { //because cmdb-web-site need to know some (only this one in this case) api routes because of the client-side fetch()
     getGroups: apiPath+'/groups'
 }
 
 //WEB
-import site, { shadowWebRoutes } from './web/site/cmdb-web-site.mjs'
+import webSite, { shadowWebRoutes } from './web/site/cmdb-web-site.mjs'
 
 //DOCS
 import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs'
 
-/**
- * @param {number} port 
- * @param {boolean} isDataSourceElastic 
- * @param {string} elasticSearchURL
- */
-export function server(port, isDataSourceElastic, elasticSearchURL){ //in order be to be used in tests and be more flexible
-    if(port) PORT = port
-    if(isDataSourceElastic) {
-        if(!elasticSearchURL) throw new Error("If data source is elastic, a valid elasticSearchURL must be provided")
-        ELASTIC_SEARCH_URL = elasticSearchURL
-        createOurIndexes()
-    }
+/** @param {ServerConfig} config */
+export function server(config){ //in order be to be used in tests and be more flexible
 
-    console.log(`dataSource -> ${isDataSourceElastic ? "elasticSearch" : "memory"}`)
+    if(!config instanceof ServerConfig) throw new Error("A ServerConfig must be provided")
 
+    const PORT = config.port
+    const api = theApi.default(config)
     const app = express() //it has 'export' 
 
     // Session config
@@ -95,7 +82,7 @@ export function server(port, isDataSourceElastic, elasticSearchURL){ //in order 
     //Middleware setup
     app.use(cors()) //Allows requests to skip the Same-origin policy and access resources from remote hosts https://blog.knoldus.com/a-guide-to-cors-in-node-js-with-express/#:~:text=start%20to%20learn%3A-,What%20is%20CORS%3F,-CORS%20stands%20for
     app.use(express.json()) //Parses the HTTP request body and puts it in req.body
-    app.use(express.urlencoded({extended: true})) // for parsing application/x-www-form-urlencoded
+    app.use(express.urlencoded({extended: true})) // for parsing application/x-www-form-urlencoded, in cases where a POST or GET is performed in the context of a HTML form
     app.use(cookieParser())
 
     app.set('view engine', 'hbs') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=production%2C%20otherwise%20undefined.-,view%20engine,-String
@@ -109,7 +96,7 @@ export function server(port, isDataSourceElastic, elasticSearchURL){ //in order 
     app.use(express.static('./web/site/public')) //https://expressjs.com/en/starter/static-files.html
     app.use('/', authorizationMw) //this must be placed after the other "uses()" or things like req.cookie won't work
 
-    app.use('/js', express.static(path.resolve("../Code/web/site/scripts/").replace(/\\/g, '/'))) //https://stackoverflow.com/a/55279238/9375488   https://stackoverflow.com/a/60395362/9375488
+    app.use('/js', express.static(path.resolve("../Code/web/site/scripts/").replace(/\\/g, '/'))) //https://stackoverflow.com/a/55279238/9375488   https://stackoverflow.com/a/60395362/9375488 Allows the successful use of <script src="/js/client-fetch.js"></script> inside .hbs files
 
     //API
     app.post(apiPath+'/users', api.signUpUser)
@@ -133,11 +120,29 @@ export function server(port, isDataSourceElastic, elasticSearchURL){ //in order 
     app.use(apiPath+'/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     // WEB
-    app.use('/', site)
+    app.use('/', webSite(config))
 
-    app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}`))
+    app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}. dataSource -> ${config.isDataSourceElastic ? "elasticSearch" : "memory"}`))
 
     console.log("End setting up server")
 
     return app
+}
+
+export class ServerConfig {
+    /**
+     * @param {number} port 
+     * @param {boolean} isDataSourceElastic 
+     * @param {string} elasticSearchURL
+     */
+    constructor(port, isDataSourceElastic, elasticSearchURL){
+        if(typeof port != "number" && port > 0) throw new Error("A valid port number must be provided")
+        if(isDataSourceElastic) {
+            if(typeof elasticSearchURL != "string") throw new Error(`If data source is elastic, a valid elasticSearchURL must be provided. Obtained: ${elasticSearchURL}`)
+        }
+
+        this.port = port
+        this.isDataSourceElastic = isDataSourceElastic
+        this.elasticSearchURL = elasticSearchURL
+    }
 }

@@ -1,8 +1,7 @@
 import * as mocha from 'mocha' //mocha (test framework)
-const assertion = mocha.xit //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
+const test = mocha.xit //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
 
 import chai, { expect } from 'chai' //chai (assertion library)
-
 
 import deepEqualInAnyOrder from 'deep-equal-in-any-order';
 chai.use(deepEqualInAnyOrder)
@@ -10,14 +9,15 @@ chai.use(deepEqualInAnyOrder)
 import chaiHttp from 'chai-http';
 chai.use(chaiHttp);
 
-import * as server from '../cmdb-server.mjs'
-const appExpress = server.server(1907, false, "http://localhost:9200")
+import * as server from '../cmdb-server.mjs' 
+const config = new server.ServerConfig(1907, false, "http://localhost:9200")
+const appExpress/*: Express */ = server.server(config)
 const api = server.apiPath
 
 describe('Users', function () {
     const token = 'Bearer f7c59d82-8a6a-436d-96e0-dd2758a37ab1'
 
-    assertion('Get top 5 movies', function () {
+    test('Get top 5 movies', function () {
         chai.request(appExpress).get(api+"/movies/top?top=5").set('Authorization', token).end(function (err, res){
             const top = res.body.top
             expect(top).to.be.a('array').lengthOf(5)
@@ -26,7 +26,7 @@ describe('Users', function () {
         })
     })
 
-    assertion('Search movies w/ "the " limit 5', function () {
+    test('Search movies w/ "the " limit 5', function () {
         chai.request(appExpress).get(api+"/movies/search?searchTerms=the&limit=10").set('Authorization', token).end(function (err, res){
             const found = res.body.found
             expect(found).to.be.a('array').lengthOf(10)
@@ -38,7 +38,7 @@ describe('Users', function () {
         })
     })
 
-    assertion('Get movie tt0118715', function () {
+    test('Get movie tt0118715', function () {
         chai.request(appExpress).get(api+"/movies/tt0118715").set('Authorization', token).end(function (err, res){
             const id = res.body.id
             expect(id).to.be.a('string')
@@ -50,7 +50,7 @@ describe('Users', function () {
         })
     })
 
-    assertion('Get the actor that plays the character Rambo', function () {
+    test('Get the actor that plays the character Rambo', function () {
         chai.request(appExpress).get(api+"/actor/nm0000230").set('Authorization', token).end(function (err, res){
             const id = res.body.id
             expect(id).to.be.a('string')

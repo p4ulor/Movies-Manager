@@ -1,3 +1,5 @@
-import { server } from "./cmdb-server.mjs"
+import { server, ServerConfig } from "./cmdb-server.mjs"
 
-export const application = server(1904, false, "http://localhost:9200")
+export const application = server(new ServerConfig(1904, true, "http://localhost:9200"))
+
+console.log("Server setup finished")

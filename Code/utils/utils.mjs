@@ -31,7 +31,6 @@ export function totalMinutesToHoursAndMinutes(totalMinutes) {
 }
 
 /**
- * 
  * @param {Array<any>} array 
  * @param {number} index 
  */

@@ -58,7 +58,7 @@ const moviesLibrary = [
             154, "Quentin Tarantino", [new MovieActor("nm0000237", "John Travolta"), new MovieActor("nm0000235", "Uma Thurman") /* ... */]))
 ]
 
-//the following 2 counters and 2 functions are required since users (not for this assignment though) or groups can be deleted. And it would cause inconsistencies or other problems if using the lenght as a counter
+//the following 2 counters and 2 functions are required since users (not for this assignment though) or groups can be deleted. And it would cause inconsistencies or other problems if we used the lenght as the ID
 let userIDCount = 2
 let groupIDCount = 2
 let nextUserID = () => {
