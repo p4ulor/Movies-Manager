@@ -3,6 +3,46 @@ import * as codes from '../../utils/errors-and-codes.mjs'
 import * as body from '../../utils/req-resp-bodies.mjs'
 import { doesBodyContainProps } from '../../utils/utils.mjs'
 
+export const apiPath = "/api"
+export const docsPath = apiPath+'/docs'
+
+export const apiPaths = {
+    signUpUser: apiPath+'/users',
+    loginUser: apiPath+'/login',
+    createGroup: apiPath+'/groups',
+    addMovieToGroup: {
+        path: apiPath+'/groups/:groupID/:movieID',
+        setPath: (groupID, movieID) => { return `${apiPath}/groups/${groupID}/${movieID}` } 
+    },
+    getGroupList: apiPath+'/groups',
+    updateGroup: {
+        path: apiPath+'/groups/:groupID',
+        setPath: (groupID) => { return `${apiPath}/groups/${groupID}` }
+    },
+    deleteGroup: {
+        path: apiPath+'/groups/:groupID',
+        setPath: (groupID) => { return `${apiPath}/groups/${groupID}` }
+    },
+    getGroup: {
+        path: apiPath+'/groups/:groupID',
+        setPath: (groupID) => { return `${apiPath}/groups/${groupID}` }
+    },
+    removeMovieFromGroup: {
+        path: apiPath+'/groups/:groupID/:movieID',
+        setPath: (groupID, movieID) => { return `${apiPath}/groups/${groupID}/${movieID}` } 
+    },
+    getTopMovies: apiPath+'/movies/top',
+    searchMovie: apiPath+'/movies/search',
+    getMovie: {
+        path: apiPath+'/movies/:movieID',
+        setPath: (movieID) => { return `${apiPath}/movies/${movieID}` }
+    },
+    getActor: {
+        path: apiPath+'/actor/:actorID',
+        setPath: (actorID) => { return `${apiPath}/actor/${actorID}` }
+    }
+}
+
 /** @param {ServerConfig} config */
 function api(config){
 
@@ -87,7 +127,7 @@ function api(config){
     async function removeMovieFromGroup(req, rsp){
         tryCatch(async () => {
             const token = getHeaderToken(req)
-            const [groupIDPathParam, movieIDPathParam] = doesPathContain_Query_or_Path_Params(req, [new Param("groupID", true), new Param("movieID")], true)
+            const [groupIDPathParam, movieIDPathParam] = doesPathContain_Query_or_Path_Params(req, [new Param("groupID"), new Param("movieID")], true)
             const res = await services.removeMovieFromGroup(groupIDPathParam, movieIDPathParam, token).catch((e) => { throw e})
             rsp.status(codes.statusCodes.OK).json(res)
         }, rsp)
@@ -134,19 +174,58 @@ function api(config){
     }
 
     return {
-        signUpUser,
-        loginUser,
-        createGroup,
-        addMovieToGroup,
-        getGroupList,
-        updateGroup,
-        deleteGroup,
-        getGroup,
-        removeMovieFromGroup,
-        getTopMovies,
-        searchMovie,
-        getMovie,
-        getActor
+        signUpUser: {
+            path: apiPaths.signUpUser,
+            func: signUpUser
+        },
+        loginUser: {
+            path: apiPaths.loginUser,
+            func: loginUser
+        },
+        createGroup: {
+            path: apiPaths.createGroup,
+            func: createGroup
+        },
+        addMovieToGroup: {
+            path: apiPaths.addMovieToGroup.path,
+            func: addMovieToGroup
+        },
+        getGroupList: {
+            path: apiPaths.getGroupList,
+            func: getGroupList
+        },
+        updateGroup: {
+            path: apiPaths.updateGroup.path,
+            func: updateGroup
+        },
+        deleteGroup: {
+            path: apiPaths.deleteGroup.path,
+            func: deleteGroup
+        },
+        getGroup: {
+            path: apiPaths.getGroup,
+            func: getGroup
+        },
+        removeMovieFromGroup: {
+            path: apiPaths.removeMovieFromGroup.path,
+            func: removeMovieFromGroup
+        },
+        getTopMovies: {
+            path: apiPaths.getTopMovies,
+            func: getTopMovies
+        },
+        searchMovie: {
+            path: apiPaths.searchMovie,
+            func: searchMovie
+        },
+        getMovie: {
+            path: apiPaths.getMovie.path,
+            func: getMovie
+        },
+        getActor: {
+            path: apiPaths.getActor.path,
+            func: getActor
+        }
     }
 }
 

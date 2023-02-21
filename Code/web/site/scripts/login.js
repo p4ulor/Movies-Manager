@@ -1,4 +1,4 @@
-function submit(){
+function submit(){ //no longer in use, it was just an experiment
     const body = () => {
         const name = document.getElementsByName("name")[0].value
         const pw = document.getElementsByName("password")[0].value

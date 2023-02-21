@@ -1,8 +1,11 @@
 <div class="text-center">
     <h2><a href={{moviePage}}>{{movieName}} {{movieDuration}}</a></h2> 
-    <form method="POST" action="{{host}}{{removeMovieRoute}}">
+
+    <button onclick="deleteMovie(`{{removeMovieURI}}`)">Remove movie from group</button>
+
+    {{!--<form method="POST" action="{{removeMovieURI}}">
         <input hidden="true" value={{groupID}} name="groupID">
         <input hidden="true" value={{movieID}} name="movieID">
         <button type="submit">Remove movie from group</button>
-    </form>
+    </form> --}}
 </div>

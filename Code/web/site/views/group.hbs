@@ -1,28 +1,38 @@
-<div class="text-center">
-    <form method="POST" action={{updateGroupRoute}}>
-        <h2>Name: 
-            <span id="hide"></span>
-            <input id="txt" name="groupName" value="{{groupName}}" style="border: none;"></input> {{!-- The " " is neccessary or it only shows the first chars before the first space (no further chars after the first space)  --}}
-        </h2>
+<script src="/js/client-fetch.js"></script> {{!-- Having this on top avoids having to import it on partials each time --}}
 
-        <h3>Description:</h3>
-        <textarea name="groupDescription" style="border: none;">{{groupDescription}}</textarea>
-        </br>
-        
-        <button type="submit">Update group details</button>
-    </form>
+<script>
+    function deleteMovie(uri){ //This is also here because if it was in movieItem.hbs, it would: 1st: be "imported" repeatedly, and 2nd: this function call wouldn't work w/ a predefined {{removeMovieURI}}, because on the 'onclick' the page would search for the closest script in the HTML page, and it can (and has) called the pre-defined script for the deletion of another movie (in our case it would always delete the last, since its the last function with the same name that was defined)
+        fetx(uri, "DELETE").then(_ => {
+            location.href = getHandlBarsOptionString(`${{{groupPage}}}`)
+        }) 
+    }
+    
+    function getHandlBarsOptionString(str){
+        return str.substring(1, str.length) //because the '$' is included in the string... this seems to only occurr inside scripts
+    }
+</script>
+
+<div class="text-center">
+    <h2 class="text-center">Name: 
+        <span id="hide"></span>
+        <input id="txt" name="groupName" value="{{groupName}}" style="border: none;"></input> {{!-- The " " in value is neccessary or it only shows the first chars before the first space (no further chars after the first space)  --}}
+    </h2>
+
+    <h3>Description:</h3>
+    <textarea name="groupDescription" style="border: none;">{{groupDescription}}</textarea>
+    </br>
+    
+    <button id="updateGroupButton" type="submit">Update group details</button>
 
     <h3>Total duration: {{totalDuration}}</h3>
 
     <h4>Movies:</h4>
     {{#each movies}}
-        {{> movieItem}} {{!-- The '> group' says that this variable is to be interpreted as a .hbs view --}}
+        {{> movieItem}} {{!-- The '> movieItem' says that this variable is to be interpreted as a .hbs view --}}
         <hr>
     {{/each}}
 
-    <form method="POST" action="{{host}}{{deleteGroupRoute}}"></formmethod>
-        <button type="submit" >Delete this group</button>
-    </form>
+    <button id="deleteGroupButton" type="submit">Delete this group</button>
 </div>
 
 {{!-- 🙏 https://stackoverflow.com/a/38867270/9375488 🙏 --}}
@@ -54,5 +64,32 @@
     function resize() {
         hide.textContent = txt.value;
         txt.style.width = hide.offsetWidth + "px";
+    }
+
+    document.getElementById("deleteGroupButton").onclick = function(){
+        const uri = getHandlBarsOptionString(`${{{deleteURI}}}`)
+        fetx(uri, "DELETE").then(_ => {
+            location.href = getHandlBarsOptionString(`${{{myGroupsPage}}}`)
+        })
+    }
+
+    document.getElementById("updateGroupButton").onclick = function(){
+        const groupName = document.getElementsByName("groupName")[0].value
+        const groupDescription = document.getElementsByName("groupDescription")[0].value
+
+        const uri = getHandlBarsOptionString(`${{{updateURI}}}`)
+
+        const body = {
+            groupName,
+            groupDescription
+        }
+
+        fetx(uri, "PUT", body).then(_ => {
+            location.href = getHandlBarsOptionString(`${{{groupPage}}}`)
+        })
+    }
+
+    function getHandlBarsOptionString(str){
+        return str.substring(1, str.length) //because the '$' is included in the string... this seems to only occurr inside scripts
     }
 </script>

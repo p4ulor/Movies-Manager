@@ -21,15 +21,23 @@
             <div class="container-fluid">
                 <ul class="navbar-nav" id="navBarUnorderedList">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href={{homePath}}>Home</a>
+                    </li>  
+                </ul>
+
+                <ul class="navbar-nav" id="navBarUnorderedList">
+                    <li class="nav-item">
+                        <a class="nav-link" href={{docsPath}}>Docs</a>
                     </li>  
                 </ul>
 
                 <ul class="navbar-nav ml-auto"> {{!-- https://stackoverflow.com/a/20362024/9375488 --}}
                     <li class="nav-item ml-auto">
-                        <a class="nav-link float-right" id="loginLink" href="/login">Login</a>
+                        <a class="nav-link float-right" id="loginLink" href={{loginPath}}>Login</a>
                     </li>
                 </ul>
+
+                
             </div>
         </nav>
 
@@ -67,20 +75,21 @@
         }
 
         window.addEventListener("load", ()=>{
+            console.log("Page loaded")
             const isUserLoggedIn = getCookie("token") //todoooooooooo this is bad/cheap design
             console.log(isUserLoggedIn)
             if(isUserLoggedIn!=""){
-                addNewNavItem("My Groups", "/mygroups")
-                addNewNavItem("Search for movies", "/search")
-                addNewNavItem("Top movies", "/top")
+                addNewNavItem("My Groups", getHandlBarsOptionString(`${{{myGroupsPath}}}`))
+                addNewNavItem("Search for movies",  getHandlBarsOptionString(`${{{searchPath}}}`))
+                addNewNavItem("Top movies",  getHandlBarsOptionString(`${{{topMoviesPath}}}`))
 
                 const logOut = document.getElementById("loginLink")
                 logOut.innerHTML="Logout"
-                logOut.href="/"
+                logOut.href = getHandlBarsOptionString(`${{{homePath}}}`)
                 logOut.onclick = () => {
                     setTimeout(() => { 
-                        logOut.innerHTML="Login"
-                        logOut.href="/login"
+                        logOut.innerHTML = "Login"
+                        logOut.href = getHandlBarsOptionString(`${{{loginPath}}}`)
                         logOut.onclick = null
                     }, 500) //becuse otherwise it will instantly goes to /login...
 
@@ -93,6 +102,10 @@
                 }
             }
         })
+
+        function getHandlBarsOptionString(str){
+            return str.substring(1, str.length) //because the '$' is included in the string... this seems to only occurr inside scripts
+        }
 
     </script>
 </html>

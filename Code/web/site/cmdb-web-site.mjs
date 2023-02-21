@@ -7,10 +7,64 @@ import { doesBodyContainProps, totalMinutesToHoursAndMinutes } from '../../utils
 import * as body from '../../utils/req-resp-bodies.mjs'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { apiPaths, apiPath, docsPath } from '../api/cmdb-web-api.mjs'
+
+export const webPages = {
+    home: {
+        url: "/",
+        view: "home.hbs"
+    },
+    login: {
+        url:"/login",
+        view: "login.hbs",
+        wrongPW: "/login?wrongPW=true",
+        script: `${path.resolve("../Code/web/site/scripts/login.js").replace(/\\/g, '/')}` //https://stackoverflow.com/a/60395362/9375488
+    },
+    register: {
+        url:"/register",
+        view: "register.hbs"
+    },
+    mygroups: {
+        url:"/mygroups",
+        view: "listOfGroups.hbs"
+    },
+    createGroup: {
+        url:"/creategroup",
+        view: "createGroup.hbs"
+    },
+    pageOfAGroup: {
+        url: "/groups/:groupID",
+        view: "group.hbs",
+        setUrl: (groupID) => { return `/groups/${groupID}` }
+    },
+    pageOfAMovie: {
+        url: "/movies/:movieID",
+        view: "movie.hbs",
+        setUrl: (movieID) => { return `/movies/${movieID}` }
+    },
+    searchMovies: {
+        url: "/search",
+        view: "searchMovies.hbs"
+    },
+    topMovies: {
+        url: "/top",
+        view: "getTopMovies.hbs"
+    },
+    pageOfAnActor: {
+        url: "/actor/:actorID",
+        view: "actorBio.hbs",
+        setUrl: (actorID) => { return `/actor/${actorID}` }
+    },
+    pageError: {
+        url: "/error",
+        view: "error.hbs",
+        setUrl: (name) => { return `/error?type=${name}` }
+    }
+}
 
 /** @param {server.ServerConfig} config */
 function webSite(config){
-    const host = `http://localhost:${config.port}`
+    const host = config.hostAndPort
 
     const services = service.default(config)
 
@@ -26,63 +80,17 @@ function webSite(config){
             this.options = {
                 title: !title ? "CMDB" : title,
                 host: host,
-                script: script
+                script: script,
+                apiPath: apiPath,
+                homePath: webPages.home.url,
+                docsPath: docsPath,
+                loginPath: webPages.login.url,
+                myGroupsPath: webPages.mygroups.url,
+                searchPath: webPages.searchMovies.url,
+                topMoviesPath: webPages.topMovies.url
                 /* path: shadowWebRoute */
                 /* api: server.apiPath */
             }
-        }
-    }
-
-    const webPages = {
-        home: {
-            url: "/",
-            view: "home.hbs"
-        },
-        login: {
-            url:"/login",
-            view: "login.hbs",
-            wrongPW: "/login?wrongPW=true",
-            script: `${path.resolve("../Code/web/site/scripts/login.js").replace(/\\/g, '/')}` //https://stackoverflow.com/a/60395362/9375488
-        },
-        register: {
-            url:"/register",
-            view: "register.hbs"
-        },
-        mygroups: {
-            url:"/mygroups",
-            view: "listOfGroups.hbs"
-        },
-        createGroup: {
-            url:"/creategroup",
-            view: "createGroup.hbs"
-        },
-        pageOfAGroup: {
-            url: "/groups/:groupID",
-            view: "group.hbs",
-            setUrl: (groupID) => { return `/groups/${groupID}` }
-        },
-        pageOfAMovie: {
-            url: "/movies/:movieID",
-            view: "movie.hbs",
-            setUrl: (movieID) => { return `/movies/${movieID}` }
-        },
-        searchMovies: {
-            url: "/search",
-            view: "searchMovies.hbs"
-        },
-        topMovies: {
-            url: "/top",
-            view: "getTopMovies.hbs"
-        },
-        pageOfAnActor: {
-            url: "/actor/:actorID",
-            view: "actorBio.hbs",
-            setUrl: (actorID) => { return `/actor/${actorID}` }
-        },
-        pageError: {
-            url: "/error",
-            view: "error.hbs",
-            setUrl: (name) => { return `/error?type=${name}` }
         }
     }
     
@@ -148,20 +156,26 @@ function webSite(config){
             const token = getTokenFromCookie(req, rsp)
             //TODO: Put slider for paging
             const group = await services.getGroup(req.params.groupID, token)
+            view.options.groupPage = webPages.pageOfAGroup.setUrl(group.id)
+            view.options.myGroupsPage = webPages.mygroups.url
             view.options.groupID = group.id
             view.options.groupName = group.groupObj.name
             view.options.groupDescription = group.groupObj.description
             view.options.totalDuration = totalMinutesToHoursAndMinutes(group.groupObj.totalDuration)
-            view.options.updateGroupRoute = shadowWebRoutes.updateGroup.setUrl(group.id)
-            view.options.deleteGroupRoute = shadowWebRoutes.deleteGroup.setUrl(group.id)
+            view.options.updateURI = host + apiPaths.updateGroup.setPath(group.id)
+            view.options.deleteURI = host + apiPaths.deleteGroup.setPath(group.id)
+            //And multiple helper functions are used here
+
             view.options.movies = group.groupObj.movies.map(movie => {
                 return {
                     movieName: movie.name,
                     movieDuration: totalMinutesToHoursAndMinutes(movie.duration),
                     moviePage: webPages.pageOfAMovie.setUrl(movie.id),
-                    removeMovieRoute: shadowWebRoutes.removeMovie.setUrl(movie.id),
+                    
+                    removeMovieURI: host + apiPaths.removeMovieFromGroup.setPath(group.id, movie.id),
                     groupID: group.id,
-                    movieID: movie.id
+                    movieID: movie.id,
+                    groupPage: webPages.pageOfAGroup.setUrl(group.id)
                 }
             })
             rsp.render(view.file, view.options)
@@ -181,9 +195,11 @@ function webSite(config){
             view.options.movieDirectors = movie.movieObj.director
             view.options.movieActors = movie.movieObj.actors
     
-            view.options.shadowWebPath = shadowWebPath
+            //A helper function exists to set the url of the add movie to group path
+            //A helper function exists to set the url of a page of the group, if the movie is added to a group, in order to redirect to it
+
             view.options.movieID = req.params.movieID
-            view.options.getListOfGroupsURI = server.apiRoutes.getGroups
+            view.options.getListOfGroupsURI = apiPaths.getGroupList
     
             view.options.actorsList = movie.movieObj.actorsList.map(actor => {
                 return {
@@ -311,18 +327,7 @@ function webSite(config){
             redirect(resp, webPages.pageOfAGroup.setUrl(groupID))
         }, resp)
     })
-    
-    router.post(shadowWebRoutes.addMovieToGroup.url, (req, resp) => {
-        tryCatch(async () => {
-            const token = getTokenFromCookie(req, resp)
-            console.log(JSON.stringify(req.body))
-            const groupID = req.params.groupID
-            const movieID = req.params.movieID
-            const msg = await services.addMovieToGroup(movieID, groupID, token)
-            console.log(msg.msg)
-            redirect(resp, webPages.pageOfAGroup.setUrl(groupID))
-        }, resp)
-    })
+
     
     /**
      * @param {express.Response} rsp 
@@ -413,9 +418,5 @@ export const shadowWebRoutes = {
     updateGroup: {
         url: `${shadowWebPath}/groups/update/:groupID`,
         setUrl: (groupID) => { return `${shadowWebPath}/groups/update/${groupID}` } 
-    },
-    addMovieToGroup: {
-        url: `${shadowWebPath}/groups/:groupID/:movieID`,
-        setUrl: (groupID, movieID) => { return `${shadowWebPath}/groups/${groupID}/${movieID}` } 
     }
 }

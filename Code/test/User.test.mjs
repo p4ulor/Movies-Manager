@@ -1,7 +1,7 @@
 const isDataElasticSearch = true
 
 import * as mocha from 'mocha' //mocha (test framework)
-const test = mocha.xit //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
+const test = mocha.it //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
 
 import chai, { expect } from 'chai' //chai (assertion library)
 

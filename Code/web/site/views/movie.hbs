@@ -20,6 +20,7 @@
     {{/each}}
 </div>
 
+<script src="/js/client-fetch.js"></script>
 <script>
     let isOpen = false
     function openSelector(){
@@ -27,54 +28,48 @@
         isOpen = true
 
         let uri = getHandlBarsOptionString(`${{{getListOfGroupsURI}}}`)
-        //gets names and id's of user's groups. We thought about storing the groups in sessionStorage for optimization, but since listing the groups of a user can receives skip and limit params, and groups can be added or deleted, this would mean that we would need to keep up sessionStorage with all of these operations, which we could implement, but we guessed that it wouldn't be "The be-all and end-all" nor the focus of this project
+
         function getGroups(){ //https://stackoverflow.com/questions/34558264/fetch-api-with-cookie
-            fetch(uri, { method: "GET", credentials: 'same-origin', body: null}).then(async response => { 
-                if(!response.ok){
-                    response.json().then(message => {
-                        let alertMsg = `Error ${response.status}`
-                        alertMsg = alertMsg.concat(`, ${message.error}`)
-                        alert(alertMsg)
-                    })
-                } else {
-                    try { 
-                        //console.log(await response.clone().text())
-                        response.json().then(arrayGroups => { //changed from await to then because it suddently stopped working 1 day after???!!!
-                            console.log(arrayGroups)
-                            showGroupsList(arrayGroups.groups)
-                        })
-                    }
-                    catch(e) { alert("Error converting to json->"+e); isOpen = false }
+            fetx(uri, "GET").then(arrayGroups => {
+                if(arrayGroups) {
+                    console.log(arrayGroups)
+                    showGroupsList(arrayGroups.groups)
                 }
-            }).catch(e => {
-                alert("Fetch error ->"+e); isOpen = false
+                else isOpen = false
             })
         }
 
-        function updateFormActionURL(theSelector, form){
+        function updateFormActionURL(theSelector, button){
             console.log(`Selected group of id=${theSelector.value}`)
 
             const groupID = theSelector.value
             const movieID = getHandlBarsOptionString(`${{{movieID}}}`)
-
-            //const form = document.getElementById("form") //this will result in null! so we need to receive the form as input when setting this up for the 1st time
-            
-            //(groupID, movieID) => { return `${shadowWebPath}/groups/${groupID}/${movieID}` }
-            const func = {{{function_addMovieToGroupSetURL}}} //(see handlebars registered helpers in server.mjs)  https://handlebarsjs.com/guide/#html-escaping
-            const shadowWebPath = getHandlBarsOptionString(`${{{shadowWebPath}}}`) //used in the func!
+            const apiPath = getHandlBarsOptionString(`${{{apiPath}}}`)
+            const func = {{{function_addMovieToGroupSetPath}}} //(see handlebars registered helpers in server.mjs)  https://handlebarsjs.com/guide/#html-escaping
             const path = func(groupID, movieID)
-            const host = getHandlBarsOptionString(`${{{host}}}`)
-            form.action = `${host}${path}`
+
+            const redirect = {{{function_getPageOfAGroupSetPath}}}
+            const redirectPath = redirect(groupID)
+            
+            const addMovieToGroupURI = getHandlBarsOptionString(`${{{host}}}`) + path
+
+            button.onclick = () => {
+                fetx(addMovieToGroupURI, "PUT").then(_ => {
+                    location.href = redirectPath
+                })
+            }
         }
 
         function showGroupsList(groupsArray){
-            const form = document.createElement("form")
-            form.id = "form"
-            form.method = "POST"
+            const div = document.createElement("div")
+
+            const addButton = document.createElement("button")
+            addButton.innerHTML = "Add"
+            addButton.type = "submit"
 
             const selector = document.createElement("select")
             selector.id="selector"
-            selector.onchange = () => updateFormActionURL(selector, form)
+            selector.onchange = () => updateFormActionURL(selector, addButton)
 
             for (const group of groupsArray) {
                 let option = document.createElement("option")
@@ -83,16 +78,12 @@
                 selector.appendChild(option)
             }
 
-            updateFormActionURL(selector, form) //triggers a default setup
+            updateFormActionURL(selector, addButton) //defines a default setup
 
-            const addButton = document.createElement("button")
-            addButton.innerHTML = "Add"
-            addButton.type = "submit"
+            div.appendChild(selector)
+            div.appendChild(addButton)
 
-            form.appendChild(selector)
-            form.appendChild(addButton)
-
-            document.getElementById("movieDiv").append(form)
+            document.getElementById("movieDiv").append(div)
         }
         getGroups()
     }

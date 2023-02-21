@@ -8,7 +8,7 @@
 async function fetx(path, method, body){
     const options = {
         method: method, 
-        credentials: 'same-origin',
+        credentials: 'same-origin', //includes cookies in request
         body: (body || method!="GET" || method!="DELETE") ? JSON.stringify(body) : null,
         headers: { "Content-Type": "application/json" , "Accept" : "application/json"}
     }

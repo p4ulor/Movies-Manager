@@ -16,13 +16,13 @@ import * as path from 'node:path'
 
 //My files imports
 import * as theApi from './web/api/cmdb-web-api.mjs'
-export const apiPath = "/api"
+
 export const apiRoutes = { //because cmdb-web-site need to know some (only this one in this case) api routes because of the client-side fetch()
-    getGroups: apiPath+'/groups'
+    getGroups: theApi.apiPath+'/groups'
 }
 
 //WEB
-import webSite, { shadowWebRoutes } from './web/site/cmdb-web-site.mjs'
+import webSite, { webPages } from './web/site/cmdb-web-site.mjs'
 
 //DOCS
 import swaggerUi from 'swagger-ui-express'
@@ -34,7 +34,6 @@ export function server(config){ //in order be to be used in tests and be more fl
     if(!config instanceof ServerConfig) throw new Error("A ServerConfig must be provided")
 
     const PORT = config.port
-    const api = theApi.default(config)
     const app = express() //it has 'export' 
 
     // Session config
@@ -87,9 +86,16 @@ export function server(config){ //in order be to be used in tests and be more fl
 
     app.set('view engine', 'hbs') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=production%2C%20otherwise%20undefined.-,view%20engine,-String
     hbs.registerPartials('./web/site/views/partials') // In order for things like '{{> group}}' to work inside .hbs files https://stackoverflow.com/a/40583205/9375488
-    hbs.registerHelper('function_addMovieToGroupSetURL', function() { //https://handlebarsjs.com/guide/#custom-helpers Im oblitated to setup these helpers here or it doesnt work apparently...
-        return shadowWebRoutes.addMovieToGroup.setUrl //we could avoid using this helper, we're just trying it out. And we actually learned new things by using this
+    hbs.registerHelper('function_addMovieToGroupSetPath', function() { //https://handlebarsjs.com/guide/#custom-helpers Im oblitated to setup these helpers here or it doesnt work apparently... The helpers are useful to "import" function to allow us to reference functions in the .hbs files
+        return theApi.apiPaths.addMovieToGroup.setPath
     })
+    hbs.registerHelper('function_getPageOfAGroupSetPath', function() {
+        return webPages.pageOfAGroup.setUrl
+    })
+    hbs.registerHelper('function_removeMovieFromGroup', function() {
+        return theApi.apiPaths.removeMovieFromGroup.setPath
+    })
+
     app.set('views', './web/site/views/') //https://expressjs.com/en/5x/api.html#app.settings.table:~:text=false%20(disabled)-,views,-String%20or%20Array
 
     app.use(favicon('./web/site/public/favicon.ico')) //https://expressjs.com/en/resources/middleware/serve-favicon.html
@@ -99,25 +105,26 @@ export function server(config){ //in order be to be used in tests and be more fl
     app.use('/js', express.static(path.resolve("../Code/web/site/scripts/").replace(/\\/g, '/'))) //https://stackoverflow.com/a/55279238/9375488   https://stackoverflow.com/a/60395362/9375488 Allows the successful use of <script src="/js/client-fetch.js"></script> inside .hbs files
 
     //API
-    app.post(apiPath+'/users', api.signUpUser)
-    app.post(apiPath+'/login', api.loginUser)
-    app.post(apiPath+'/groups', api.createGroup)
-    app.put(apiPath+'/groups/:groupID/:movieID', api.addMovieToGroup)
-    app.get(apiRoutes.getGroups, api.getGroupList) //query params -> skip and limit
-    app.post(apiPath+'/groups/:groupID', api.updateGroup)
-    app.delete(apiPath+'/groups/:groupID', api.deleteGroup)
-    app.get(apiPath+'/groups/:groupID', api.getGroup)
-    app.delete(apiPath+'/groups/:groupID/:movieID', api.removeMovieFromGroup)
+    const api = theApi.default(config)
+    app.post(api.signUpUser.path, api.signUpUser.func)
+    app.post(api.loginUser.path, api.loginUser.func)
+    app.post(api.createGroup.path, api.createGroup.func)
+    app.put(api.addMovieToGroup.path, api.addMovieToGroup.func) //controversial decision having this be a PUT because we dont really create a new resource w/ this operation, we just add a reference to a movie for the group, BUT we allow a group to have repetitive references to movies, so it's an idempotent operation
+    app.get(api.getGroupList.path, api.getGroupList.func) //query params -> skip and limit
+    app.put(api.updateGroup.path, api.updateGroup.func)
+    app.delete(api.deleteGroup.path, api.deleteGroup.func)
+    app.get(api.getGroup.path, api.getGroup.func)
+    app.delete(api.removeMovieFromGroup.path, api.removeMovieFromGroup.func)
 
     //IMDB calls
-    app.get(apiPath+'/movies/top', api.getTopMovies), //optional query params -> top
-    app.get(apiPath+'/movies/search', api.searchMovie) //necessary params -> searchTerms. Optional =skip and limit
-    app.get(apiPath+'/movies/:movieID', api.getMovie)
-    app.get(apiPath+'/actor/:actorID', api.getActor)
+    app.get(api.getTopMovies.path, api.getTopMovies.func), //optional query params -> top
+    app.get(api.searchMovie.path, api.searchMovie.func) //necessary params -> searchTerms. Optional =skip and limit
+    app.get(api.getMovie.path, api.getMovie.func)
+    app.get(api.getActor.path, api.getActor.func)
 
     //DOCS
     const swaggerDocument = yaml.load('../Docs/cmdb-api-spec.yaml')
-    app.use(apiPath+'/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+    app.use(theApi.docsPath, swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     // WEB
     app.use('/', webSite(config))
@@ -144,5 +151,7 @@ export class ServerConfig {
         this.port = port
         this.isDataSourceElastic = isDataSourceElastic
         this.elasticSearchURL = elasticSearchURL
+
+        this.hostAndPort = `http://localhost:${this.port}`
     }
 }

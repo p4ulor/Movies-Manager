@@ -409,7 +409,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaaa2\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_25f649os\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaaa222\",\r\n    \"password\": \"ay\",\r\n    \"api_key\": \"k_25f649os\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -503,7 +503,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"paulo\",\r\n    \"password\": \"ay\"\r\n}",
+							"raw": "{\r\n    \"name\": \"paulo23aaabaaaaaa222\",\r\n    \"password\": \"ay\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -759,7 +759,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"myfavmovies\",\r\n    \"description\": \"of all time\"\r\n}",
+							"raw": "{\r\n    \"name\": \"myfavmovies33\",\r\n    \"description\": \"of all time33\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1203,7 +1203,7 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -2074,7 +2074,7 @@
 	"variable": [
 		{
 			"key": "pauloToken",
-			"value": "f7c59d82-8a6a-436d-96e0-dd2758a37ab1",
+			"value": "0e1f202e-4915-4d66-a679-d14b6e668524",
 			"type": "string"
 		},
 		{
@@ -2090,6 +2090,16 @@
 		{
 			"key": "carlosElasticToken",
 			"value": "e246a3cd-afd2-4625-88ff-d954c253101c",
+			"type": "string"
+		},
+		{
+			"key": "pauloElasticToken",
+			"value": "0e1f202e-4915-4d66-a679-d14b6e668524",
+			"type": "string"
+		},
+		{
+			"key": "pauloMemToken",
+			"value": "f7c59d82-8a6a-436d-96e0-dd2758a37ab1",
 			"type": "string"
 		}
 	]
