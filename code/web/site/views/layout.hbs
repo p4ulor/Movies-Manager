@@ -36,8 +36,6 @@
                         <a class="nav-link float-right" id="loginLink" href={{loginPath}}>Login</a>
                     </li>
                 </ul>
-
-                
             </div>
         </nav>
 
@@ -76,8 +74,8 @@
 
         window.addEventListener("load", ()=>{
             console.log("Page loaded")
-            const isUserLoggedIn = getCookie("token") //todoooooooooo this is bad/cheap design
-            console.log(isUserLoggedIn)
+            const isUserLoggedIn = getCookie("token") //NOTE this is bad/cheap design for reals apps, cookies should be HTTP only and shouldn't be able to be accessed like this
+            console.log("isUserLoggedIn", isUserLoggedIn)
             if(isUserLoggedIn!=""){
                 addNewNavItem("My Groups", getHandlBarsOptionString(`${{{myGroupsPath}}}`))
                 addNewNavItem("Search for movies",  getHandlBarsOptionString(`${{{searchPath}}}`))
@@ -91,11 +89,15 @@
                         logOut.innerHTML = "Login"
                         logOut.href = getHandlBarsOptionString(`${{{loginPath}}}`)
                         logOut.onclick = null
-                    }, 500) //becuse otherwise it will instantly goes to /login...
+                    }, 500) //becuse otherwise it will instantly go to /login...
 
-                    while(document.cookie!=''){  //clear all cookies
-                        document.cookie = document.cookie + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-                    }
+
+                    deleteAllCookies()
+                    
+                    //while(document.cookie!=''){  //clear all cookies, but for some reasion this is now causing infinite cycle only in non 1 level paths (non main tab paths)
+                        //document.cookie = document.cookie + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/'
+                    //}
+
                     //clear cookies manually demonstration:
                     //document.cookie = "token" + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'//https://stackoverflow.com/a/10593045/9375488
                     //document.cookie = "userName"...
@@ -105,6 +107,17 @@
 
         function getHandlBarsOptionString(str){
             return str.substring(1, str.length) //because the '$' is included in the string... this seems to only occurr inside scripts
+        }
+
+        function deleteAllCookies() {
+            const cookies = document.cookie.split(";");
+
+            for (var i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = cookie.substr(0, eqPos);
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
         }
 
     </script>
