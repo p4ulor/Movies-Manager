@@ -4,6 +4,7 @@
         </br>
     {{/if}}
 
+    {{!-- The 'name' HTML property is used for the form to parse the inputs and place them in the json body as fields--}}
     <form method="POST" action="{{host}}{{loginRoute}}">
         <label>Username</label>
         <input type="text" name="name" {{!-- required --}}></input>
@@ -25,5 +26,3 @@
 {{!-- Importing scripts express way, which allows the use of import --}}
 {{!-- <script src="/js/client-fetch.js"></script> --}} {{!-- Since pure javascript doesn't support imports, we use HTML as the means of "importing" https://stackoverflow.com/a/950146/9375488 --}}
 {{!-- <script src="/js/login.js"></script>  --}}       {{!-- Thanks to line 84 at "app.use('/js', express.static()..." in cmdb-server.mjs. It can't be an .mjs or it won't load/associate the functions mentioned here like submit() --}}
-
-{{!-- The 'name' property is used for the form to parse the inputs and place them in the json body as fields--}}

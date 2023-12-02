@@ -7,9 +7,13 @@ const test = mocha.xit //just for a more clear lexic. To disable all tests, repl
 import request from 'supertest'
 import { expect } from 'chai' //chai (assertion library)
 
-import * as server from '../cmdb-server.mjs' 
+import * as server from '../cmdb-server.mjs'
+import { apiPaths } from '../web/api/cmdb-web-api.mjs'
 const config = new server.ServerConfig(1908, true, "http://localhost:9200")
-const appExpress/*: Express */ = server.server(config)
+/**
+ * <Express>
+ */
+const appExpress = await server.server(config)
 const api = server.apiPath
 
 import * as _elasticFetch from '../utils/elastic-fetch.mjs'
@@ -23,12 +27,12 @@ function getToken() {
 }
 let userID
 
-const boratID = "tt0443453" //borat movie
+const boratMovieID = "tt0443453"
 
 describe('Group tests', function () {
 
     mocha.before((done) => { //https://mochajs.org/#hooks  https://stackoverflow.com/a/30332621
-        request(appExpress).post(api+"/users").send({
+        request(appExpress).post(apiPaths.loginUser).send({
             name: "ppaulonew33",
             password: "ay",
             api_key: "k_000000"
@@ -59,7 +63,7 @@ describe('Group tests', function () {
         const tok = getToken()
         createGroup("myfavmovies", "of all time").end(function (err, res){
             const groupID = res.body.id
-            addMovie(groupID, boratID).end(function (err, res){
+            addMovie(groupID, boratMovieID).end(function (err, res){
                 expect(res.body.msg).to.be.a('string').equals("Added movie -> Borat")
                 expect(res).to.have.status(200)
                 elasticFetch.deleteDoc(dataElastic.ourIndexes.groups, groupID)
@@ -71,8 +75,8 @@ describe('Group tests', function () {
         const tok = getToken()
         createGroup("myfavmovies", "of all time").end(function (err, res){
             const groupID = res.body.id
-            addMovie(groupID, boratID).end(function (err, res){
-                request(appExpress).get(api+"/groups").set('Authorization', tok).end(function (err, res){
+            addMovie(groupID, boratMovieID).end(function (err, res){
+                request(appExpress).get(apiPaths.getGroupList).set('Authorization', tok).end(function (err, res){
                     const groups = res.body.groups
                     expect(groups).to.be.a('array')
                     expect(groups[0].id).to.be.a('string')
@@ -88,8 +92,8 @@ describe('Group tests', function () {
         const tok = getToken()
         createGroup("myfavmovies", "of all time").end(function (err, res){
             const groupID = res.body.id
-            addMovie(groupID, boratID).end(function (err, res){
-                request(appExpress).post(api+`/groups/${groupID}`).set('Authorization', tok).send({
+            addMovie(groupID, boratMovieID).end(function (err, res){
+                request(appExpress).post(apiPaths.updateGroup.setPath(groupID)).set('Authorization', tok).send({
                     groupName: "watch in 1 year",
                     groupDescription: "zzzzzzzzzzz"
                 }).end(function (err, res){
@@ -104,8 +108,8 @@ describe('Group tests', function () {
         const tok = getToken()
         createGroup("watch later", "no time").end(function (err, res){
             const groupID = res.body.id
-            addMovie(groupID, boratID).end(function (err, res){
-                request(appExpress).get(api+`/groups/${groupID}`).set('Authorization', tok).end(function (err, res){
+            addMovie(groupID, boratMovieID).end(function (err, res){
+                request(appExpress).get(apiPaths.getGroup.setPath(groupID)).set('Authorization', tok).end(function (err, res){
                     const obj = res.body.groupObj
                     expect(obj.name).to.be.equal("watch later")
                     expect(obj.description).to.be.equal("no time")
@@ -122,8 +126,8 @@ describe('Group tests', function () {
         const tok = getToken()
         createGroup("myfavmovies", "of all time").end(function (err, res){
             const groupID = res.body.id
-            addMovie(groupID, boratID).end(function (err, res){
-                request(appExpress).delete(api+`/groups/${groupID}/tt0443453`).set('Authorization', tok).end(function (err, res){
+            addMovie(groupID, boratMovieID).end(function (err, res){
+                request(appExpress).delete(apiPaths.removeMovieFromGroup.setPath(groupID, boratMovieID)).set('Authorization', tok).end(function (err, res){
                     expect(res.body.msg).to.be.a("string")
                     expect(res).to.have.status(200)
                     elasticFetch.deleteDoc(dataElastic.ourIndexes.groups, groupID)
@@ -136,14 +140,14 @@ describe('Group tests', function () {
         const tok = getToken()
         createGroup("myfavmovies", "of all time").end(function (err, res){
             const groupID = res.body.id
-            request(appExpress).delete(api+`/groups/${groupID}`).set('Authorization', tok).end(function (err, res){
+            request(appExpress).delete(apiPaths.deleteGroup.setPath(groupID)).set('Authorization', tok).end(function (err, res){
                 const msg = res.body.msg
                 expect(msg).to.be.a('string')
                 expect(msg).to.contain("Deleted")
                 console.log(msg)
                 expect(res).to.have.status(200)
             }).then(() => {
-                request(appExpress).get(api+`/groups/${groupID}`).set('Authorization', tok).end(function (err, res){
+                request(appExpress).get(apiPaths.getGroup.setPath(groupID)).set('Authorization', tok).end(function (err, res){
                     expect(res).to.have.status(404)
                 })
             })
@@ -157,7 +161,7 @@ describe('Group tests', function () {
 
 function createGroup(name, description){ //I created groups for each operation because the tests aren't really sequential, although sometimes they end up running sequentially
     const tok = getToken()
-    return request(appExpress).post(api+"/groups").set('Authorization', tok).send({
+    return request(appExpress).post(apiPaths.getGroupList).set('Authorization', tok).send({
         name: name,
         description: description
     })
@@ -165,13 +169,13 @@ function createGroup(name, description){ //I created groups for each operation b
 
 function addMovie(groupID, movieID){
     const tok = getToken()
-    return request(appExpress).put(api+`/groups/${groupID}/${movieID}`).set('Authorization', tok)
+    return request(appExpress).put(apiPaths.addMovieToGroup.setPath(groupID, movieID)).set('Authorization', tok)
 }
 
 function createSomeGroup(){
     const tok = getToken()
     return createGroup("myfavmovies", "of all time").end(function (err, res){
         const groupID = res.body.id
-        return addMovie(groupID, boratID)
+        return addMovie(groupID, boratMovieID)
     })
 }

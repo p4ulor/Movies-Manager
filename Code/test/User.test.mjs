@@ -11,10 +11,14 @@ chai.use(deepEqualInAnyOrder)
 import chaiHttp from 'chai-http'
 chai.use(chaiHttp)
 
-import * as server from '../cmdb-server.mjs' 
+import * as server from '../cmdb-server.mjs'
+import { apiPaths } from '../web/api/cmdb-web-api.mjs'
+import { webPages } from '../web/site/cmdb-web-site.mjs'
 const config = new server.ServerConfig(1905, isDataElasticSearch, "http://localhost:9200")
-const appExpress/*: Express */ = server.server(config)
-const api = server.apiPath
+/**
+ * <Express>
+ */
+const appExpress = await server.server(config)
 
 import * as _elasticFetch from '../utils/elastic-fetch.mjs'
 import * as _dataElastic from '../data/cmdb-data-elastic.mjs'
@@ -23,7 +27,7 @@ const dataElastic = _dataElastic.default(config)
 
 describe('Main page', function () {
     test('Should get .html', function () {
-        chai.request(appExpress).get("/").send().end(function (err, res){
+        chai.request(appExpress).get(webPages.home.url).send().end(function (err, res){
             expect(res.get("Content-Type")).to.include("text/html") // or use res.header.content-type=="text/html" https://stackoverflow.com/a/30302180/9375488
             expect(res).to.have.status(200)
         })
@@ -33,7 +37,7 @@ describe('Main page', function () {
 describe('Users', function () {
 
     test('Create a user', function () {
-        chai.request(appExpress).post(api+"/users").send({
+        chai.request(appExpress).post(apiPaths.signUpUser).send({
             name: "ppaulonew33",
             password: "ay",
             api_key: "k_000000"
@@ -48,7 +52,7 @@ describe('Users', function () {
     test('Login user', function () {
         let token
         let id
-        chai.request(appExpress).post(api+"/users").send({
+        chai.request(appExpress).post(apiPaths.signUpUser).send({
             name: "ppaulonew344",
             password: "ay",
             api_key: "k_000000"
@@ -57,7 +61,7 @@ describe('Users', function () {
             token = resp.body.token
             id = resp.body.userID
 
-            chai.request(appExpress).post(api+"/login").send({
+            chai.request(appExpress).post(apiPaths.loginUser).send({
                 name: "ppaulonew344",
                 password: "ay"
             }).end(function (err, res){

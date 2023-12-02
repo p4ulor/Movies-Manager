@@ -17,10 +17,6 @@ import * as path from 'node:path'
 //My files imports
 import * as theApi from './web/api/cmdb-web-api.mjs'
 
-export const apiRoutes = { //because cmdb-web-site need to know some (only this one in this case) api routes because of the client-side fetch()
-    getGroups: theApi.apiPath+'/groups'
-}
-
 //WEB
 import webSite, { webPages } from './web/site/cmdb-web-site.mjs'
 
@@ -28,7 +24,10 @@ import webSite, { webPages } from './web/site/cmdb-web-site.mjs'
 import swaggerUi from 'swagger-ui-express'
 import yaml from 'yamljs'
 
-/** @param {ServerConfig} config */
+/** 
+ * @param {ServerConfig} config 
+ * @returns {Promise<Express>}
+ */
 export function server(config){ //in order be to be used in tests and be more flexible
 
     if(!config instanceof ServerConfig) throw new Error("A ServerConfig must be provided")
@@ -46,7 +45,7 @@ export function server(config){ //in order be to be used in tests and be more fl
         }
     ))
 
-    // Passport Initialization https://www.npmjs.com/package/passport#:~:text=%7D)%3B-,Middleware,-To%20use%20Passport
+    // Passport Initialization (not really used) https://www.npmjs.com/package/passport#:~:text=%7D)%3B-,Middleware,-To%20use%20Passport
     app.use(passport.session())
     app.use(passport.initialize())
 
@@ -109,11 +108,11 @@ export function server(config){ //in order be to be used in tests and be more fl
     app.post(api.signUpUser.path, api.signUpUser.func)
     app.post(api.loginUser.path, api.loginUser.func)
     app.post(api.createGroup.path, api.createGroup.func)
-    app.put(api.addMovieToGroup.path, api.addMovieToGroup.func) //controversial decision having this be a PUT because we dont really create a new resource w/ this operation, we just add a reference to a movie for the group, BUT we allow a group to have repetitive references to movies, so it's an idempotent operation
+    app.post(api.addMovieToGroup.path, api.addMovieToGroup.func)
     app.get(api.getGroupList.path, api.getGroupList.func) //query params -> skip and limit
     app.put(api.updateGroup.path, api.updateGroup.func)
     app.delete(api.deleteGroup.path, api.deleteGroup.func)
-    app.get(api.getGroup.path, api.getGroup.func)
+    app.get(api.getGroup.path, api.getGroup.func) //query params skip and limit
     app.delete(api.removeMovieFromGroup.path, api.removeMovieFromGroup.func)
 
     //IMDB calls
@@ -123,17 +122,37 @@ export function server(config){ //in order be to be used in tests and be more fl
     app.get(api.getActor.path, api.getActor.func)
 
     //DOCS
-    const swaggerDocument = yaml.load('../Docs/cmdb-api-spec.yaml')
+    const swaggerDocument = yaml.load('../docs/cmdb-api-spec.yaml')
     app.use(theApi.docsPath, swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
     // WEB
     app.use('/', webSite(config))
 
-    app.listen(PORT, () => console.log(`Server listening in http://localhost:${PORT}. dataSource -> ${config.isDataSourceElastic ? "elasticSearch" : "memory"}`))
+    
+
+    const promise = new Promise(async (resolve, reject) => {
+        const server = app.listen(PORT, () => {
+            console.log(`Server starting to listen in http://localhost:${PORT}. dataSource -> ${config.isDataSourceElastic ? "elasticSearch" : "memory"}`)
+        })
+        server.once('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                const errorMsg = `Port ${PORT} is already in use`
+                reject(errorMsg)
+            } else {
+                console.error(`Other error occured ${err}`);
+                reject(err)
+            }
+        });
+
+        server.once('listening', () => {
+            console.log("Listen successfull")
+            resolve(app)
+        });
+    })
 
     console.log("End setting up server")
 
-    return app
+    return promise
 }
 
 export class ServerConfig {

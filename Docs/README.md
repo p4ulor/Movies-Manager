@@ -22,7 +22,7 @@ or
 ## Description of the application structure in server
 The server is well structured, given the fact that we used JSdocs and classes, which also speeded up the development and reduced bugs during development.
 
-The `cmdb-server.mjs` contains a function that allows the initialization of the server. 
+The `cmdb-setup-server.mjs` contains a function that allows the initialization of the server. 
 
 We dont have repetitive hardcoded URI's, and we wrote many utility functions. 
 
@@ -30,14 +30,17 @@ We perform several request error checks, and return appropriate errors describin
 
 A big perk of our application is that we cache the search results and top movies obtained from the IMDB API. And we store in our DB all movies and actors consulted. We do this in order to reduce API calls to IMDB to the minimum.
 
-We also allow the flexibility between the data storage have it's origin from the Elastic Search DB or from the program's memory
+We also allow the flexibility between the data storage be set to Elastic Search DB or to be be in memory
+
+> [!NOTE]  
+> If the indexes (equivalent to tables in SQL) in Elastic Search for our predefined objects, don't exist, they will be created (see `createOurIndexes()`).
 
 ## Description of the application structure in client
 The client side application mostly uses HTML forms for GET, PUT, POST and DELETE requests. As requested for this phase, it was supposed to change from HTML forms to client-side fetches. And the only write-request we are performing client side without HTML forms is at the Login. 
 
-Given the request of this phase, we decided that we would expect to write more client side javascript to obtain consulting the DOM to get input values before performing fetch requests, so we created a folder /scripts/ inside /web/site/ to split and organize Handlebars views from scripts. We also configured our solution in a way that avoids repetitive code. For example, we expected that the fetch() function would be called more repeatedly, so we wrote a fetx() function in /web/site/scripts/ which would be "imported" in HTML for places where we needed the fetx(), this would reduce repetitive code and simplify our HTTP requests to the API.
+Given the request of this phase, we decided that we would expect to write more client side javascript to obtain consulting the DOM to get input values before performing fetch requests, so we created a folder `/scripts/` inside `/web/site/` to split and organize Handlebars views from scripts. We also configured our solution in a way that avoids repetitive code. For example, we expected that the fetch() function would be called more repeatedly, so we wrote a *fetx()* function in `/web/site/scripts/` which would be "imported" in HTML for places where we needed the *fetx()*, this would reduce repetitive code and simplify our HTTP requests to the API.
 
-We could have performed better error validations on the client-side.~
+We could have performed better error validations on the client-side.
 
 The main challenge of this component was avoiding hardcoded and repetitive strings and functions, per example the API paths
 
@@ -64,9 +67,10 @@ For both elastic search and mem-data, the same objects definition were used, as 
 - movies: `Array<GroupMovie>` (cached id, name and duration of a movie in the group (avoid's repetitive and demanding data calls))
 - totalDuration: `number`
 
-**Entities that use and get information from the IMDB API:**
+> [!NOTE]  
+> Entities that use and get information from the IMDB API.
+> And the id is the same as the id used by the IMDB-API
 
-The id is the same as the id used by the IMDB-API
 ## **Movie**
 - id: `string`
 ### MovieObj

@@ -69,8 +69,8 @@ export async function imdb_getTopMovies(numOfTop, api_key){
             for (let i = 0; i < numOfTop; i++){
                 topNmovies.push(getTopMoviesItemArrayObjProperties(cachedTopResults[i]))
             }
-            const jsonResponse = {top: topNmovies}
             console.log("\nTop movies obtained ="+JSON.stringify(jsonResponse), "\n")
+            const jsonResponse = {top: topNmovies}
             return jsonResponse
         })
     }).catch(e => {
@@ -180,4 +180,6 @@ export async function imdb_getActor(api_key, actorID){
     })
 }
 
-
+function wasAPI_keySentInvalid(apiKey){
+    //TODO
+}
