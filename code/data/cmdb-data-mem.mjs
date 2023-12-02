@@ -55,7 +55,12 @@ const moviesLibrary = [
     new Movie("tt0110912",  new MovieObj("Pulp Fiction",
             "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
             "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_Ratio0.6904_AL_.jpg",
-            154, "Quentin Tarantino", [new MovieActor("nm0000237", "John Travolta"), new MovieActor("nm0000235", "Uma Thurman") /* ... */]))
+            154, "Quentin Tarantino", [new MovieActor("nm0000237", "John Travolta"), new MovieActor("nm0000235", "Uma Thurman") /* ... */])),
+
+    new Movie("tt0111161",  new MovieObj("The Shawshank Redemption",
+            "Over the course of several years, two convicts form a friendship, seeking consolation and, eventually, redemption through basic compassion.",
+            "https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_FMjpg_UX1200_.jpg",
+            142, "Frank Darabont", [new MovieActor("nm0000209", "Tim Robbins"), new MovieActor("nm0000151", "Morgan Freeman") /* ... */])),
 ]
 
 //the following 2 counters and 2 functions are required since users (not for this assignment though) or groups can be deleted. And it would cause inconsistencies or other problems if we used the lenght as the ID
@@ -288,7 +293,7 @@ export async function getMovieFromDBorIMDB(movieID, api_key, justShowPreview){
         moviesLibrary.push(movie)
         console.log(`\nInserted movie -> ${JSON.stringify(movie)} to our DB\n`)
     } else console.log("Obtained movie from our DB")
-    if(justShowPreview) return movie.getPreview()
+    if(justShowPreview) return movie.movieObj.getPreview()
     else return movie
 }
 

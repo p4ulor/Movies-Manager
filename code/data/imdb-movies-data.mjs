@@ -20,6 +20,12 @@ export async function imdb_getMovie(api_key, movieID){
     let URI = IMDB_getMovieById(api_key, movieID)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
+
+            if(obj.errorMessage){
+                console.log(`imdb_getTopMovies error: ${obj.errorMessage}`)
+                return null
+            }
+
             const movieWithOurProps = extractMovieProperties(obj)
             console.log("\nMovie obtained from imdb API -> "+JSON.stringify(movieWithOurProps), "\n")
             return movieWithOurProps
@@ -43,7 +49,23 @@ const extractMovieProperties = (obj) => {
     ))
 }
 
-let cachedTopResults = []
+class MovieTopRating {
+    /**
+     * @param {string} id
+     * @param {string} rank
+     * @param {string} title
+     */
+    constructor(id, rank, title){
+        this.id = id; this.rank = rank; this.title = title
+    }
+}
+
+//placing some results here now that the API free plan is gone
+let cachedTopResults = [
+    new MovieTopRating("tt0111161", 1, "The Shawshank Redemption"),
+    new MovieTopRating("tt0068646", 2, "The Godfather"),
+    new MovieTopRating("tt0468569", 3, "The Dark Knight")
+]
 
 export async function imdb_getTopMovies(numOfTop, api_key){
     const topNmovies = []
@@ -65,6 +87,12 @@ export async function imdb_getTopMovies(numOfTop, api_key){
     let URI = IMDB_top250Movies(api_key)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
+
+            if(obj.errorMessage){
+                console.log(`imdb_getTopMovies error: ${obj.errorMessage}`)
+                return null
+            }
+
             cachedTopResults = obj.items
             for (let i = 0; i < numOfTop; i++){
                 topNmovies.push(getTopMoviesItemArrayObjProperties(cachedTopResults[i]))
@@ -74,7 +102,7 @@ export async function imdb_getTopMovies(numOfTop, api_key){
             return jsonResponse
         })
     }).catch(e => {
-        console.log(e)
+        console.log("Invalid API key?"+e)
         return null
     })
 }
@@ -121,6 +149,12 @@ export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
     let URI = IMDB_searchMovie(api_key, searchTerms)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
+
+            if(obj.errorMessage){
+                console.log(`imdb_getTopMovies error: ${obj.errorMessage}`)
+                return null
+            }
+
             const resultsArray = obj.results
 
             cachedResults.push({terms: searchTerms, results: resultsArray})
@@ -137,7 +171,7 @@ export async function imdb_searchMovie(searchTerms, skip, limit, api_key){
             return jsonResponse
         })
     }).catch(e => {
-        console.log(e)
+        console.log("Invalid API key?"+e)
         return null
     })
 }
@@ -170,16 +204,18 @@ export async function imdb_getActor(api_key, actorID){
     let URI = IMDB_getActorById(api_key, actorID)
     return fetch(URI).then(response => {
         return response.json().then(obj => {
+
+            if(obj.errorMessage){
+                console.log(`imdb_getTopMovies error: ${obj.errorMessage}`)
+                return null
+            }
+
             const actor = new Actor(actorID, new ActorObj(obj.image, obj.name, obj.birthDate))
             console.log("\nActor obtained from imdb API -> "+JSON.stringify(actor),"\n")
             return actor
         })
     }).catch(e => {
-        console.log("Actor not found?"+e)
+        console.log("Actor not found? Invalid API key?"+e)
         return null
     })
-}
-
-function wasAPI_keySentInvalid(apiKey){
-    //TODO
 }

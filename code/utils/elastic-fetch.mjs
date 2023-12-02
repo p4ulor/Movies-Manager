@@ -12,7 +12,13 @@ function elasticFetch(config){
         const uri = doesIndexExistUri(indexName)
         return await fetch(uri, {method: "HEAD"}).then(response => 
             response.ok
-        )
+        ).catch(e => {
+            if(e.code=="ECONNREFUSED"){
+                throw new Error(`Elastic search doesn't seem to be running!`)
+            } else {
+                throw new Error(`Connection to elastic search on failed on ${uri}`)
+            }
+        })
     }
     
     async function createIndex(indexName){
@@ -78,7 +84,9 @@ function elasticFetch(config){
     
         return fetch(uri, options).then(response => 
             response.json()
-        )
+        ).catch(e => {
+            console.log(`easyFetch error: ${e}`)
+        })
     }
     
     const doesIndexExistUri = (index) => `${ELASTIC_SEARCH_URL}/${index}`

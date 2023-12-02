@@ -28,15 +28,22 @@ import yaml from 'yamljs'
  * @param {ServerConfig} config 
  * @returns {Promise<Express>}
  */
-export function server(config){ //in order be to be used in tests and be more flexible
+export async function server(config){ //in order be to be used in tests and be more flexible
 
     if(!config instanceof ServerConfig) throw new Error("A ServerConfig must be provided")
+
+    if(config.isDataSourceElastic){
+        const isOn = await isElasticDBon(config.elasticSearchURL)
+        if(!isOn){
+            throw new Error("Elastic Search doesn't seem to be running")
+        }
+    }
 
     const PORT = config.port
     const app = express() //it has 'export' 
 
-    // Session config
-    app.use(expressSession( //https://www.passportjs.org/tutorials/password/session/#:~:text=%27public%27)))%3B-,app.use(session(%7B,-secret%3A%20%27keyboard
+    // Passport Session config (not being used, at least correctly) https://www.passportjs.org/tutorials/password/session/#:~:text=%27public%27)))%3B-,app.use(session(%7B,-secret%3A%20%27keyboard
+    app.use(expressSession(
         {
             secret: "Group4",
             resave: false,
@@ -45,7 +52,7 @@ export function server(config){ //in order be to be used in tests and be more fl
         }
     ))
 
-    // Passport Initialization (not really used) https://www.npmjs.com/package/passport#:~:text=%7D)%3B-,Middleware,-To%20use%20Passport
+    // Passport Initialization (not being used) https://www.npmjs.com/package/passport#:~:text=%7D)%3B-,Middleware,-To%20use%20Passport
     app.use(passport.session())
     app.use(passport.initialize())
 
@@ -108,7 +115,7 @@ export function server(config){ //in order be to be used in tests and be more fl
     app.post(api.signUpUser.path, api.signUpUser.func)
     app.post(api.loginUser.path, api.loginUser.func)
     app.post(api.createGroup.path, api.createGroup.func)
-    app.post(api.addMovieToGroup.path, api.addMovieToGroup.func)
+    app.put(api.addMovieToGroup.path, api.addMovieToGroup.func)
     app.get(api.getGroupList.path, api.getGroupList.func) //query params -> skip and limit
     app.put(api.updateGroup.path, api.updateGroup.func)
     app.delete(api.deleteGroup.path, api.deleteGroup.func)
@@ -128,12 +135,12 @@ export function server(config){ //in order be to be used in tests and be more fl
     // WEB
     app.use('/', webSite(config))
 
-    
-
     const promise = new Promise(async (resolve, reject) => {
+        
         const server = app.listen(PORT, () => {
             console.log(`Server starting to listen in http://localhost:${PORT}. dataSource -> ${config.isDataSourceElastic ? "elasticSearch" : "memory"}`)
         })
+        
         server.once('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 const errorMsg = `Port ${PORT} is already in use`
@@ -155,6 +162,16 @@ export function server(config){ //in order be to be used in tests and be more fl
     return promise
 }
 
+async function isElasticDBon(elasticSearchURL){
+    try {
+        const response = await fetch(elasticSearchURL)
+        return true
+    } catch (e) {
+        console.log(`isElasticDBon: ${e.cause.message}`)
+        return false
+    }
+}
+
 export class ServerConfig {
     /**
      * @param {number} port 
@@ -164,7 +181,7 @@ export class ServerConfig {
     constructor(port, isDataSourceElastic, elasticSearchURL){
         if(typeof port != "number" && port > 0) throw new Error("A valid port number must be provided")
         if(isDataSourceElastic) {
-            if(typeof elasticSearchURL != "string") throw new Error(`If data source is elastic, a valid elasticSearchURL must be provided. Obtained: ${elasticSearchURL}`)
+            if(typeof elasticSearchURL != "string" || elasticSearchURL.trim().length==0) throw new Error(`If data source is elastic, a valid elasticSearchURL must be provided. Obtained: ${elasticSearchURL}`)
         }
 
         this.port = port

@@ -2,6 +2,10 @@
 - This was done as an [Assignment](./AssignmentPaper.md) for the discipline Introduction to Programming in Web ([IPW](https://www.isel.pt/en/leic/introduction-internet-programming))
 - A simple web-app which allows logged in users (and w/ their IMDB API key) to search, consult and manage movies in their groups/collections and also consult the actors and the movie information
 - The users can edit the name & description of the groups, delete and add movies to the groups
+- The most challenging thing was avoiding hardcoded logic into the handle bars views
+
+> [!IMPORTANT]  
+> IMDB no longer provides free 100 API calls a day [due to free plan abuse](https://imdb-api.com/account/tickets)
 
 ## Technical details
 - The back-end (server) runs with Node.js w/ the express framework (read [this](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Introduction) to know what this means) and the front-end is generated via Handlebars

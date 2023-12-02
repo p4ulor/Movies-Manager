@@ -1,3 +1,7 @@
+let skip = false
+
+
+
 import * as mocha from 'mocha' //mocha (test framework)
 const test = mocha.it //just for a more clear lexic. To disable all tests, replace 'it' with 'xit' https://stackoverflow.com/a/32724129
 
@@ -11,16 +15,24 @@ chai.use(chaiHttp);
 
 import * as server from '../cmdb-server.mjs'
 import { apiPaths } from '../web/api/cmdb-web-api.mjs'
+
+console.log("\n---Starting IMDB.test---")
 const config = new server.ServerConfig(1907, false, "http://localhost:9200")
-/**
- * <Express>
- */
-const appExpress = await server.server(config)
+let appExpress
+
+try {
+    appExpress = await server.server(config)
+} catch(e){
+    console.log("Error:", e.message)
+    console.log("Will just skip test")
+    skip = true
+}
 
 const boratID = "tt0443453" //borat movie
+const token = 'Bearer f7c59d82-8a6a-436d-96e0-dd2758a37ab1'
 
 describe('Users', function () {
-    const token = 'Bearer f7c59d82-8a6a-436d-96e0-dd2758a37ab1'
+    if(skip) return
 
     test('Get top 5 movies', function () {
         chai.request(appExpress).get(apiPaths.getTopMovies + "?top=5").set('Authorization', token).end(function (err, res){
@@ -31,7 +43,7 @@ describe('Users', function () {
         })
     })
 
-    test('Search movies w/ "the " limit 5', function () {
+    test('Search movies w/ "the " limit 10', function () {
         chai.request(appExpress).get(apiPaths.searchMovie + "?searchTerms=the&limit=10").set('Authorization', token).end(function (err, res){
             const found = res.body.found
             expect(found).to.be.a('array').lengthOf(10)
@@ -44,7 +56,7 @@ describe('Users', function () {
     })
 
     test('Get movie tt0118715', function () {
-        chai.request(appExpress).get(apiPaths.getMovie(boratID)).set('Authorization', token).end(function (err, res){
+        chai.request(appExpress).get(apiPaths.getMovie.setPath("tt0118715")).set('Authorization', token).end(function (err, res){
             const id = res.body.id
             expect(id).to.be.a('string')
             

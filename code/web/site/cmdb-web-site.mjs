@@ -221,14 +221,16 @@ function webSite(config){
                 const skip = new Number(view.options.pageNumber) * 5 - 5
                 const token = getTokenFromCookie(req, rsp)
                 const result = await services.searchMovie(req.query.searchTerms, skip, 5, token)
-                view.options.movies = result.found.map(movieResultItem => {
-                    //console.log(movie)
-                    return {
-                        movieName: movieResultItem.title,
-                        movieDescription: movieResultItem.description,
-                        moviePage: webPages.pageOfAMovie.setUrl(movieResultItem.id)
-                    }
-                })
+                if(result!=null){
+                    view.options.movies = result.found.map(movieResultItem => {
+                        //console.log(movie)
+                        return {
+                            movieName: movieResultItem.title,
+                            movieDescription: movieResultItem.description,
+                            moviePage: webPages.pageOfAMovie.setUrl(movieResultItem.id)
+                        }
+                    })
+                }
                 rsp.render(view.file, view.options)
             } else {
                 view.options.nextLimit = 5
@@ -243,14 +245,16 @@ function webSite(config){
             const limit = !req.query.top ? 5 : req.query.top
             const token = getTokenFromCookie(req, rsp)
             const topMovies = await services.getTopMovies(limit, token)
-            view.options.movies = topMovies.top.map(movie => {
-                return {
-                    movieName: movie.name,
-                    movieDuration: "",
-                    moviePage: webPages.pageOfAMovie.setUrl(movie.id)
-                }
-            })
-    
+            if(topMovies!=null){
+                view.options.movies = topMovies.top.map(movie => {
+                    return {
+                        movieName: movie.name,
+                        movieDuration: "",
+                        moviePage: webPages.pageOfAMovie.setUrl(movie.id)
+                    }
+                })
+            }
+        
             rsp.render(view.file, view.options)
         }, rsp)
     })
@@ -275,7 +279,7 @@ function webSite(config){
             doesBodyContainProps(req.body, body.UserLoginRequest)
             const tokenAndUserID = await services.loginUser(req.body)
             processLoginOrRegister(req, resp, tokenAndUserID)
-            req.login(tokenAndUserID.token) // #passport https://www.passportjs.org/concepts/authentication/login/ https://stackoverflow.com/a/54274283/9375488
+            //req.login(tokenAndUserID.token) // #passport https://www.passportjs.org/concepts/authentication/login/ https://stackoverflow.com/a/54274283/9375488
             //next() // what is this next 'next' function? -> https://stackoverflow.com/a/46122356/9375488
         }, resp)
     })

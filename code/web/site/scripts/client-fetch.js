@@ -20,15 +20,15 @@ async function fetx(path, method, body){
                 //window.location=`/error?type=${response.statusText}` //omg I was using window.location.pathname and it was converting ? to %3F... https://stackoverflow.com/a/26377931/9375488
                 return null
             })
-        }
-
-        try {
-            const obj = await rsp.json()
-            console.log(`Fetch JSON response -> ${JSON.stringify(obj)}`)
-            return obj
-        } catch (e) {
-            console.log("Error parsing to json -> " + e)
-            return null
+        } else {
+            try {
+                const obj = await rsp.json()
+                console.log(`Fetch JSON response -> ${JSON.stringify(obj)}`)
+                return obj
+            } catch (e) {
+                console.log("Error parsing to json -> " + e)
+                return null
+            }
         }
     }).catch(e => {
         console.log("Request error -> "+e)

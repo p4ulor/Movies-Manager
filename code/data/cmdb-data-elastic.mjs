@@ -26,7 +26,9 @@ function elasticDB(config){
                     elasticFetx.createIndex(indexName)
                     console.log("created", indexName)
                 }
-            })  
+            }).catch(e => {
+                //console.log(`${e} occurred, skipping createOurIndexes`)
+            })
         })
     }
 
