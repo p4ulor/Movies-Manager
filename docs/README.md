@@ -48,6 +48,9 @@ The main challenge of this component was avoiding hardcoded and repetitive strin
 For both elastic search and mem-data, the same objects definition were used, as defined in `Code/data/cmdb-data-objs.mjs`. The root object of each entity has an `id` and a wrapper object which contains the data itself of the object. This ensures compatability with elastic-search
 
 # Entities / Objects
+
+![](./storage.png)
+
 ## **User**
 - id: `string` 
 ### UserObj
