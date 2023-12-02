@@ -15,3 +15,7 @@
 ## Demo
 
 
+
+https://github.com/p4ulor/Movies-Manager/assets/32241574/7a1d6088-6cc0-4b7f-b1c8-9e723a93c9a9
+
+
