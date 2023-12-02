@@ -101,7 +101,7 @@ export function server(config){ //in order be to be used in tests and be more fl
     app.use(express.static('./web/site/public')) //https://expressjs.com/en/starter/static-files.html
     app.use('/', authorizationMw) //this must be placed after the other "uses()" or things like req.cookie won't work
 
-    app.use('/js', express.static(path.resolve("../Code/web/site/scripts/").replace(/\\/g, '/'))) //https://stackoverflow.com/a/55279238/9375488   https://stackoverflow.com/a/60395362/9375488 Allows the successful use of <script src="/js/client-fetch.js"></script> inside .hbs files
+    app.use('/js', express.static(path.resolve("../code/web/site/scripts/").replace(/\\/g, '/'))) //https://stackoverflow.com/a/55279238/9375488   https://stackoverflow.com/a/60395362/9375488 Allows the successful use of <script src="/js/client-fetch.js"></script> inside .hbs files
 
     //API
     const api = theApi.default(config)

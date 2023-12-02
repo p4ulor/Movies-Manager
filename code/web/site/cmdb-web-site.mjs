@@ -18,7 +18,7 @@ export const webPages = {
         url:"/login",
         view: "login.hbs",
         wrongPW: "/login?wrongPW=true",
-        script: `${path.resolve("../Code/web/site/scripts/login.js").replace(/\\/g, '/')}` //https://stackoverflow.com/a/60395362/9375488
+        script: `${path.resolve("../code/web/site/scripts/login.js").replace(/\\/g, '/')}` //https://stackoverflow.com/a/60395362/9375488
     },
     register: {
         url:"/register",
