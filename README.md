@@ -16,6 +16,6 @@
 
 
 
-https://github.com/p4ulor/Movies-Manager/assets/32241574/7a1d6088-6cc0-4b7f-b1c8-9e723a93c9a9
+https://github.com/p4ulor/Movies-Manager/assets/32241574/b1e84167-0965-40c3-8bde-fbb849da7f62
 
 
